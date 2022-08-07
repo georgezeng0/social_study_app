@@ -3,6 +3,7 @@
 /**
  * Required modules
  */
+
 if(process.env.NODE_ENV !== "production"){
     require('dotenv').config();
 }
@@ -10,6 +11,8 @@ if(process.env.NODE_ENV !== "production"){
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
+const wrapAsync = require('./utils/wrapAsync')
+const AppError = require('./utils/appError')
 
 // Mongoose models
 const Flashcard = require('../models/flashcardSchema');
@@ -35,6 +38,7 @@ const PORT = process.env.PORT || 5000;
 /**
  * App Configuration
  */
+
 const app = express()
 
 // JSON body parser & url encoded bodies
@@ -50,52 +54,57 @@ app.get("/api", (req, res) => {
 })
 
 // Flashcard routes
-app.get("/api/flashcards", async(req, res, next)=> {
-    try {
-        const flashcards = await Flashcard.find(); 
-        res.send(flashcards)
-    } catch (error) {
-        next(error)
-    }
+app.get("/api/flashcards", wrapAsync(async(req, res, next)=> {
+    const flashcards = await Flashcard.find(); 
+    res.send(flashcards)
+}))
+
+app.post("/api/flashcards/new", wrapAsync(async (req, res, next) => {
+    const flashcard = new Flashcard(req.body); 
+    await flashcard.save()
+    res.send({message: "Flashcard created"})
+}))
+
+app.patch("/api/flashcards/:f_id", wrapAsync(async (req, res, next) => {
+    const updatedFlashcard = await Flashcard.findByIdAndUpdate(
+        req.params.f_id,
+        req.body,
+        { runValidators: true }
+    )
+    await updatedFlashcard.save()
+    res.send({
+        oldFlashcard: updatedFlashcard,
+        message: "Flashcard updated"
+    })
+}))
+
+app.delete("/api/flashcards/:f_id", wrapAsync(async (req, res, next) => {
+    const deletedFlashcard = await Flashcard.findByIdAndDelete(req.params.f_id)
+    res.send({
+        deletedFlashcard: deletedFlashcard,
+        message: "Flashcard deleted"
+    })
+}))
+
+/**
+ *  Error Handling
+ */
+
+// Find error names when testing > for handling specific error names
+app.use((err, req, res, next) => {
+    console.log(err.name); //Find error name
+    // if (err.name==="ValidationError") {
+    //     err=handleValidationErr(err); // Eaxmple: if validation error > handle it via another middleware (e.g. setting specific status/message)
+    // }
+
+    next(err)
 })
 
-app.post("/api/flashcards/new", async (req, res, next) => {
-    try {
-        const flashcard = new Flashcard(req.body); 
-        await flashcard.save()
-        res.send({message: "flashcard created"})
-    } catch (error) {
-        next(error)
-    }
+
+app.use((err, req, res, next) => {
+    const { status = 500, message = 'Internal Error' } = err;
+    res.status(status).send(message);
 })
-
-app.patch("/api/flashcards/:f_id", async (req, res, next) => {
-    try {
-        const updatedFlashcard = await Flashcard.findByIdAndUpdate(
-            req.params.f_id,
-            req.body,
-            { runValidators: true }
-        )
-        await updatedFlashcard.save()
-        res.send({
-            old: updatedFlashcard,
-            message: "flashcard updated"
-        })
-    } catch (error) {
-        next(error)
-    }
-})
-
-app.delete("/api/flashcards/:f_id", async (req, res, next) => {
-    try {
-        const deletedFlashcard = await Flashcard.findByIdAndDelete(req.params.f_id)
-        res.send({old: deletedFlashcard, message: "flashcard deleted"})
-    } catch (error) {
-        next(error)
-    }
-})
-
-
 
 /**
  * Server Activation
