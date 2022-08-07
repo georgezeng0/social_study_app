@@ -15,7 +15,9 @@ const wrapAsync = require('./utils/wrapAsync')
 const AppError = require('./utils/appError')
 
 // Mongoose models
-const Flashcard = require('../models/flashcardSchema');
+
+// Routes import
+const flashcardRoutes = require('./routes/flashcardRoutes')
 
 /**
  * App variables
@@ -54,37 +56,7 @@ app.get("/api", (req, res) => {
 })
 
 // Flashcard routes
-app.get("/api/flashcards", wrapAsync(async(req, res, next)=> {
-    const flashcards = await Flashcard.find(); 
-    res.send(flashcards)
-}))
-
-app.post("/api/flashcards/new", wrapAsync(async (req, res, next) => {
-    const flashcard = new Flashcard(req.body); 
-    await flashcard.save()
-    res.send({message: "Flashcard created"})
-}))
-
-app.patch("/api/flashcards/:f_id", wrapAsync(async (req, res, next) => {
-    const updatedFlashcard = await Flashcard.findByIdAndUpdate(
-        req.params.f_id,
-        req.body,
-        { runValidators: true }
-    )
-    await updatedFlashcard.save()
-    res.send({
-        oldFlashcard: updatedFlashcard,
-        message: "Flashcard updated"
-    })
-}))
-
-app.delete("/api/flashcards/:f_id", wrapAsync(async (req, res, next) => {
-    const deletedFlashcard = await Flashcard.findByIdAndDelete(req.params.f_id)
-    res.send({
-        deletedFlashcard: deletedFlashcard,
-        message: "Flashcard deleted"
-    })
-}))
+app.use("/api/flashcards",flashcardRoutes)
 
 /**
  *  Error Handling
@@ -96,14 +68,18 @@ app.use((err, req, res, next) => {
     // if (err.name==="ValidationError") {
     //     err=handleValidationErr(err); // Eaxmple: if validation error > handle it via another middleware (e.g. setting specific status/message)
     // }
-
     next(err)
 })
 
-
+// Final error handler
+// Deconstructs the status, message, name and stack from error object. If not in production, will send stack.
 app.use((err, req, res, next) => {
-    const { status = 500, message = 'Internal Error' } = err;
-    res.status(status).send(message);
+    const { status = 500, message = 'Internal Error', name = 'Error', stack } = err;
+    if (process.env.NODE_ENV !== "production") {
+        res.status(status).send({ errorName:name, message, stack })
+    } else {
+        res.status(status).send({ errorName:name, message });
+    }
 })
 
 /**
