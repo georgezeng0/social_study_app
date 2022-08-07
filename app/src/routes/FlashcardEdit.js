@@ -1,8 +1,11 @@
 import React from 'react'
+import { FlashcardForm } from '../components'
 
 const FlashcardEdit = () => {
   return (
-    <div>flashcardEdit</div>
+      <main>
+          <FlashcardForm formType='formEdit'/>
+    </main>
   )
 }
 

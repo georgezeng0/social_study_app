@@ -1,8 +1,13 @@
 import React from 'react'
+import { FlashcardForm } from '../components'
 
 const FlashcardNew = () => {
+    
+
   return (
-    <div>FlashcardNew</div>
+      <main>
+          <FlashcardForm formType='formNew'/>
+    </main>
   )
 }
 
