@@ -3,7 +3,8 @@ import axios from 'axios'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import {
-  FlashcardEdit, FlashcardNew, Flashcards, SingleFlashcard
+  FlashcardEdit, FlashcardNew, Flashcards, SingleFlashcard,
+  SetEdit, SetNew, SingleSet
 } from './routes'
 
 import { Navbar } from './components'
@@ -33,7 +34,10 @@ const App = () => {
         <Route path="/flashcards" element={<Flashcards/>}/>
         <Route path="/flashcards/create" element={<FlashcardNew/>}/>
         <Route path="/flashcards/:f_id" element={<SingleFlashcard/>}/>
-        <Route path="/flashcards/:f_id/edit" element={<FlashcardEdit/>}/>
+        <Route path="/flashcards/:f_id/edit" element={<FlashcardEdit />} />
+        <Route path="/sets/create" element={<SetNew/>}/>
+        <Route path="/sets/:s_id" element={<SingleSet/>}/>
+        <Route path="/sets/:s_id/edit" element={<SetEdit/>}/>
         <Route path="*" element={<h1>404</h1>}/>
     </Routes>
     </BrowserRouter>

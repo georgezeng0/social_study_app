@@ -18,6 +18,7 @@ const AppError = require('./utils/appError')
 
 // Routes import
 const flashcardRoutes = require('./routes/flashcardRoutes')
+const setRoutes = require('./routes/setRoutes')
 
 /**
  * App variables
@@ -56,7 +57,10 @@ app.get("/api", (req, res) => {
 })
 
 // Flashcard routes
-app.use("/api/flashcards",flashcardRoutes)
+app.use("/api/flashcards", flashcardRoutes)
+
+// Set routes
+app.use("/api/sets", setRoutes)
 
 /**
  *  Error Handling
