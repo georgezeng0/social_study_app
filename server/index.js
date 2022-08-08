@@ -68,7 +68,7 @@ app.use("/api/sets", setRoutes)
 
 // Find error names when testing > for handling specific error names
 app.use((err, req, res, next) => {
-    console.log(err.name); //Find error name
+    console.log(err); //Find error name
     // if (err.name==="ValidationError") {
     //     err=handleValidationErr(err); // Eaxmple: if validation error > handle it via another middleware (e.g. setting specific status/message)
     // }

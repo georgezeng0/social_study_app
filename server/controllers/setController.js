@@ -26,7 +26,7 @@ module.exports.updateSet = async (req, res, next) => {
 }
 
 module.exports.deleteSet = async (req, res, next) => {
-    const deletedSet= await Set.findByIdAndDelete(req.params.s_id)
+    const deletedSet = await Set.findOneAndDelete({ _id: req.params.s_id })
     res.send({
         deletedSet: deletedSet,
         message: "Set deleted"
@@ -34,6 +34,6 @@ module.exports.deleteSet = async (req, res, next) => {
 }
 
 module.exports.getSingleSet = async (req, res, next) => {
-    const set = await Set.findById(req.params.s_id) 
+    const set = await Set.findById(req.params.s_id).populate('flashcards') 
     res.send(set)
 }

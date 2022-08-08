@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
+import { Flashcards } from '../components'
 import { getSingleSet } from '../features/setSlice'
 
 const SingleSet = () => {
@@ -21,7 +22,8 @@ const SingleSet = () => {
       <h1>Flashcard Set</h1>
       <h3>Name: {name}</h3>
       <div>
-        <h5>Flashcards</h5>
+        <h4>Flashcards</h4>
+        <Flashcards/>
       </div>
     </main>
   )

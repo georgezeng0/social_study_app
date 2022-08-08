@@ -1,19 +1,21 @@
 import React from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { createFlashcard, updateForm, resetForm, editFlashcard } from '../features/flashcardSlice'
 
 
 const FlashcardForm = ({formType}) => {
     const dispatch = useDispatch()
-    const { f_id } = useParams();
-    const {front, back} = useSelector(state=>state.flashcard[formType])
+  const { f_id } = useParams();
+  const [searchParams, _] = useSearchParams();
+  const s_id = searchParams.get("set")
+  const { front, back } = useSelector(state => state.flashcard[formType])
 
-    const handleSubmit = (e) => {
+  const handleSubmit = (e) => {
         e.preventDefault()
         if (formType === 'formNew') {
-            dispatch(createFlashcard())
+            dispatch(createFlashcard(s_id))
             dispatch(resetForm({ formType }))
         } 
         if (formType === 'formEdit') {

@@ -4,9 +4,9 @@ const wrapAsync = require('../utils/wrapAsync');
 
 const { getFlashcards, createFlashcard, updateFlashcard, deleteFlashcard } = require('../controllers/flashcardController')
 
-router.get("/", wrapAsync(getFlashcards))
+router.get("/:s_id", wrapAsync(getFlashcards))
 
-router.post("/new", wrapAsync(createFlashcard))
+router.post("/:s_id/new", wrapAsync(createFlashcard))
 
 router.patch("/:f_id", wrapAsync(updateFlashcard))
 
