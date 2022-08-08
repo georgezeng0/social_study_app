@@ -32,3 +32,8 @@ module.exports.deleteSet = async (req, res, next) => {
         message: "Set deleted"
     })
 }
+
+module.exports.getSingleSet = async (req, res, next) => {
+    const set = await Set.findById(req.params.s_id) 
+    res.send(set)
+}

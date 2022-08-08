@@ -36,7 +36,7 @@ const Flashcards = () => {
 
 
           <div>
-              <h1>Flashcards</h1>
+              <h1>Flashcards - Likely only get flashcards per set</h1>
               <Link to='/flashcards/create'>New Flashcard</Link>
           </div>
           <div>

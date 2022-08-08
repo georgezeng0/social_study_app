@@ -1,8 +1,29 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
+import { getSingleSet } from '../features/setSlice'
 
 const SingleSet = () => {
+  const dispatch = useDispatch()
+  const { selectedSet } = useSelector(state=>state.set)
+  const { s_id } = useParams()
+  
+  const {_id='',name='',flashcards=[]} = selectedSet
+
+  useEffect(() => {
+    if (selectedSet?._id !== s_id) {
+      dispatch(getSingleSet(s_id))
+    }
+  }, [dispatch, s_id, selectedSet])
+  
   return (
-    <div>SingleSet</div>
+    <main>
+      <h1>Flashcard Set</h1>
+      <h3>Name: {name}</h3>
+      <div>
+        <h5>Flashcards</h5>
+      </div>
+    </main>
   )
 }
 

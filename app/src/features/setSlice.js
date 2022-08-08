@@ -7,7 +7,8 @@ const initialState = {
         isError: false,
         message: ''
     },
-    sets:[],
+    sets: [],
+    selectedSet: {},
     formNew: {
         name: ''
     },
@@ -16,8 +17,20 @@ const initialState = {
     }
 }
 
+export const getSingleSet = createAsyncThunk(
+    'set/getSingleSet',
+    async (s_id, thunkAPI) => {
+        try {
+            const res = await axios(`/api/sets/${s_id}`);
+            return res.data
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response.data.message);
+        }
+    }
+)
+
 export const getSets = createAsyncThunk(
-    'flashcard/getSets',
+    'set/getSets',
     async (_, thunkAPI) => {
         try {
             const res = await axios('/api/sets');
@@ -130,6 +143,20 @@ export const setSlice = createSlice({
             state.error.isError = false;
         },
         [editSet.rejected]: (state, action) => {
+            state.isLoading = false;
+            state.error.isError = true;
+            state.error.message = action.payload
+        },
+        [getSingleSet.pending]: (state) => {
+            state.error.isError = false;
+            state.isLoading = true
+        },
+        [getSingleSet.fulfilled]: (state,action) => {
+            state.isLoading = false;
+            state.error.isError = false;
+            state.selectedSet=action.payload
+        },
+        [getSingleSet.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
             state.error.message = action.payload
