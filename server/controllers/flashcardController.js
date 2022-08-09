@@ -23,10 +23,10 @@ module.exports.createFlashcard = async (req, res, next) => {
     const set = await Set.findById(s_id)
     const flashcard = new Flashcard(req.body); 
     set.flashcards.push(flashcard);
+    set.stats.numFlashcards += 1;
     flashcard.parentSet = set
     await set.save()
     await flashcard.save()
-    
     res.send({flashcard, message: "Flashcard created"})
 }
 
@@ -45,6 +45,9 @@ module.exports.updateFlashcard = async (req, res, next) => {
 
 module.exports.deleteFlashcard = async (req, res, next) => {
     const deletedFlashcard = await Flashcard.findByIdAndDelete(req.params.f_id)
+    const set = await Set.findById(deletedFlashcard.parentSet)
+    set.stats.numFlashcards -= 1;
+    await set.save()
     res.send({
         deletedFlashcard: deletedFlashcard,
         message: "Flashcard deleted"

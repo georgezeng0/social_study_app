@@ -9,7 +9,7 @@ const SingleSet = () => {
   const { selectedSet } = useSelector(state=>state.set)
   const { s_id } = useParams()
   
-  const {name=''} = selectedSet
+  const {name='', stats:{numFlashcards}} = selectedSet
 
   useEffect(() => {
     if (selectedSet?._id !== s_id) {
@@ -21,6 +21,7 @@ const SingleSet = () => {
     <main>
       <h1>Flashcard Set</h1>
       <h3>Name: {name}</h3>
+      <p>Number of flashcards: {numFlashcards}</p>
       <div>
         <h4>Flashcards</h4>
         <Flashcards/>

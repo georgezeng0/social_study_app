@@ -31,11 +31,11 @@ const Flashcard = ({ f_id }) => {
                 setPrevCardId(flashcards[index - 1]._id)
                 setNextCardId(flashcards[index+1]._id)
             }
-            if (index === 0) {
+            if (index === 0 && n>1) {
                 setPrevCardId('')
                 setNextCardId(flashcards[index+1]._id)
             }
-            if (index === n - 1) {
+            if (index === n - 1 && n>1) {
                 setPrevCardId(flashcards[index - 1]._id)
                 setNextCardId('')
             }
