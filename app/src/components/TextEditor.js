@@ -1,11 +1,14 @@
-import React, { useRef } from 'react'
+import React, { useRef,useState, useEffect } from 'react'
 import { Editor } from '@tinymce/tinymce-react';
 import { useDispatch } from 'react-redux';
 import { updateForm } from '../features/flashcardSlice';
+import Loading from './Loading';
+import styled from 'styled-components';
 
 const TextEditor = ({ value, name, formType }) => {
     // the controlled input value and the name of the input (e.g. front/ back) is passed as props
 
+    const [isLoading, setIsLoading] = useState(true)
     const dispatch = useDispatch();
     const editorRef = useRef(null);
     // const log = () => {
@@ -19,11 +22,16 @@ const TextEditor = ({ value, name, formType }) => {
     }
 
     return (
-      <>
-        <Editor
+        <Wrapper>
+            {isLoading && <Loading />}
+            <div className={isLoading?"hide":""}>
+                <Editor
                 tinymceScriptSrc={process.env.PUBLIC_URL + '/tinymce/tinymce.min.js'}
-                onInit={(evt, editor) => editorRef.current = editor}
-                initialValue={value}
+                onInit={(evt, editor) => {
+                    editorRef.current = editor
+                    setIsLoading(false)
+                }
+                }
                 init={{
                     height: 500,
                     menubar: true,
@@ -40,10 +48,17 @@ const TextEditor = ({ value, name, formType }) => {
                 }}
                 value={value}
                 onEditorChange={handleChange}
-        />
-      </>
+                />
+            </div>
+      </Wrapper>
     );
 }
+
+const Wrapper = styled.div`
+.hide{
+    display:none
+}
+`
 
 
 export default TextEditor

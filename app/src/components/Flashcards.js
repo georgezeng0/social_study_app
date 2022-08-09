@@ -15,10 +15,10 @@ const Flashcards = () => {
               <Link to={`/flashcards/create?set=${s_id}`}>New Flashcard</Link>
           </div>
           <div>
-              {flashcards && flashcards.map(flashcard => {
-                  const { _id, front, back } = flashcard
+              {flashcards && flashcards.map((flashcard,i) => {
+                  const { _id, front, back, title } = flashcard
                   return <div key={_id}>
-                      {front} - {back}
+                      <h4>{i+1} - {title}</h4>
                       <Link to={`/flashcards/${_id}`}>View</Link>
                       <Link to={`/flashcards/${_id}/edit`}>Edit</Link>
                       <button onClick={()=>dispatch(deleteFlashcard(_id))}>Delete</button>

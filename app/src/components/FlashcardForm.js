@@ -10,7 +10,7 @@ const FlashcardForm = ({formType}) => {
     const { f_id } = useParams();
     const [searchParams, _] = useSearchParams();
     const s_id = searchParams.get("set")
-  const { front, back } = useSelector(state => state.flashcard[formType])
+  const { front, back, title } = useSelector(state => state.flashcard[formType])
   
 
   useEffect(() => {
@@ -31,33 +31,29 @@ const FlashcardForm = ({formType}) => {
         }
     }
 
-  //   const handleChange = (e) => {
-  //       const name = e.target.name;
-  //       const value = e.target.value;
-  //       dispatch(updateForm({formType,name, value}))
-  // }
+    const handleChange = (e) => {
+        const name = e.target.name;
+        const value = e.target.value;
+        dispatch(updateForm({formType,name, value}))
+  }
   
 
   return (
     <form onSubmit={handleSubmit}>
       <div>
+        <h3><label htmlFor="front">Title</label></h3>
+        <input type="text" name="title" value={title}
+          onChange={handleChange}
+          placeholder="Something to describe this flashcard" />
+      </div>
+      <div>
         <h3><label htmlFor="front">Front</label></h3>
-            {/* <textarea
-                      name="front" id="front" cols="30" rows="10"
-                      onChange={handleChange}
-                      value={front}>
-                    </textarea> */}
             <TextEditor name='front' value={front} formType={formType}/>
       </div>
       
       <div>
         <h3><label htmlFor="back">Back</label></h3>
             <TextEditor name='back' value={back} formType={formType}/>
-          {/* <textarea
-              name="back" id="back" cols="30" rows="10"
-              onChange={handleChange}
-              value={back}>
-            </textarea> */}
       </div>
               
       <button>Submit</button>

@@ -14,11 +14,13 @@ const initialState = {
     },
     formNew: {
         front: '',
-        back: ''
+        back: '',
+        title: ''
     },
     formEdit: {
         front: '',
-        back: ''
+        back: '',
+        title: ''
     },
     editCard: {}
 }
@@ -69,8 +71,8 @@ export const createFlashcard = createAsyncThunk(
     'flashcard/createFlashcard',
     async (s_id, thunkAPI) => {
         try {
-            const { front, back } = thunkAPI.getState().flashcard.formNew
-            const res = await axios.post(`/api/flashcards/new/${s_id}`, { front, back });
+            const form = thunkAPI.getState().flashcard.formNew
+            const res = await axios.post(`/api/flashcards/new/${s_id}`, { ...form });
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data.message);
@@ -82,8 +84,8 @@ export const editFlashcard = createAsyncThunk(
     'flashcard/editFlashcard',
     async (f_id, thunkAPI) => {
         try {
-            const { front, back } = thunkAPI.getState().flashcard.formEdit
-            const res = await axios.patch(`/api/flashcards/${f_id}`, { front, back });
+            const form= thunkAPI.getState().flashcard.formEdit
+            const res = await axios.patch(`/api/flashcards/${f_id}`, { ...form });
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data.message);
@@ -112,10 +114,7 @@ export const flashcardSlice = createSlice({
             state[formType][name]=value
         },
         resetForm: (state, { payload: { formType } }) => {
-            state[formType] = {
-                front: '',
-                back: ''
-            }
+            state[formType] = initialState.formNew
         },
         setActiveCard: (state, { payload }) => {
             if (state.activeCard.card._id!==payload) {

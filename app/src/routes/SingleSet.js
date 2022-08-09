@@ -9,7 +9,7 @@ const SingleSet = () => {
   const { selectedSet } = useSelector(state=>state.set)
   const { s_id } = useParams()
   
-  const {_id='',name='',flashcards=[]} = selectedSet
+  const {name=''} = selectedSet
 
   useEffect(() => {
     if (selectedSet?._id !== s_id) {

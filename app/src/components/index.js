@@ -4,7 +4,8 @@ import SetForm from "./SetForm";
 import Flashcards from "./Flashcards";
 import Flashcard from "./Flashcard";
 import TextEditor from "./TextEditor";
+import Loading from "./Loading";
 
 export {
-    Navbar, FlashcardForm, SetForm, Flashcards,Flashcard,TextEditor
+    Navbar, FlashcardForm, SetForm, Flashcards,Flashcard,TextEditor,Loading
 }
