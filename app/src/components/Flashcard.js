@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { deleteFlashcard, getOneFlashcard, setActiveCard } from '../features/flashcardSlice'
 import styled from 'styled-components'
+import dompurifyHTML from '../utils/dompurifyHTML'
 
 const Flashcard = ({ f_id }) => {
     const dispatch = useDispatch()
@@ -49,12 +50,10 @@ const Flashcard = ({ f_id }) => {
               <button onClick={()=>setCardState({...cardState, showBack: !cardState.showBack})}>Toggle Answer</button>
           </div>
 
-          <article className='front'>
-              {card?.front}
+          <article className='front' dangerouslySetInnerHTML={{__html: dompurifyHTML(card.front)}}>
           </article>
 
-          <article className={`back ${cardState.showBack?'show':''}`}>
-              {card?.back}
+          <article className={`back ${cardState.showBack?'show':''}`} dangerouslySetInnerHTML={{__html: dompurifyHTML(card.back)}}>
           </article>
 
           <div>
