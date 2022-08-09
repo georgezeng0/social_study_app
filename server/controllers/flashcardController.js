@@ -10,6 +10,13 @@ module.exports.getFlashcards = async (req, res, next) => {
     res.send(flashcards)
 }
 
+// Get single flashcard
+module.exports.getOneFlashcard = async (req, res, next) => {
+    const { f_id } = req.params;
+    const flashcard = await Flashcard.findById(f_id);
+    res.send(flashcard);
+}
+
 // Create flashcard within a set
 module.exports.createFlashcard = async (req, res, next) => {
     const { s_id } = req.params

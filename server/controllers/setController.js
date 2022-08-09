@@ -26,6 +26,7 @@ module.exports.updateSet = async (req, res, next) => {
 }
 
 module.exports.deleteSet = async (req, res, next) => {
+    // Uses findOneAndDelete due to middleware that cascades the flashcard children
     const deletedSet = await Set.findOneAndDelete({ _id: req.params.s_id })
     res.send({
         deletedSet: deletedSet,

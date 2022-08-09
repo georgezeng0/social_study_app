@@ -3,6 +3,10 @@ import axios from 'axios'
 
 const initialState = {
     flashcards: [],
+    activeCard: {
+        card: {},
+        index: -1
+    },
     isLoading: false,
     error: {
         isError: false,
@@ -18,26 +22,41 @@ const initialState = {
     }
 }
 
-// Flashcards can be populated from the parent set object 
+// NB - Flashcards can be populated from the parent set object - avoids another call to API
+// Gets flashcards by set
+export const getFlashcards = createAsyncThunk(
+    'flashcard/getFlashcards',
+    async (s_id, thunkAPI) => {
+        try {
+            const res = await axios(`/api/flashcards/by_set/${s_id}`);
+            return res.data
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response.data.message);
+        }
+    }
+)
 
-// export const getFlashcards = createAsyncThunk(
-//     'flashcard/getFlashcards',
-//     async (s_id, thunkAPI) => {
-//         try {
-//             const res = await axios(`/api/flashcards/$[s_id}`);
-//             return res.data
-//         } catch (error) {
-//             return thunkAPI.rejectWithValue(error.response.data.message);
-//         }
-//     }
-// )
+export const getOneFlashcard = createAsyncThunk(
+    'flashcard/getOneFlashcard',
+    async (f_id, thunkAPI) => {
+        try {
+            const res = await axios(`/api/flashcards/${f_id}`);
+            if (res.data?.parentSet) {
+                thunkAPI.dispatch(getFlashcards(res.data.parentSet))
+            }
+            return res.data
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response.data.message);
+        }
+    }
+)
 
 export const createFlashcard = createAsyncThunk(
     'flashcard/createFlashcard',
     async (s_id, thunkAPI) => {
         try {
             const { front, back } = thunkAPI.getState().flashcard.formNew
-            const res = await axios.post(`/api/flashcards/${s_id}/new`, { front, back });
+            const res = await axios.post(`/api/flashcards/new/${s_id}`, { front, back });
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data.message);
@@ -83,23 +102,48 @@ export const flashcardSlice = createSlice({
                 front: '',
                 back: ''
             }
+        },
+        setActiveCard: (state, { payload }) => {
+            if (state.activeCard.card._id!==payload) {
+                state.activeCard.card = state.flashcards.find(card => card._id === payload)
+            }
+            state.activeCard.index = state.flashcards.reduce((foundIndex, card, i) => {
+                if (card._id === payload) {
+                    return i
+                }
+                return foundIndex
+            },-1)
         }
     },
     extraReducers: {
-        // [getFlashcards.pending]: (state) => {
-        //     state.error.isError = false;
-        //     state.isLoading = true
-        // },
-        // [getFlashcards.fulfilled]: (state,action) => {
-        //     state.isLoading = false;
-        //     state.error.isError = false;
-        //     state.flashcards = action.payload;
-        // },
-        // [getFlashcards.rejected]: (state, action) => {
-        //     state.isLoading = false;
-        //     state.error.isError = true;
-        //     state.error.message = action.payload
-        // },
+        [getFlashcards.pending]: (state) => {
+            state.error.isError = false;
+            state.isLoading = true
+        },
+        [getFlashcards.fulfilled]: (state,action) => {
+            state.isLoading = false;
+            state.error.isError = false;
+            state.flashcards = action.payload;
+        },
+        [getFlashcards.rejected]: (state, action) => {
+            state.isLoading = false;
+            state.error.isError = true;
+            state.error.message = action.payload
+        },
+        [getOneFlashcard.pending]: (state) => {
+            state.error.isError = false;
+            state.isLoading = true
+        },
+        [getOneFlashcard.fulfilled]: (state,action) => {
+            state.isLoading = false;
+            state.error.isError = false;
+            state.activeCard.card = action.payload;
+        },
+        [getOneFlashcard.rejected]: (state, action) => {
+            state.isLoading = false;
+            state.error.isError = true;
+            state.error.message = action.payload
+        },
         [createFlashcard.pending]: (state) => {
             state.error.isError = false;
             state.isLoading = true
@@ -142,6 +186,6 @@ export const flashcardSlice = createSlice({
     }
 })
 
-export const {updateForm, resetForm  } = flashcardSlice.actions
+export const {updateForm, resetForm,setActiveCard  } = flashcardSlice.actions
 
 export default flashcardSlice.reducer
