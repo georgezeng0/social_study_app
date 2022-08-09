@@ -19,8 +19,10 @@ const initialState = {
     formEdit: {
         front: '',
         back: ''
-    }
+    },
+    editCard: {}
 }
+    
 
 // NB - Flashcards can be populated from the parent set object - avoids another call to API
 // Gets flashcards by set
@@ -44,6 +46,18 @@ export const getOneFlashcard = createAsyncThunk(
             if (res.data?.parentSet) {
                 thunkAPI.dispatch(getFlashcards(res.data.parentSet))
             }
+            return res.data
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response.data.message);
+        }
+    }
+)
+
+export const populateFlashcardForm = createAsyncThunk(
+    'flashcard/populateFlashcardForm',
+    async (f_id, thunkAPI) => {
+        try {
+            const res = await axios(`/api/flashcards/${f_id}`);
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data.message);
@@ -113,7 +127,7 @@ export const flashcardSlice = createSlice({
                 }
                 return foundIndex
             },-1)
-        }
+        },
     },
     extraReducers: {
         [getFlashcards.pending]: (state) => {
@@ -179,6 +193,20 @@ export const flashcardSlice = createSlice({
             state.error.isError = false;
         },
         [deleteFlashcard.rejected]: (state, action) => {
+            state.isLoading = false;
+            state.error.isError = true;
+            state.error.message = action.payload
+        },
+        [populateFlashcardForm.pending]: (state) => {
+            state.error.isError = false;
+            state.isLoading = true
+        },
+        [populateFlashcardForm.fulfilled]: (state,action) => {
+            state.isLoading = false;
+            state.error.isError = false;
+            state.formEdit = {...action.payload, _id: undefined}
+        },
+        [populateFlashcardForm.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
             state.error.message = action.payload
