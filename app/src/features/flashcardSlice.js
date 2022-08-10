@@ -15,12 +15,22 @@ const initialState = {
     formNew: {
         front: '',
         back: '',
-        title: ''
+        title: '',
+        notes: '',
+        reversible: false,
+        stats: {
+            difficulty: '',
+        }
     },
     formEdit: {
         front: '',
         back: '',
-        title: ''
+        title: '',
+        notes: '',
+        reversible: false,
+        stats: {
+            difficulty: '',
+        },
     },
     editCard: {}
 }
@@ -111,7 +121,11 @@ export const flashcardSlice = createSlice({
     reducers: {
         updateForm: (state, { payload }) => {
             const { formType, name, value } = payload;
-            state[formType][name]=value
+            if (name === "difficulty") {
+                state[formType].stats.difficulty = value
+            } else {
+                state[formType][name] = value
+            }
         },
         resetForm: (state, { payload: { formType } }) => {
             state[formType] = initialState.formNew

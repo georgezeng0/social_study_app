@@ -10,7 +10,7 @@ const FlashcardForm = ({formType}) => {
     const { f_id } = useParams();
     const [searchParams, _] = useSearchParams();
     const s_id = searchParams.get("set")
-  const { front, back, title } = useSelector(state => state.flashcard[formType])
+  const { front, back, title, reversible, notes, stats: {difficulty} } = useSelector(state => state.flashcard[formType])
   
 
   useEffect(() => {
@@ -47,6 +47,18 @@ const FlashcardForm = ({formType}) => {
           placeholder="Something to describe this flashcard" />
       </div>
       <div>
+        <label htmlFor="difficulty">Difficulty</label>
+        <input type="range" id="difficulty" name="difficulty"
+          min="0" max="3" value={difficulty} onChange={handleChange}
+        />
+      </div>
+      <div>
+        <label htmlFor="reversible">Reversibility</label>
+        <input type="checkbox" id="reversible" name="reversible"
+         value={reversible} onChange={handleChange}
+        />
+      </div>
+      <div>
         <h3><label htmlFor="front">Front</label></h3>
             <TextEditor name='front' value={front} formType={formType}/>
       </div>
@@ -54,6 +66,11 @@ const FlashcardForm = ({formType}) => {
       <div>
         <h3><label htmlFor="back">Back</label></h3>
             <TextEditor name='back' value={back} formType={formType}/>
+      </div>
+
+      <div>
+        <h3><label htmlFor="notes">Notes</label></h3>
+            <TextEditor name='notes' value={notes} formType={formType}/>
       </div>
               
       <button>Submit</button>
