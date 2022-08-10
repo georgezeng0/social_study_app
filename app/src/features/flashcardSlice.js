@@ -19,7 +19,7 @@ const initialState = {
         notes: '',
         reversible: false,
         stats: {
-            difficulty: '',
+            difficulty: 0,
         }
     },
     formEdit: {
@@ -29,7 +29,7 @@ const initialState = {
         notes: '',
         reversible: false,
         stats: {
-            difficulty: '',
+            difficulty: 0,
         },
     },
     editCard: {}

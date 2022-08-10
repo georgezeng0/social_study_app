@@ -11,11 +11,29 @@ const Flashcard = ({ f_id }) => {
     const { flashcards, activeCard: { card, index } } = useSelector(state => state.flashcard)
     const [nextCardId, setNextCardId] = useState('')
     const [prevCardId, setPrevCardId] = useState('')
+    const [cardFront, setCardFront] = useState('')
+    const [cardBack, setCardBack] = useState('')
 
     const [cardState, setCardState] = useState({
         flip: false,
         showNotes: false
     })
+
+    useEffect(() => {
+        // Reset show notes on card change. Flip is not reset, but content shown varies on flip state.
+        setCardState({
+            // flip: false,
+            ...cardState,
+            showNotes: false
+        })
+        if (cardState.flip) {
+            setCardFront(card.back)
+            setCardBack(card.front)
+        } else {
+            setCardFront(card.front)
+            setCardBack(card.back)
+        }
+    },[f_id,card])
 
     useEffect(() => {
         if (!flashcards.length) {
@@ -71,12 +89,12 @@ const Flashcard = ({ f_id }) => {
               <div className={`_flip-card-inner ${cardState.flip?"_flip-action":''}`}>
               {/* Flip Card container for animation */}
         <div className="card _flip-front">
-          <article className='card-body container' dangerouslySetInnerHTML={{__html: dompurifyHTML(card.front)}}>
+          <article className='card-body container' dangerouslySetInnerHTML={{__html: dompurifyHTML(cardFront)}}>
               </article>
           </div>
 
           <div className={`card _flip-back`}>
-          <article className={`card-body container`} dangerouslySetInnerHTML={{__html: dompurifyHTML(card.back)}}>
+          <article className={`card-body container`} dangerouslySetInnerHTML={{__html: dompurifyHTML(cardBack)}}>
               </article>
               </div></div></div>
 
@@ -97,14 +115,14 @@ const Flashcard = ({ f_id }) => {
 const Wrapper = styled.section`
 ._flip-card{
     background-color: transparent;
-    perspective: 1000px;
+    perspective: 5000px;
     height: 400px;
 }
 ._flip-card-inner{
     position: relative;
     width: 100%;
     height: 100%;
-    transition: transform 0.8s;
+    transition: transform 0.7s;
     transform-style: preserve-3d;
 }
 ._flip-front,._flip-back{
@@ -116,7 +134,7 @@ const Wrapper = styled.section`
  }
 
 ._flip-back{
-transform: rotateY(180deg);
+    transform: rotateY(180deg);
 }
 ._flip-action{
   transform: rotateY(180deg);
