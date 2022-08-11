@@ -1,6 +1,17 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
 
+const initialForm= {
+    front: '',
+    back: '',
+    title: '',
+    notes: '',
+    reversible: false,
+    stats: {
+        difficulty: 0,
+    }
+}
+
 const initialState = {
     flashcards: [],
     activeCard: {
@@ -12,26 +23,8 @@ const initialState = {
         isError: false,
         message: ''
     },
-    formNew: {
-        front: '',
-        back: '',
-        title: '',
-        notes: '',
-        reversible: false,
-        stats: {
-            difficulty: 0,
-        }
-    },
-    formEdit: {
-        front: '',
-        back: '',
-        title: '',
-        notes: '',
-        reversible: false,
-        stats: {
-            difficulty: 0,
-        },
-    },
+    formNew: initialForm,
+    formEdit: initialForm,
     editCard: {}
 }
     
@@ -217,7 +210,7 @@ export const flashcardSlice = createSlice({
         [populateFlashcardForm.fulfilled]: (state,action) => {
             state.isLoading = false;
             state.error.isError = false;
-            state.formEdit = {...action.payload, _id: undefined}
+            state.formEdit = {...action.payload, _id: undefined, __v: undefined}
         },
         [populateFlashcardForm.rejected]: (state, action) => {
             state.isLoading = false;

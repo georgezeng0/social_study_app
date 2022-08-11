@@ -17,6 +17,7 @@ const Flashcards = () => {
     useEffect(() => {
         if (s_id) {
             setFlashcards(flashcards_set)
+            setSetId(s_id)
         }
         if (f_id) {
             setFlashcards(flashcards_)

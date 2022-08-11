@@ -8,11 +8,12 @@ const setSchema = new mongoose.Schema(
             required: true
         },
         flashcards: [{ type: mongoose.Schema.Types.ObjectId, ref: "Flashcard" }],
+        tags: [String],
         stats: {
             numFlashcards: { type: Number, default: 0 }
         },
         // owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
-        public: Boolean
+        isPublic: Boolean
     });
 
 setSchema.post('findOneAndDelete', async (set) => {

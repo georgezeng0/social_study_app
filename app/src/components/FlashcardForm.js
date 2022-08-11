@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { createFlashcard, updateForm, resetForm, editFlashcard, populateFlashcardForm } from '../features/flashcardSlice'
 import TextEditor from './TextEditor'
 
-const FlashcardForm = ({formType}) => {
+const FlashcardForm = ({formType, editNotesOnly}) => {
     const dispatch = useDispatch()
     const { f_id } = useParams();
     const [searchParams, _] = useSearchParams();
@@ -36,6 +36,17 @@ const FlashcardForm = ({formType}) => {
         const value = e.target.value;
         dispatch(updateForm({formType,name, value}))
   }
+
+  if (editNotesOnly) {
+return <form onSubmit={handleSubmit}>
+
+      <div>
+            <TextEditor name='notes' value={notes} formType={formType}/>
+      </div>
+              
+      <button>Submit</button>
+    </form>
+  }
   
 
   return (
@@ -46,6 +57,7 @@ const FlashcardForm = ({formType}) => {
           onChange={handleChange}
           placeholder="Something to describe this flashcard" />
       </div>
+      <h3>Options</h3>
       <div>
         <label htmlFor="difficulty">Difficulty</label>
         <input type="range" id="difficulty" name="difficulty"
@@ -53,7 +65,7 @@ const FlashcardForm = ({formType}) => {
         />
       </div>
       <div>
-        <label htmlFor="reversible">Reversibility</label>
+        <label htmlFor="reversible">Reversible</label>
         <input type="checkbox" id="reversible" name="reversible"
          value={reversible} onChange={handleChange}
         />

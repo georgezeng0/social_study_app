@@ -4,23 +4,26 @@ import { useNavigate } from 'react-router-dom'
 import { deleteFlashcard, getOneFlashcard, setActiveCard } from '../features/flashcardSlice'
 import styled from 'styled-components'
 import dompurifyHTML from '../utils/dompurifyHTML'
+import FlashcardForm from './FlashcardForm'
 
 const Flashcard = ({ f_id }) => {
     const dispatch = useDispatch()
     const navigate = useNavigate();
     const { flashcards, activeCard: { card, index } } = useSelector(state => state.flashcard)
+
     const [nextCardId, setNextCardId] = useState('')
     const [prevCardId, setPrevCardId] = useState('')
     const [cardFront, setCardFront] = useState('')
     const [cardBack, setCardBack] = useState('')
-
+    const [showEditNotes,setShowEditNotes] = useState(false)
     const [cardState, setCardState] = useState({
         flip: false,
         showNotes: false
     })
 
+    // Reset notes show on card change. Flip is not reset, but content shown varies on flip state.
+    // So that the front card is always shown first
     useEffect(() => {
-        // Reset show notes on card change. Flip is not reset, but content shown varies on flip state.
         setCardState({
             // flip: false,
             ...cardState,
@@ -35,6 +38,7 @@ const Flashcard = ({ f_id }) => {
         }
     },[f_id,card])
 
+    // Gets the list of flashcards in the set, if flashcards already in the store, then set activec card to selected card
     useEffect(() => {
         if (!flashcards.length) {
             dispatch(getOneFlashcard(f_id))
@@ -43,6 +47,7 @@ const Flashcard = ({ f_id }) => {
         }
     }, [dispatch, flashcards, f_id])
     
+    // Logic for next/ previous card buttons
     useEffect(() => {
         if (flashcards.length && card._id===f_id) {
             const n = flashcards.length
@@ -101,10 +106,15 @@ const Flashcard = ({ f_id }) => {
               
                   
               <div className={`_notes container ${cardState.showNotes ? 'd-block' : 'd-none'}`} >
-                <h5 className='display-6 border-bottom'>Notes</h5>
-              <p dangerouslySetInnerHTML={{ __html: dompurifyHTML(card.notes) }}
-              className='p-2'
-              ></p>
+              <h5 className='display-6 border-bottom'>Notes</h5>
+              <button onClick={() => setShowEditNotes(!showEditNotes)}>
+                  {showEditNotes ? "Cancel Editing":"Edit Notes"}</button>
+              {showEditNotes ?
+                  <FlashcardForm formType="formEdit" editNotesOnly={true} /> :
+                  <p dangerouslySetInnerHTML={{ __html: dompurifyHTML(card.notes) }}
+                      className='p-2'
+                  ></p>
+              }
               </div>
 
               

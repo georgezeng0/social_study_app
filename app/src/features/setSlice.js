@@ -1,6 +1,12 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
 
+const initialForm = {
+    name: '',
+    tags: [],
+    isPublic: false,
+}
+
 const initialState = {
     isLoading: false,
     error: {
@@ -9,13 +15,11 @@ const initialState = {
     },
     sets: [],
     selectedSet: {},
-    formNew: {
-        name: ''
-    },
-    formEdit: {
-        name: ''
-    }
-}
+    formNew: initialForm,
+    formEdit: initialForm,
+    tagsList: ["General", "Medicine", "Science", "History", "Geography", "Language", "Arts", "Movies", "Books", "IT"]
+    // Fixed tags list? or can this be updated dynamically e.g. database
+} 
 
 export const getSingleSet = createAsyncThunk(
     'set/getSingleSet',
@@ -45,8 +49,20 @@ export const createSet = createAsyncThunk(
     'set/createSet',
     async (_, thunkAPI) => {
         try {
-            const { name } = thunkAPI.getState().set.formNew
-            const res = await axios.post('/api/sets/new', { name });
+            const form = thunkAPI.getState().set.formNew
+            const res = await axios.post('/api/sets/new', form);
+            return res.data
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response.data.message);
+        }
+    }
+)
+
+export const populateSetForm = createAsyncThunk(
+    'set/populateSetForm',
+    async (s_id, thunkAPI) => {
+        try {
+            const res = await axios(`/api/sets/${s_id}`);
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data.message);
@@ -58,8 +74,8 @@ export const editSet = createAsyncThunk(
     'set/editSet',
     async (s_id, thunkAPI) => {
         try {
-            const { name } = thunkAPI.getState().set.formEdit
-            const res = await axios.patch(`/api/sets/${s_id}`, { name });
+            const form = thunkAPI.getState().set.formEdit
+            const res = await axios.patch(`/api/sets/${s_id}`, form);
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data.message);
@@ -85,12 +101,23 @@ export const setSlice = createSlice({
     reducers: {
         updateForm: (state, { payload }) => {
             const { formType, name, value } = payload;
-            state[formType][name]=value
+            if (name === "tags") {
+                const index = state[formType].tags.indexOf(value)
+                if (index>-1) {
+                    state[formType].tags.splice(index, 1)
+                } else {
+                    state[formType].tags.push(value)
+                }
+            } 
+            else if (name === "isPublic") {
+                state[formType].isPublic=!state[formType].isPublic
+            }
+            else {
+                state[formType][name] = value
+            }
         },
         resetForm: (state, { payload: { formType } }) => {
-            state[formType] = {
-                name:''
-            }
+            state[formType] = initialForm
         }
     },
     extraReducers: {
@@ -160,7 +187,21 @@ export const setSlice = createSlice({
             state.isLoading = false;
             state.error.isError = true;
             state.error.message = action.payload
-        }
+        },
+        [populateSetForm.pending]: (state) => {
+            state.error.isError = false;
+            state.isLoading = true
+        },
+        [populateSetForm.fulfilled]: (state,action) => {
+            state.isLoading = false;
+            state.error.isError = false;
+            state.formEdit={...action.payload, _id:undefined, __v: undefined}
+        },
+        [populateSetForm.rejected]: (state, action) => {
+            state.isLoading = false;
+            state.error.isError = true;
+            state.error.message = action.payload
+        }        
     }
 })
 
