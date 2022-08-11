@@ -44,7 +44,7 @@ module.exports.updateFlashcard = async (req, res, next) => {
 }
 
 module.exports.deleteFlashcard = async (req, res, next) => {
-    const deletedFlashcard = await Flashcard.findByIdAndDelete(req.params.f_id)
+    const deletedFlashcard = await Flashcard.findOneAndDelete({ _id: req.params.f_id })
     const set = await Set.findById(deletedFlashcard.parentSet)
     set.stats.numFlashcards -= 1;
     await set.save()

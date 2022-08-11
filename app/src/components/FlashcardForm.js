@@ -39,7 +39,7 @@ const FlashcardForm = ({formType, editNotesOnly}) => {
                       return data;
                   }
             })
-            dispatch(updateForm({formType,name: "image", value: res.data.url}))
+        dispatch(updateForm({ formType, name: "image", value: { url: res.data.url, publicID: res.data.public_id } }))
           return res.data.url
       } catch (error) {
           console.log(error);
@@ -123,7 +123,7 @@ const FlashcardForm = ({formType, editNotesOnly}) => {
             
         </div>
         <div>
-          <img src={currentImage} alt="" width="200px" />
+          <img src={currentImage.url} alt="" width="200px" />
         </div>
       </div>
 

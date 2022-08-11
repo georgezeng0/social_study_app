@@ -91,7 +91,7 @@ const Flashcard = ({ f_id }) => {
           </div>
 
           <div className="card">
-              <img src={card.image} alt="" className="card-image" />
+              <img src={card?.image?.url} alt="" className="card-image" />
           </div>
 
           <div className={`_flip-card `}>

@@ -7,7 +7,11 @@ const initialForm= {
     title: '',
     notes: '',
     reversible: false,
-    image: '',
+    image: {
+        url: '',
+        thumb: '',
+        publicID: ''
+    },
     stats: {
         difficulty: 0,
     }

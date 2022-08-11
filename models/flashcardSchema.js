@@ -1,4 +1,11 @@
 const mongoose = require('mongoose');
+const axios = require('axios')
+
+if(process.env.NODE_ENV !== "production"){
+    require('dotenv').config();
+}
+
+const cloudinary = require('cloudinary').v2;
 
 const flashcardSchema = new mongoose.Schema(
     {
@@ -12,8 +19,22 @@ const flashcardSchema = new mongoose.Schema(
             difficulty: Number, // 0-3 : Easy, Medium, Hard, Very Hard
             // attempts tracking, + more stats?
         },
-        image: String
+        image: {
+            url: String,
+            thumb: String,
+            publicID: String
+        }
     });
+
+// Deleting flashcard also deletes the image from Cloudinary
+flashcardSchema.post('findOneAndDelete', (card) => {
+    if (card.image.publicID) {
+        cloudinary.uploader.destroy(card.image.publicID, function(error,result) {
+            console.log("Delete Cloudinary image post-flashcard deletion :",result, error) });
+    }
+    
+})
+
 
 const Flashcard = mongoose.model('Flashcard', flashcardSchema);
 
