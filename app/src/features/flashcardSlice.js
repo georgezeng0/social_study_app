@@ -7,6 +7,7 @@ const initialForm= {
     title: '',
     notes: '',
     reversible: false,
+    image: '',
     stats: {
         difficulty: 0,
     }

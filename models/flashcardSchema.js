@@ -11,7 +11,8 @@ const flashcardSchema = new mongoose.Schema(
         stats: {
             difficulty: Number, // 0-3 : Easy, Medium, Hard, Very Hard
             // attempts tracking, + more stats?
-        }
+        },
+        image: String
     });
 
 const Flashcard = mongoose.model('Flashcard', flashcardSchema);

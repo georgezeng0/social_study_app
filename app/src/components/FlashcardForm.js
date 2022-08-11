@@ -1,31 +1,64 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams, useSearchParams } from 'react-router-dom'
+import styled from 'styled-components'
 import { createFlashcard, updateForm, resetForm, editFlashcard, populateFlashcardForm } from '../features/flashcardSlice'
 import TextEditor from './TextEditor'
+import axios from 'axios'
 
 const FlashcardForm = ({formType, editNotesOnly}) => {
     const dispatch = useDispatch()
     const { f_id } = useParams();
     const [searchParams, _] = useSearchParams();
     const s_id = searchParams.get("set")
-  const { front, back, title, reversible, notes, stats: {difficulty} } = useSelector(state => state.flashcard[formType])
+  const { front, back, title, reversible, image: currentImage, notes, stats: {difficulty} } = useSelector(state => state.flashcard[formType])
   
+  const [image, setImage] = useState('');
 
   useEffect(() => {
     if (formType === 'formEdit') {
       dispatch(populateFlashcardForm(f_id))
     }
-  }, [formType,dispatch])
+  }, [formType, dispatch])
+  
+  // Uses cloudinary upload API
+  const url = `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_NAME}/image/upload`
+  const imageUpload = async () => {
+      const formData = new FormData();
+      // Update formData object to send to cloudinary
+      formData.append("file", image)
+      formData.append("upload_preset",process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET)
+      formData.append("folder","food_delivery_app") // folder on cloudinary
+      try {
+          const res = await axios.post(url, formData,
+              {
+                  transformRequest: (data, headers) => {
+                      headers["X-Requested-With"]="XMLHttpRequest"
+                      delete headers['Authorization'];
+                      return data;
+                  }
+            })
+            dispatch(updateForm({formType,name: "image", value: res.data.url}))
+          return res.data.url
+      } catch (error) {
+          console.log(error);
+      }
+  }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
         e.preventDefault()
-        if (formType === 'formNew') {
+    if (formType === 'formNew') {
+      if (image) {
+            await imageUpload()
+          }
             dispatch(createFlashcard(s_id))
             dispatch(resetForm({ formType }))
         } 
-        if (formType === 'formEdit') {
+    if (formType === 'formEdit') {
+      if (image) {
+        await imageUpload()
+      }
             dispatch(editFlashcard(f_id))
             dispatch(resetForm({ formType }))
         }
@@ -37,8 +70,9 @@ const FlashcardForm = ({formType, editNotesOnly}) => {
         dispatch(updateForm({formType,name, value}))
   }
 
+  // Return only the notes editor of the form
   if (editNotesOnly) {
-return <form onSubmit={handleSubmit}>
+    return <form onSubmit={handleSubmit}>
 
       <div>
             <TextEditor name='notes' value={notes} formType={formType}/>
@@ -50,7 +84,7 @@ return <form onSubmit={handleSubmit}>
   
 
   return (
-    <form onSubmit={handleSubmit}>
+    <Wrapper onSubmit={handleSubmit}>
       <div>
         <h3><label htmlFor="front">Title</label></h3>
         <input type="text" name="title" value={title}
@@ -70,6 +104,29 @@ return <form onSubmit={handleSubmit}>
          value={reversible} onChange={handleChange}
         />
       </div>
+
+      <div>
+        <h3>Main Image</h3>
+        
+        {/* Image */}
+        <div>
+            {image && <div className='preview-container'>
+                <span id='preview-text'>PREVIEW</span>
+                <img className="preview-img" src={URL.createObjectURL(image)} alt="" />
+                </div>
+            }
+            <label htmlFor="image">{formType==="formNew" ? `Select` : `Edit`} Image</label>
+            
+            <input type="file" accept="image/*" name="image" id="image"
+                onChange={e => setImage(e.target.files[0])}
+            />
+            
+        </div>
+        <div>
+          <img src={currentImage} alt="" width="200px" />
+        </div>
+      </div>
+
       <div>
         <h3><label htmlFor="front">Front</label></h3>
             <TextEditor name='front' value={front} formType={formType}/>
@@ -86,8 +143,48 @@ return <form onSubmit={handleSubmit}>
       </div>
               
       <button>Submit</button>
-    </form>
+    </Wrapper>
   )
 }
+
+const Wrapper = styled.form`
+#image{
+    width: 75%;
+    padding: 10px;
+    border: 2px solid var(--secondary-2);
+}
+.preview-container{
+    position: relative;
+}
+#preview-text{
+    position: absolute;
+    top: 40%;
+    width: 100%;
+    text-align: center;
+    font-size: 1.2rem;
+    color: white;
+    text-shadow: 0px 0px 5px black;
+}
+.preview-img{
+    width: 250px;
+    margin: 5px
+}
+.preview-container{
+    position: relative;
+}
+#preview-text{
+    position: absolute;
+    top: 40%;
+    width: 100%;
+    text-align: center;
+    font-size: 1.2rem;
+    color: white;
+    text-shadow: 0px 0px 5px black;
+}
+.preview-img{
+    width: 250px;
+    margin: 5px
+}
+`
 
 export default FlashcardForm

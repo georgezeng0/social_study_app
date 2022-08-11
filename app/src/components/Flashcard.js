@@ -90,6 +90,10 @@ const Flashcard = ({ f_id }) => {
               <button onClick={()=>setCardState({...cardState, showNotes: !cardState.showNotes})}>Show/Hide Notes</button>
           </div>
 
+          <div className="card">
+              <img src={card.image} alt="" className="card-image" />
+          </div>
+
           <div className={`_flip-card `}>
               <div className={`_flip-card-inner ${cardState.flip?"_flip-action":''}`}>
               {/* Flip Card container for animation */}
