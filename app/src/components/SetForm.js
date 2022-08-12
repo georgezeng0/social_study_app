@@ -2,12 +2,16 @@ import React,{ useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { createSet,resetForm,updateForm,editSet, populateSetForm } from '../features/setSlice'
+import { Error } from '../routes'
+import AsyncModal from './AsyncModal'
+import Loading from './Loading'
+
 
 
 const SetForm = ({formType}) => {
     const dispatch = useDispatch()
     const { s_id } = useParams();
-  const { [formType]: { name, tags, isPublic }, tagsList } = useSelector(state => state.set)
+  const { [formType]: { name, tags, isPublic }, tagsList, error:{isError,message, status}, isLoading } = useSelector(state => state.set)
   
   useEffect(() => {
     if (formType === "formEdit") {
@@ -31,9 +35,10 @@ const SetForm = ({formType}) => {
         const name = e.target.name;
         const value = e.target.value;
         dispatch(updateForm({formType,name, value}))
-    }
+  }
 
   return (
+    <>
     <form onSubmit={handleSubmit}>
       <div>
         <h3><label htmlFor="name">Set Name</label></h3>
@@ -61,7 +66,10 @@ const SetForm = ({formType}) => {
       </div>
 
       <button>Submit</button>
-    </form>
+      </form>
+      
+      <AsyncModal props={{ isError, status, message, isLoading }} />
+      </>
   )
 }
 

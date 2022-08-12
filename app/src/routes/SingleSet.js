@@ -1,15 +1,19 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams, Link } from 'react-router-dom'
-import { Flashcards } from '../components'
-import { deleteSet, getSingleSet } from '../features/setSlice'
+import { Flashcards, Loading } from '../components'
+import { deleteSet, getSingleSet,resetError } from '../features/setSlice'
+import Error from './Error'
 
 const SingleSet = () => {
   const dispatch = useDispatch()
-  const { selectedSet } = useSelector(state=>state.set)
+  const { selectedSet, error:{isError,message, status}, isLoading } = useSelector(state=>state.set)
   const { s_id } = useParams()
   
-  
+  // Reset any errors in the set store on page load
+  useEffect(() => {
+    dispatch(resetError())
+  },[])
 
   useEffect(() => {
     if (selectedSet?._id !== s_id) {
@@ -19,6 +23,14 @@ const SingleSet = () => {
   
   const { name = '', stats = {}, tags=[], isPublic } = selectedSet
   const { numFlashcards } = stats
+
+  if (isLoading) {
+    return <Loading/>
+  }
+
+  if (isError) {
+    return <Error status={status} message={message} />
+  }
 
   return (
     <main>

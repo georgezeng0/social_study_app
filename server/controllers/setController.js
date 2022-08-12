@@ -1,5 +1,6 @@
 // const mongoose = require('mongoose');
 const Set = require('../../models/setSchema');
+const AppError = require('../utils/appError')
 
 module.exports.getSets = async (req, res, next) => {
     const sets = await Set.find(); 
@@ -36,5 +37,9 @@ module.exports.deleteSet = async (req, res, next) => {
 
 module.exports.getSingleSet = async (req, res, next) => {
     const set = await Set.findById(req.params.s_id).populate('flashcards') 
+    if (!set) {
+        // If Set not found
+        return next(new AppError(404, "Set not found."))
+    }
     res.send(set)
 }

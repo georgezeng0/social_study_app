@@ -26,7 +26,8 @@ const initialState = {
     isLoading: false,
     error: {
         isError: false,
-        message: ''
+        message: '',
+        status: ''
     },
     formNew: initialForm,
     formEdit: initialForm,
@@ -43,7 +44,7 @@ export const getFlashcards = createAsyncThunk(
             const res = await axios(`/api/flashcards/by_set/${s_id}`);
             return res.data
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.message);
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
         }
     }
 )
@@ -58,7 +59,7 @@ export const getOneFlashcard = createAsyncThunk(
             }
             return res.data
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.message);
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
         }
     }
 )
@@ -70,7 +71,7 @@ export const populateFlashcardForm = createAsyncThunk(
             const res = await axios(`/api/flashcards/${f_id}`);
             return res.data
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.message);
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
         }
     }
 )
@@ -83,7 +84,7 @@ export const createFlashcard = createAsyncThunk(
             const res = await axios.post(`/api/flashcards/new/${s_id}`, { ...form });
             return res.data
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.message);
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
         }
     }
 )
@@ -96,7 +97,7 @@ export const editFlashcard = createAsyncThunk(
             const res = await axios.patch(`/api/flashcards/${f_id}`, { ...form });
             return res.data
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.message);
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
         }
     }
 )
@@ -108,7 +109,7 @@ export const deleteFlashcard = createAsyncThunk(
             const res = await axios.delete(`/api/flashcards/${f_id}`);
             return res.data
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.message);
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
         }
     }
 )
@@ -153,7 +154,7 @@ export const flashcardSlice = createSlice({
         [getFlashcards.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
-            state.error.message = action.payload
+            state.error = { ...state.error, ...action.payload }
         },
         [getOneFlashcard.pending]: (state) => {
             state.error.isError = false;
@@ -167,7 +168,7 @@ export const flashcardSlice = createSlice({
         [getOneFlashcard.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
-            state.error.message = action.payload
+            state.error = { ...state.error, ...action.payload }
         },
         [createFlashcard.pending]: (state) => {
             state.error.isError = false;
@@ -180,7 +181,7 @@ export const flashcardSlice = createSlice({
         [createFlashcard.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
-            state.error.message = action.payload
+            state.error = { ...state.error, ...action.payload }
         },
         [editFlashcard.pending]: (state) => {
             state.error.isError = false;
@@ -193,7 +194,7 @@ export const flashcardSlice = createSlice({
         [editFlashcard.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
-            state.error.message = action.payload
+            state.error = { ...state.error, ...action.payload }
         },
         [deleteFlashcard.pending]: (state) => {
             state.error.isError = false;
@@ -206,7 +207,7 @@ export const flashcardSlice = createSlice({
         [deleteFlashcard.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
-            state.error.message = action.payload
+            state.error = { ...state.error, ...action.payload }
         },
         [populateFlashcardForm.pending]: (state) => {
             state.error.isError = false;
@@ -220,7 +221,7 @@ export const flashcardSlice = createSlice({
         [populateFlashcardForm.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
-            state.error.message = action.payload
+            state.error = { ...state.error, ...action.payload }
         }
     }
 })

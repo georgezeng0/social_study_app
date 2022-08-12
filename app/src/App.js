@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import {
   FlashcardEdit, FlashcardNew, Flashcards, SingleFlashcard,
-  SetEdit, SetNew, SingleSet
+  SetEdit, SetNew, SingleSet, Error
 } from './routes'
 
 import { Navbar } from './components'
@@ -38,7 +38,7 @@ const App = () => {
         <Route path="/sets/create" element={<SetNew/>}/>
         <Route path="/sets/:s_id" element={<SingleSet/>}/>
         <Route path="/sets/:s_id/edit" element={<SetEdit/>}/>
-        <Route path="*" element={<h1>404</h1>}/>
+        <Route path="*" element={<Error status="404" message="Page not found!" />}/>
     </Routes>
     </BrowserRouter>
   )

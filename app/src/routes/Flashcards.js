@@ -3,15 +3,26 @@ import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect } from 'react'
-import { deleteSet,getSets} from '../features/setSlice'
+import { deleteSet,getSets, resetError} from '../features/setSlice'
+import { Loading } from '../components'
+import Error from './Error'
 
 const Flashcards = () => {
-    const { sets } = useSelector(state => state.set)
+    const { sets, isLoading, error:{isError,status,message} } = useSelector(state => state.set)
     const dispatch = useDispatch()
 
     useEffect(() => {
+        dispatch(resetError())
         dispatch(getSets())
-    },[dispatch])
+    }, [dispatch])
+    
+    if (isLoading) {
+        return <Loading/>
+    }
+
+    if (isError) {
+        return <Error status={status} message={message} />
+    }
 
   return (
       <Wrapper>
@@ -30,8 +41,6 @@ const Flashcards = () => {
                   </div>
               })}
           </div>
-
-
           
     </Wrapper>
   )

@@ -11,6 +11,7 @@ const initialState = {
     isLoading: false,
     error: {
         isError: false,
+        status: '',
         message: ''
     },
     sets: [],
@@ -28,7 +29,7 @@ export const getSingleSet = createAsyncThunk(
             const res = await axios(`/api/sets/${s_id}`);
             return res.data
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.message);
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
         }
     }
 )
@@ -40,7 +41,7 @@ export const getSets = createAsyncThunk(
             const res = await axios('/api/sets');
             return res.data
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.message);
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
         }
     }
 )
@@ -53,7 +54,7 @@ export const createSet = createAsyncThunk(
             const res = await axios.post('/api/sets/new', form);
             return res.data
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.message);
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
         }
     }
 )
@@ -65,7 +66,7 @@ export const populateSetForm = createAsyncThunk(
             const res = await axios(`/api/sets/${s_id}`);
             return res.data
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.message);
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
         }
     }
 )
@@ -78,7 +79,7 @@ export const editSet = createAsyncThunk(
             const res = await axios.patch(`/api/sets/${s_id}`, form);
             return res.data
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.message);
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
         }
     }
 )
@@ -90,7 +91,7 @@ export const deleteSet = createAsyncThunk(
             const res = await axios.delete(`/api/sets/${s_id}`);
             return res.data
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data.message);
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
         }
     }
 )
@@ -118,6 +119,9 @@ export const setSlice = createSlice({
         },
         resetForm: (state, { payload: { formType } }) => {
             state[formType] = initialForm
+        },
+        resetError: (state, action) => {
+            state.error=initialState.error
         }
     },
     extraReducers: {
@@ -132,7 +136,7 @@ export const setSlice = createSlice({
         [createSet.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
-            state.error.message = action.payload
+            state.error = { ...state.error, ...action.payload }
         },
         [getSets.pending]: (state) => {
             state.error.isError = false;
@@ -146,7 +150,7 @@ export const setSlice = createSlice({
         [getSets.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
-            state.error.message = action.payload
+            state.error = { ...state.error, ...action.payload }
         },
         [deleteSet.pending]: (state) => {
             state.error.isError = false;
@@ -159,7 +163,7 @@ export const setSlice = createSlice({
         [deleteSet.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
-            state.error.message = action.payload
+            state.error = { ...state.error, ...action.payload }
         },
         [editSet.pending]: (state) => {
             state.error.isError = false;
@@ -172,7 +176,7 @@ export const setSlice = createSlice({
         [editSet.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
-            state.error.message = action.payload
+            state.error = { ...state.error, ...action.payload }
         },
         [getSingleSet.pending]: (state) => {
             state.error.isError = false;
@@ -186,7 +190,7 @@ export const setSlice = createSlice({
         [getSingleSet.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
-            state.error.message = action.payload
+            state.error = { ...state.error, ...action.payload }
         },
         [populateSetForm.pending]: (state) => {
             state.error.isError = false;
@@ -200,11 +204,11 @@ export const setSlice = createSlice({
         [populateSetForm.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
-            state.error.message = action.payload
+            state.error = { ...state.error, ...action.payload }
         }        
     }
 })
 
-export const { updateForm, resetForm} = setSlice.actions
+export const { updateForm, resetForm, resetError} = setSlice.actions
 
 export default setSlice.reducer

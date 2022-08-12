@@ -6,13 +6,16 @@ import styled from 'styled-components'
 import { createFlashcard, updateForm, resetForm, editFlashcard, populateFlashcardForm } from '../features/flashcardSlice'
 import TextEditor from './TextEditor'
 import axios from 'axios'
+import AsyncModal from './AsyncModal'
 
 const FlashcardForm = ({formType, editNotesOnly}) => {
     const dispatch = useDispatch()
     const { f_id } = useParams();
     const [searchParams, _] = useSearchParams();
     const s_id = searchParams.get("set")
-  const { front, back, title, reversible, image: currentImage, notes, stats: {difficulty} } = useSelector(state => state.flashcard[formType])
+  const { [formType]: { front, back, title, reversible, image: currentImage, notes, stats: { difficulty } },
+    error: { isError, status, message }, isLoading
+  } = useSelector(state => state.flashcard)
   
   const [image, setImage] = useState('');
 
@@ -84,6 +87,7 @@ const FlashcardForm = ({formType, editNotesOnly}) => {
   
 
   return (
+    <>
     <Wrapper onSubmit={handleSubmit}>
       <div>
         <h3><label htmlFor="front">Title</label></h3>
@@ -123,7 +127,7 @@ const FlashcardForm = ({formType, editNotesOnly}) => {
             
         </div>
         <div>
-          <img src={currentImage.url} alt="" width="200px" />
+          <img src={currentImage?.url} alt="" width="200px" />
         </div>
       </div>
 
@@ -143,7 +147,10 @@ const FlashcardForm = ({formType, editNotesOnly}) => {
       </div>
               
       <button>Submit</button>
+      
     </Wrapper>
+    <AsyncModal props={{ isError, status, message, isLoading }} />
+    </>
   )
 }
 
