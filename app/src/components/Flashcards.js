@@ -32,12 +32,15 @@ const Flashcards = () => {
           </div>
           <div>
               {flashcards && flashcards.map((flashcard,i) => {
-                  const { _id, front, back, title } = flashcard
+                  const { _id, front, back, title, parentSet } = flashcard
                   return <div key={_id} className={`${_id===f_id?"bg-primary":""}`}>
                       <h4>{i+1} - {title}</h4>
                       <Link to={`/flashcards/${_id}`}>View</Link>
-                      <Link to={`/flashcards/${_id}/edit`}>Edit</Link>
-                      <button onClick={()=>dispatch(deleteFlashcard(_id))}>Delete</button>
+                      {/* Edit/delete only when in "set" view */}
+                      {s_id && <>
+                          <Link to={`/flashcards/${_id}/edit`}>Edit</Link>
+                          <button onClick={() => dispatch(deleteFlashcard({ f_id: _id, s_id: parentSet }))}>Delete</button>
+                      </>}
                   </div>
               })}
           </div>

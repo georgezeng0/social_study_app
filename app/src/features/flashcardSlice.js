@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
+import { getSingleSet } from './setSlice'
 
 const initialForm= {
     front: '',
@@ -28,6 +29,10 @@ const initialState = {
         isError: false,
         message: '',
         status: ''
+    },
+    success: {
+        isSuccess: false,
+        successMessage: ''
     },
     formNew: initialForm,
     formEdit: initialForm,
@@ -104,9 +109,13 @@ export const editFlashcard = createAsyncThunk(
 
 export const deleteFlashcard = createAsyncThunk(
     'flashcard/deleteFlashcard',
-    async (f_id, thunkAPI) => {
+    async ({ f_id, s_id }, thunkAPI) => {
         try {
             const res = await axios.delete(`/api/flashcards/${f_id}`);
+            if (res.data?.deletedFlashcard) {
+                thunkAPI.dispatch(getFlashcards(s_id));
+                thunkAPI.dispatch(getSingleSet(s_id))
+            }
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
@@ -140,11 +149,15 @@ export const flashcardSlice = createSlice({
                 return foundIndex
             },-1)
         },
+        resetSuccess: (state, action) => {
+            state.success=initialState.success
+        }
     },
     extraReducers: {
         [getFlashcards.pending]: (state) => {
             state.error.isError = false;
             state.isLoading = true
+            state.success.isSuccess = false;
         },
         [getFlashcards.fulfilled]: (state,action) => {
             state.isLoading = false;
@@ -159,6 +172,7 @@ export const flashcardSlice = createSlice({
         [getOneFlashcard.pending]: (state) => {
             state.error.isError = false;
             state.isLoading = true
+            state.success.isSuccess = false;
         },
         [getOneFlashcard.fulfilled]: (state,action) => {
             state.isLoading = false;
@@ -173,10 +187,15 @@ export const flashcardSlice = createSlice({
         [createFlashcard.pending]: (state) => {
             state.error.isError = false;
             state.isLoading = true
+            state.success.isSuccess = false;
         },
         [createFlashcard.fulfilled]: (state,action) => {
             state.isLoading = false;
             state.error.isError = false;
+            state.success = {
+                isSuccess: true,
+                successMessage: "Flashcard Created - Redirecting..."
+            };
         },
         [createFlashcard.rejected]: (state, action) => {
             state.isLoading = false;
@@ -186,10 +205,15 @@ export const flashcardSlice = createSlice({
         [editFlashcard.pending]: (state) => {
             state.error.isError = false;
             state.isLoading = true
+            state.success.isSuccess = false;
         },
         [editFlashcard.fulfilled]: (state,action) => {
             state.isLoading = false;
             state.error.isError = false;
+            state.success = {
+                isSuccess: true,
+                successMessage: "Flashcard Updated - Redirecting..."
+            };
         },
         [editFlashcard.rejected]: (state, action) => {
             state.isLoading = false;
@@ -199,10 +223,15 @@ export const flashcardSlice = createSlice({
         [deleteFlashcard.pending]: (state) => {
             state.error.isError = false;
             state.isLoading = true
+            state.success.isSuccess = false;
         },
         [deleteFlashcard.fulfilled]: (state,action) => {
             state.isLoading = false;
             state.error.isError = false;
+            state.success = {
+                isSuccess: true,
+                successMessage: "Flashcard Deleted"
+            };
         },
         [deleteFlashcard.rejected]: (state, action) => {
             state.isLoading = false;
@@ -212,6 +241,7 @@ export const flashcardSlice = createSlice({
         [populateFlashcardForm.pending]: (state) => {
             state.error.isError = false;
             state.isLoading = true
+            state.success.isSuccess = false;
         },
         [populateFlashcardForm.fulfilled]: (state,action) => {
             state.isLoading = false;
@@ -226,6 +256,6 @@ export const flashcardSlice = createSlice({
     }
 })
 
-export const {updateForm, resetForm,setActiveCard  } = flashcardSlice.actions
+export const {updateForm, resetForm,setActiveCard,resetSuccess  } = flashcardSlice.actions
 
 export default flashcardSlice.reducer

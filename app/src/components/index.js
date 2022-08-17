@@ -6,7 +6,8 @@ import Flashcard from "./Flashcard";
 import TextEditor from "./TextEditor";
 import Loading from "./Loading";
 import AsyncModal from "./AsyncModal";
+import MessageModal from "./MessageModal";
 
 export {
-    Navbar, FlashcardForm, SetForm, Flashcards,Flashcard,TextEditor,Loading,AsyncModal
+    Navbar, FlashcardForm, SetForm, Flashcards,Flashcard,TextEditor,Loading,AsyncModal,MessageModal
 }

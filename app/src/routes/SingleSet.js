@@ -1,25 +1,35 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { Flashcards, Loading } from '../components'
 import { deleteSet, getSingleSet,resetError } from '../features/setSlice'
 import Error from './Error'
 
 const SingleSet = () => {
+  const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { selectedSet, error:{isError,message, status}, isLoading } = useSelector(state=>state.set)
+
+  const { selectedSet, error: { isError, message, status }, isLoading,
+    success: { isSuccess, successMessage }
+  } = useSelector(state => state.set)
   const { s_id } = useParams()
   
-  // Reset any errors in the set store on page load
+  // Reset any errors in the "set" redux store on page load
   useEffect(() => {
     dispatch(resetError())
-  },[])
+  },[dispatch])
 
+  // Fetch the set on page load.
   useEffect(() => {
-    if (selectedSet?._id !== s_id) {
       dispatch(getSingleSet(s_id))
+  }, [dispatch])
+
+  //Delete success message and redirect
+  useEffect(() => {
+    if (isSuccess && successMessage === "Set Deleted") {
+      navigate('/flashcards')
     }
-  }, [dispatch, s_id, selectedSet])
+  }, [isSuccess,successMessage])
   
   const { name = '', stats = {}, tags=[], isPublic } = selectedSet
   const { numFlashcards } = stats
@@ -42,7 +52,7 @@ const SingleSet = () => {
       })}</h5>
       <h5>Public Set: {isPublic ? "Yes" : "No"}</h5>
       <Link to={`/sets/${s_id }/edit`}>Edit</Link>
-      <button onClick={()=>dispatch(deleteSet(s_id ))}>Delete</button>
+      <button disabled={isLoading} onClick={()=>dispatch(deleteSet(s_id ))}>Delete</button>
       <p>Number of flashcards: {numFlashcards}</p>
       <div>
         <h4>Flashcards</h4>

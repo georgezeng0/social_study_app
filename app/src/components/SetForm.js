@@ -1,23 +1,46 @@
 import React,{ useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
-import { createSet,resetForm,updateForm,editSet, populateSetForm } from '../features/setSlice'
-import { Error } from '../routes'
+import { useNavigate, useParams } from 'react-router-dom'
+import { createSet,resetForm,updateForm,editSet, populateSetForm,resetSuccess } from '../features/setSlice'
+//import { Error } from '../routes'
 import AsyncModal from './AsyncModal'
-import Loading from './Loading'
-
+//import Loading from './Loading'
 
 
 const SetForm = ({formType}) => {
-    const dispatch = useDispatch()
-    const { s_id } = useParams();
-  const { [formType]: { name, tags, isPublic }, tagsList, error:{isError,message, status}, isLoading } = useSelector(state => state.set)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const { s_id } = useParams();
+  const { [formType]: { name, tags, isPublic }, tagsList, error: { isError, message, status }, isLoading,
+success: {isSuccess, successMessage}, selectedSet: {_id: createdSetID}
+  } = useSelector(state => state.set)
   
+  // Populate form if editing state
   useEffect(() => {
     if (formType === "formEdit") {
         dispatch(populateSetForm(s_id))
       }
-    }, [dispatch, formType])
+  }, [dispatch, formType])
+  
+  // Navigate on successful submit
+  useEffect(() => {
+    if (isSuccess && formType === 'formNew') {
+      setTimeout(() => {
+        dispatch(resetSuccess())
+        navigate(`/sets/${createdSetID}`)
+      }
+    , 2000)
+      
+    }
+    if (isSuccess && formType === 'formEdit') {
+      setTimeout(() => {
+        dispatch(resetSuccess())
+        navigate(`/sets/${s_id}`)
+      }
+        , 2000)
+    }
+  }, [isSuccess, formType])
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -65,10 +88,10 @@ const SetForm = ({formType}) => {
         <input type="checkbox" name="isPublic" id="isPublic" onChange={handleChange} checked={isPublic} />
       </div>
 
-      <button>Submit</button>
+      <button disabled={isSuccess || isLoading}>Submit</button>
       </form>
       
-      <AsyncModal props={{ isError, status, message, isLoading }} />
+      <AsyncModal props={{ isError, status, message, isLoading, isSuccess, successMessage }} />
       </>
   )
 }

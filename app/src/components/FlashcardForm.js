@@ -1,29 +1,58 @@
 import React, { useEffect, useState } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
-import { createFlashcard, updateForm, resetForm, editFlashcard, populateFlashcardForm } from '../features/flashcardSlice'
+import { createFlashcard, updateForm, resetForm, editFlashcard, populateFlashcardForm, resetSuccess } from '../features/flashcardSlice'
 import TextEditor from './TextEditor'
 import axios from 'axios'
 import AsyncModal from './AsyncModal'
 
 const FlashcardForm = ({formType, editNotesOnly}) => {
-    const dispatch = useDispatch()
+  const dispatch = useDispatch()
+  const navigate = useNavigate();
     const { f_id } = useParams();
     const [searchParams, _] = useSearchParams();
     const s_id = searchParams.get("set")
-  const { [formType]: { front, back, title, reversible, image: currentImage, notes, stats: { difficulty } },
-    error: { isError, status, message }, isLoading
+  const {
+    [formType]: { front, back, title,parentSet, reversible, image: currentImage, notes, stats: { difficulty } },
+    error: { isError, status, message }, isLoading,
+    success: {isSuccess, successMessage}
   } = useSelector(state => state.flashcard)
-  
+  const [parentSet_,setParentSet_]=useState('')
   const [image, setImage] = useState('');
 
+  // Populate form if in editing state
   useEffect(() => {
     if (formType === 'formEdit') {
       dispatch(populateFlashcardForm(f_id))
     }
   }, [formType, dispatch])
+
+  useEffect(() => {
+    if (parentSet) {
+      setParentSet_(parentSet)
+    }
+  },[parentSet])
+
+  // Navigate on successful submit
+  useEffect(() => {
+    if (isSuccess && formType === 'formNew') {
+      setTimeout(() => {
+        dispatch(resetSuccess())
+        navigate(`/sets/${s_id}`)
+      }
+    , 2000)
+      
+    }
+    if (isSuccess && formType === 'formEdit') {
+      setTimeout(() => {
+        dispatch(resetSuccess())
+        navigate(`/sets/${parentSet_}`)
+      }
+        , 2000)
+    }
+  }, [isSuccess, formType])
   
   // Uses cloudinary upload API
   const url = `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_NAME}/image/upload`
@@ -49,6 +78,7 @@ const FlashcardForm = ({formType, editNotesOnly}) => {
       }
   }
 
+  // Form Handling
   const handleSubmit = async (e) => {
         e.preventDefault()
     if (formType === 'formNew') {
@@ -149,7 +179,7 @@ const FlashcardForm = ({formType, editNotesOnly}) => {
       <button>Submit</button>
       
     </Wrapper>
-    <AsyncModal props={{ isError, status, message, isLoading }} />
+    <AsyncModal props={{ isError, status, message, isLoading, isSuccess, successMessage }} />
     </>
   )
 }

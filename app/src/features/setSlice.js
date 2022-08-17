@@ -6,13 +6,16 @@ const initialForm = {
     tags: [],
     isPublic: false,
 }
-
 const initialState = {
     isLoading: false,
     error: {
         isError: false,
         status: '',
         message: ''
+    },
+    success: {
+        isSuccess: false,
+        successMessage: ''
     },
     sets: [],
     selectedSet: {},
@@ -89,6 +92,9 @@ export const deleteSet = createAsyncThunk(
     async (s_id, thunkAPI) => {
         try {
             const res = await axios.delete(`/api/sets/${s_id}`);
+            if (res.data?.deletedSet) {
+                thunkAPI.dispatch(getSets())
+            }
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
@@ -122,16 +128,25 @@ export const setSlice = createSlice({
         },
         resetError: (state, action) => {
             state.error=initialState.error
+        },
+        resetSuccess: (state, action) => {
+            state.success=initialState.success
         }
     },
     extraReducers: {
         [createSet.pending]: (state) => {
             state.error.isError = false;
+            state.success.isSuccess = false;
             state.isLoading = true
         },
         [createSet.fulfilled]: (state,action) => {
             state.isLoading = false;
             state.error.isError = false;
+            state.success = {
+                isSuccess: true,
+                successMessage: "Set Created - Redirecting..."
+            };
+            state.selectedSet=action.payload.set
         },
         [createSet.rejected]: (state, action) => {
             state.isLoading = false;
@@ -141,6 +156,7 @@ export const setSlice = createSlice({
         [getSets.pending]: (state) => {
             state.error.isError = false;
             state.isLoading = true
+            state.success.isSuccess = false;
         },
         [getSets.fulfilled]: (state,action) => {
             state.isLoading = false;
@@ -155,10 +171,15 @@ export const setSlice = createSlice({
         [deleteSet.pending]: (state) => {
             state.error.isError = false;
             state.isLoading = true
+            state.success.isSuccess = false;
         },
         [deleteSet.fulfilled]: (state,action) => {
             state.isLoading = false;
             state.error.isError = false;
+            state.success = {
+                isSuccess: true,
+                successMessage: "Set Deleted"
+            };
         },
         [deleteSet.rejected]: (state, action) => {
             state.isLoading = false;
@@ -167,11 +188,16 @@ export const setSlice = createSlice({
         },
         [editSet.pending]: (state) => {
             state.error.isError = false;
+            state.success.isSuccess = false;
             state.isLoading = true
         },
         [editSet.fulfilled]: (state,action) => {
             state.isLoading = false;
             state.error.isError = false;
+            state.success = {
+                isSuccess: true,
+                successMessage: "Set Updated - Redirecting..."
+            };
         },
         [editSet.rejected]: (state, action) => {
             state.isLoading = false;
@@ -181,6 +207,7 @@ export const setSlice = createSlice({
         [getSingleSet.pending]: (state) => {
             state.error.isError = false;
             state.isLoading = true
+            state.success.isSuccess = false;
         },
         [getSingleSet.fulfilled]: (state,action) => {
             state.isLoading = false;
@@ -195,6 +222,7 @@ export const setSlice = createSlice({
         [populateSetForm.pending]: (state) => {
             state.error.isError = false;
             state.isLoading = true
+            state.success.isSuccess = false;
         },
         [populateSetForm.fulfilled]: (state,action) => {
             state.isLoading = false;
@@ -209,6 +237,6 @@ export const setSlice = createSlice({
     }
 })
 
-export const { updateForm, resetForm, resetError} = setSlice.actions
+export const { updateForm, resetForm, resetError, resetSuccess} = setSlice.actions
 
 export default setSlice.reducer

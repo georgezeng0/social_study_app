@@ -85,7 +85,14 @@ const Flashcard = ({ f_id }) => {
 
           <div>
               <button onClick={()=>navigate(`/flashcards/${f_id}/edit`)}> Edit </button>
-              <button onClick={() => dispatch(deleteFlashcard(f_id))}> Delete </button>
+              <button onClick={() => {
+                  dispatch(deleteFlashcard({ f_id, s_id: card.parentSet }))
+                  if (nextCardId) {
+                    navigate(`/flashcards/${nextCardId}`)
+                  } else {
+                    navigate(`/flashcards/${prevCardId}`)
+                  }
+              }}> Delete </button>
               <button onClick={()=>setCardState({...cardState, flip: !cardState.flip})}>Flip Card</button>
               <button onClick={()=>setCardState({...cardState, showNotes: !cardState.showNotes})}>Show/Hide Notes</button>
           </div>
