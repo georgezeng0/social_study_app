@@ -10,7 +10,7 @@ import Loading from './Loading'
 const Flashcard = ({ f_id }) => {
     const dispatch = useDispatch()
     const navigate = useNavigate();
-    const { flashcards, activeCard: { card, index }, isLoading } = useSelector(state => state.flashcard)
+    const { flashcards, activeCard: { card, index }, isLoading, gameMode: {isPlaying, score} } = useSelector(state => state.flashcard)
 
     const [nextCardId, setNextCardId] = useState('')
     const [prevCardId, setPrevCardId] = useState('')
@@ -39,16 +39,18 @@ const Flashcard = ({ f_id }) => {
         }
     },[f_id,card])
 
-    // Gets flashcard every time
+    // Gets flashcard every time if not playing
     useEffect(() => {
-        dispatch(getOneFlashcard(f_id))
-    }, [dispatch, f_id])
+        if (!isPlaying) {
+            dispatch(getOneFlashcard(f_id))
+        }
+    }, [dispatch, f_id, isPlaying])
 
     useEffect(() => {
         if (flashcards) {
             dispatch(setActiveCard(f_id))
         }
-    }, [dispatch, flashcards])
+    }, [dispatch, flashcards, f_id])
     
     // Logic for next/ previous card buttons
     useEffect(() => {

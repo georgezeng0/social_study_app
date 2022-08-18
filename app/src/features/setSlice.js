@@ -131,7 +131,8 @@ export const setSlice = createSlice({
         },
         resetSuccess: (state, action) => {
             state.success=initialState.success
-        }
+        },
+        
     },
     extraReducers: {
         [createSet.pending]: (state) => {

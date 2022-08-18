@@ -2,6 +2,13 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
 import { getSingleSet } from './setSlice'
 
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
 const initialForm= {
     front: '',
     back: '',
@@ -36,7 +43,13 @@ const initialState = {
     },
     formNew: initialForm,
     formEdit: initialForm,
-    editCard: {}
+    editCard: {},
+    gameMode: {
+        isPlaying: false,
+        score: 0,
+        correct: [],
+        incorrect: []
+    }
 }
     
 
@@ -151,6 +164,38 @@ export const flashcardSlice = createSlice({
         },
         resetSuccess: (state, action) => {
             state.success=initialState.success
+        },
+        playSet: (state, action) => {
+            state.gameMode.isPlaying = true;
+            const cards = [...action.payload]
+            shuffleArray(cards) // shuffle array in place
+            state.flashcards = cards
+            state.activeCard.card = cards[0]
+        },
+        correctCard: (state, action) => {
+            // If card isn't already marked as correct - add to correct and remove from incorrect if in incorrect
+            if (state.gameMode.correct.indexOf(action.payload) < 0) {
+                state.gameMode.correct.push(action.payload)
+                state.gameMode.score += 1
+                const incorrectIndex = state.gameMode.incorrect.indexOf(action.payload) 
+                if (incorrectIndex > -1) {
+                    state.gameMode.incorrect.splice(incorrectIndex,1)
+                }
+            }
+        },
+        incorrectCard: (state, action) => {
+            // If card isn't already marked as incorrect - add to incorrect and remove from correct if in correct
+            if (state.gameMode.incorrect.indexOf(action.payload) < 0) {
+                state.gameMode.incorrect.push(action.payload)
+                state.gameMode.score -= 1
+                const correctIndex = state.gameMode.correct.indexOf(action.payload) 
+                if (correctIndex > -1) {
+                    state.gameMode.correct.splice(correctIndex,1)
+                }
+            }
+        },
+        resetGame: (state, action) => {
+            state.gameMode = initialState.gameMode
         }
     },
     extraReducers: {
@@ -257,6 +302,6 @@ export const flashcardSlice = createSlice({
     }
 })
 
-export const {updateForm, resetForm,setActiveCard,resetSuccess  } = flashcardSlice.actions
+export const {updateForm, resetForm,resetGame,setActiveCard,resetSuccess,playSet, correctCard, incorrectCard  } = flashcardSlice.actions
 
 export default flashcardSlice.reducer

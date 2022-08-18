@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { Flashcards, Loading } from '../components'
-import { deleteSet, getSingleSet,resetError } from '../features/setSlice'
+import { deleteSet, getSingleSet, resetError } from '../features/setSlice'
+import { playSet } from '../features/flashcardSlice'
 import Error from './Error'
 
 const SingleSet = () => {
@@ -12,7 +13,12 @@ const SingleSet = () => {
   const { selectedSet, error: { isError, message, status }, isLoading,
     success: { isSuccess, successMessage }
   } = useSelector(state => state.set)
+  const { activeCard: { card } } = useSelector(state=>state.flashcard)
   const { s_id } = useParams()
+  const { name = '', stats = {}, tags=[], isPublic, flashcards } = selectedSet
+  const { numFlashcards } = stats
+
+  const [playButton, setPlayButton] = useState(false)
   
   // Reset any errors in the "set" redux store on page load
   useEffect(() => {
@@ -22,17 +28,27 @@ const SingleSet = () => {
   // Fetch the set on page load.
   useEffect(() => {
       dispatch(getSingleSet(s_id))
-  }, [dispatch])
+  }, [dispatch, s_id])
 
   //Delete success message and redirect
   useEffect(() => {
     if (isSuccess && successMessage === "Set Deleted") {
       navigate('/flashcards')
     }
-  }, [isSuccess,successMessage])
+  }, [isSuccess,successMessage, navigate])
   
-  const { name = '', stats = {}, tags=[], isPublic } = selectedSet
-  const { numFlashcards } = stats
+  //Navigate if play button pressed and active card state is updated
+  useEffect(() => {
+    if (playButton && card?._id) {
+      navigate(`/flashcards/${card._id}`)
+    }
+  },[playButton, card, navigate])
+
+
+  const playSetButton = () => {
+    dispatch(playSet(flashcards))
+    setPlayButton(true)
+  }
 
   if (isLoading) {
     return <Loading/>
@@ -53,6 +69,7 @@ const SingleSet = () => {
       <h5>Public Set: {isPublic ? "Yes" : "No"}</h5>
       <Link to={`/sets/${s_id }/edit`}>Edit</Link>
       <button disabled={isLoading} onClick={()=>dispatch(deleteSet(s_id ))}>Delete</button>
+      <button onClick={playSetButton}>Play Set</button>
       <p>Number of flashcards: {numFlashcards}</p>
       <div>
         <h4>Flashcards</h4>

@@ -1,17 +1,17 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams, Link } from 'react-router-dom'
-import { Flashcard, Flashcards, Loading } from '../components'
+import { Flashcard, Flashcards, PlayWindow } from '../components'
 
 const SingleFlashcard = () => {
   const { f_id } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const {activeCard: {card}} = useSelector(state=>state.flashcard)
+  const {activeCard: {card}, gameMode: {isPlaying}} = useSelector(state=>state.flashcard)
 
     return (
-    <main className='container mt-5'>
-      
+      <main className='container mt-5'>
+        {isPlaying && <PlayWindow />}
       <div className="container">
         <div className="row">
           <div className="col-12 col-lg-8">
