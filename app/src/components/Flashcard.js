@@ -5,11 +5,12 @@ import { deleteFlashcard, getOneFlashcard, setActiveCard } from '../features/fla
 import styled from 'styled-components'
 import dompurifyHTML from '../utils/dompurifyHTML'
 import FlashcardForm from './FlashcardForm'
+import Loading from './Loading'
 
 const Flashcard = ({ f_id }) => {
     const dispatch = useDispatch()
     const navigate = useNavigate();
-    const { flashcards, activeCard: { card, index } } = useSelector(state => state.flashcard)
+    const { flashcards, activeCard: { card, index }, isLoading } = useSelector(state => state.flashcard)
 
     const [nextCardId, setNextCardId] = useState('')
     const [prevCardId, setPrevCardId] = useState('')
@@ -30,22 +31,24 @@ const Flashcard = ({ f_id }) => {
             showNotes: false
         })
         if (cardState.flip) {
-            setCardFront(card.back)
-            setCardBack(card.front)
+            setCardFront(card?.back)
+            setCardBack(card?.front)
         } else {
-            setCardFront(card.front)
-            setCardBack(card.back)
+            setCardFront(card?.front)
+            setCardBack(card?.back)
         }
     },[f_id,card])
 
-    // Gets the list of flashcards in the set, if flashcards already in the store, then set activec card to selected card
+    // Gets flashcard every time
     useEffect(() => {
-        if (!flashcards.length) {
-            dispatch(getOneFlashcard(f_id))
-        } else {
+        dispatch(getOneFlashcard(f_id))
+    }, [dispatch, f_id])
+
+    useEffect(() => {
+        if (flashcards) {
             dispatch(setActiveCard(f_id))
         }
-    }, [dispatch, flashcards, f_id])
+    }, [dispatch, flashcards])
     
     // Logic for next/ previous card buttons
     useEffect(() => {
@@ -66,8 +69,15 @@ const Flashcard = ({ f_id }) => {
         }
     }, [card, index, flashcards])
 
+    if (isLoading) {
+        return <main className='container mt-5'>
+          <Loading/>
+        </main>
+      }
+
   return (
       <Wrapper>
+          <h1>{index + 1}/{flashcards.length} - {card?.title}</h1>
           <div>
               <button disabled={prevCardId.length===0}
                 onClick={() => navigate(`/flashcards/${prevCardId}`)}>
@@ -122,7 +132,7 @@ const Flashcard = ({ f_id }) => {
                   {showEditNotes ? "Cancel Editing":"Edit Notes"}</button>
               {showEditNotes ?
                   <FlashcardForm formType="formEdit" editNotesOnly={true} /> :
-                  <p dangerouslySetInnerHTML={{ __html: dompurifyHTML(card.notes) }}
+                  <p dangerouslySetInnerHTML={{ __html: dompurifyHTML(card?.notes) }}
                       className='p-2'
                   ></p>
               }

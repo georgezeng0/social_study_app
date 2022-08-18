@@ -17,7 +17,8 @@ const FlashcardForm = ({formType, editNotesOnly}) => {
   const {
     [formType]: { front, back, title,parentSet, reversible, image: currentImage, notes, stats: { difficulty } },
     error: { isError, status, message }, isLoading,
-    success: {isSuccess, successMessage}
+    success: { isSuccess, successMessage },
+    activeCard: { card: { _id: newCardId } }
   } = useSelector(state => state.flashcard)
   const [parentSet_,setParentSet_]=useState('')
   const [image, setImage] = useState('');
@@ -40,7 +41,11 @@ const FlashcardForm = ({formType, editNotesOnly}) => {
     if (isSuccess && formType === 'formNew') {
       setTimeout(() => {
         dispatch(resetSuccess())
-        navigate(`/sets/${s_id}`)
+        if (newCardId) {
+          navigate(`/flashcards/${newCardId}`)
+        } else {
+          navigate(`/sets/${s_id}`)
+        }
       }
     , 2000)
       
@@ -48,7 +53,11 @@ const FlashcardForm = ({formType, editNotesOnly}) => {
     if (isSuccess && formType === 'formEdit') {
       setTimeout(() => {
         dispatch(resetSuccess())
-        navigate(`/sets/${parentSet_}`)
+        if (window.history.state && window.history.state.idx > 0) {
+          navigate(-1); // Go back if there is history
+        } else {
+          navigate(`/sets/${parentSet_}`, { replace: true }); // the current entry in the history stack will be replaced with the new one with { replace: true }
+        }
       }
         , 2000)
     }

@@ -139,7 +139,7 @@ export const flashcardSlice = createSlice({
             state[formType] = initialState.formNew
         },
         setActiveCard: (state, { payload }) => {
-            if (state.activeCard.card._id!==payload) {
+            if (state.activeCard.card?._id!==payload) {
                 state.activeCard.card = state.flashcards.find(card => card._id === payload)
             }
             state.activeCard.index = state.flashcards.reduce((foundIndex, card, i) => {
@@ -192,6 +192,7 @@ export const flashcardSlice = createSlice({
         [createFlashcard.fulfilled]: (state,action) => {
             state.isLoading = false;
             state.error.isError = false;
+            state.activeCard.card=action.payload.flashcard
             state.success = {
                 isSuccess: true,
                 successMessage: "Flashcard Created - Redirecting..."
