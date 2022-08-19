@@ -2,10 +2,26 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
 import { getSingleSet } from './setSlice'
 
+// Function to shuffle an array in place
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+// Function to set state to sessionStorage with key "gameState"
+function saveGameState(state) {
+    // Store game state in session on each flashcard visit
+    sessionStorage.setItem("gameState", JSON.stringify({ ...state }));
+}
+
+function getGameState() {
+    let data = sessionStorage.getItem("gameState")
+    data = JSON.parse(data)
+    if (data?.flashcards) { return data }
+    else {
+        return initialState
     }
 }
 
@@ -138,7 +154,7 @@ export const deleteFlashcard = createAsyncThunk(
 
 export const flashcardSlice = createSlice({
     name: 'flashcard',
-    initialState,
+    initialState: getGameState(), // Retrieves an ongoing game if there is one in storage
     reducers: {
         updateForm: (state, { payload }) => {
             const { formType, name, value } = payload;
@@ -160,7 +176,11 @@ export const flashcardSlice = createSlice({
                     return i
                 }
                 return foundIndex
-            },-1)
+            }, -1)
+            // Save game state on each flashvard load
+            if (state.gameMode.isPlaying) {
+                saveGameState(state)
+            }
         },
         resetSuccess: (state, action) => {
             state.success=initialState.success
@@ -182,6 +202,10 @@ export const flashcardSlice = createSlice({
                     state.gameMode.incorrect.splice(incorrectIndex,1)
                 }
             }
+            // Update store
+            if (state.gameMode.isPlaying) {
+                saveGameState(state)
+            }
         },
         incorrectCard: (state, action) => {
             // If card isn't already marked as incorrect - add to incorrect and remove from correct if in correct
@@ -193,9 +217,14 @@ export const flashcardSlice = createSlice({
                     state.gameMode.score -= 1
                 }
             }
+            // Update store
+            if (state.gameMode.isPlaying) {
+                saveGameState(state)
+            }
         },
         resetGame: (state, action) => {
             state.gameMode = initialState.gameMode
+            saveGameState(state)
         }
     },
     extraReducers: {
