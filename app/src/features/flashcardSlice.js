@@ -187,10 +187,10 @@ export const flashcardSlice = createSlice({
             // If card isn't already marked as incorrect - add to incorrect and remove from correct if in correct
             if (state.gameMode.incorrect.indexOf(action.payload) < 0) {
                 state.gameMode.incorrect.push(action.payload)
-                state.gameMode.score -= 1
                 const correctIndex = state.gameMode.correct.indexOf(action.payload) 
                 if (correctIndex > -1) {
-                    state.gameMode.correct.splice(correctIndex,1)
+                    state.gameMode.correct.splice(correctIndex, 1)
+                    state.gameMode.score -= 1
                 }
             }
         },
