@@ -6,8 +6,9 @@ import SetEdit from "./SetEdit";
 import SetNew from "./SetNew";
 import SingleSet from "./SingleSet";
 import Error from "./Error";
+import Login from "./Login";
 
 export {
     FlashcardEdit, FlashcardNew, Flashcards, SingleFlashcard,
-    SetEdit, SetNew, SingleSet, Error
+    SetEdit, SetNew, SingleSet, Error, Login
 }
