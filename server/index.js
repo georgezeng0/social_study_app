@@ -21,6 +21,7 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 // Routes import
 const flashcardRoutes = require('./routes/flashcardRoutes')
 const setRoutes = require('./routes/setRoutes')
+const userRoutes = require('./routes/userRoutes')
 
 /**
  * App variables
@@ -88,6 +89,9 @@ app.use("/api/flashcards", flashcardRoutes)
 
 // Set routes
 app.use("/api/sets", setRoutes)
+
+// User ROutes
+app.use("/api/users", userRoutes)
 
 // Sends session for development purposes.
 if (process.env.NODE_ENV !== "production") {

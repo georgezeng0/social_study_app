@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import {
   FlashcardEdit, FlashcardNew, Flashcards, SingleFlashcard,
-  SetEdit, SetNew, SingleSet, Error, Login
+  SetEdit, SetNew, SingleSet, Error, Login, AuthWrapper
 } from './routes'
 
 import { Navbar } from './components'
@@ -27,6 +27,8 @@ const App = () => {
   },[])
 
   return (
+    // AuthWrapper - handles auth0 isLoading and interaction with user model backend
+    <AuthWrapper> 
     <BrowserRouter>
       <Navbar/>
       <Routes>
@@ -40,8 +42,9 @@ const App = () => {
         <Route path="/sets/:s_id/edit" element={<SetEdit/>}/>
         <Route path="/login" element={<Login/>}/>
         <Route path="*" element={<Error status="404" message="Page not found!" />}/>
-    </Routes>
+      </Routes>
     </BrowserRouter>
+    </AuthWrapper>
   )
 }
 

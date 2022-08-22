@@ -7,8 +7,9 @@ import SetNew from "./SetNew";
 import SingleSet from "./SingleSet";
 import Error from "./Error";
 import Login from "./Login";
+import AuthWrapper from "./AuthWrapper";
 
 export {
     FlashcardEdit, FlashcardNew, Flashcards, SingleFlashcard,
-    SetEdit, SetNew, SingleSet, Error, Login
+    SetEdit, SetNew, SingleSet, Error, Login, AuthWrapper
 }
