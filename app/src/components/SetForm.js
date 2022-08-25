@@ -5,9 +5,12 @@ import { createSet,resetForm,updateForm,editSet, populateSetForm,resetSuccess } 
 //import { Error } from '../routes'
 import AsyncModal from './AsyncModal'
 //import Loading from './Loading'
+import { useAuth0 } from '@auth0/auth0-react'
+import getToken from '../utils/getToken'
 
 
-const SetForm = ({formType}) => {
+const SetForm = ({ formType }) => {
+  const {getAccessTokenSilently} = useAuth0()
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -28,6 +31,7 @@ success: {isSuccess, successMessage}, selectedSet: {_id: createdSetID}
     if (isSuccess && formType === 'formNew') {
       setTimeout(() => {
         dispatch(resetSuccess())
+        dispatch(resetForm({ formType }))
         navigate(`/sets/${createdSetID}`)
       }
     , 2000)
@@ -36,21 +40,22 @@ success: {isSuccess, successMessage}, selectedSet: {_id: createdSetID}
     if (isSuccess && formType === 'formEdit') {
       setTimeout(() => {
         dispatch(resetSuccess())
+        dispatch(resetForm({ formType }))
         navigate(`/sets/${s_id}`)
       }
         , 2000)
     }
   }, [isSuccess, formType])
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
+  // Handle submit using token for API call
+    const handleSubmit = async (e) => {
+      e.preventDefault()
+      const token = await getToken(getAccessTokenSilently)
         if (formType === 'formNew') {
-            dispatch(createSet())
-            dispatch(resetForm({ formType }))
+            dispatch(createSet({token}))
         } 
         if (formType === 'formEdit') {
-            dispatch(editSet(s_id))
-            dispatch(resetForm({ formType }))
+          dispatch(editSet({ s_id, token }))     
         }
     }
 

@@ -1,9 +1,12 @@
+import { useAuth0 } from '@auth0/auth0-react'
 import React, {useEffect,useState} from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useParams } from 'react-router-dom'
 import { deleteFlashcard } from '../features/flashcardSlice'
+import getToken from '../utils/getToken'
 
 const Flashcards = () => {
+    const { getAccessTokenSilently } = useAuth0()
     const { selectedSet: { flashcards: flashcards_set } } = useSelector(state => state.set)
     const { flashcards: flashcards_ } = useSelector(state => state.flashcard)
     const dispatch = useDispatch()
@@ -39,7 +42,10 @@ const Flashcards = () => {
                       {/* Edit/delete only when in "set" view */}
                       {s_id && <>
                           <Link to={`/flashcards/${_id}/edit`}>Edit</Link>
-                          <button onClick={() => dispatch(deleteFlashcard({ f_id: _id, s_id: parentSet }))}>Delete</button>
+                          <button onClick={async () => {
+                              const token = await getToken(getAccessTokenSilently)
+                              dispatch(deleteFlashcard({ f_id: _id, s_id: parentSet,token }))
+                          }}>Delete</button>
                       </>}
                   </div>
               })}

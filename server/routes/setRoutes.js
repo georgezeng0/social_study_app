@@ -1,16 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const wrapAsync = require('../utils/wrapAsync');
+const { jwtCheck } = require('../utils/authorisation');
 
 const { getSets, createSet, updateSet, deleteSet, getSingleSet } = require('../controllers/setController')
 
 router.get("/", wrapAsync(getSets))
 
-router.post("/new", wrapAsync(createSet))
+router.post("/new",jwtCheck, wrapAsync(createSet))
 
-router.patch("/:s_id", wrapAsync(updateSet))
+router.patch("/:s_id",jwtCheck, wrapAsync(updateSet))
 
-router.delete("/:s_id", wrapAsync(deleteSet))
+router.delete("/:s_id",jwtCheck, wrapAsync(deleteSet))
 
 router.get("/:s_id", wrapAsync(getSingleSet))
 

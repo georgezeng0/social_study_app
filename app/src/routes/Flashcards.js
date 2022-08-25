@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect } from 'react'
 import { deleteSet,getSets, resetError, resetSuccess} from '../features/setSlice'
-import { Loading, MessageModal } from '../components'
+import { DeleteSetButton, Loading, MessageModal } from '../components'
 import Error from './Error'
 
 const Flashcards = () => {
@@ -46,7 +46,7 @@ const Flashcards = () => {
                       {name}
                       <Link to={`/sets/${_id}`}>View</Link>
                       <Link to={`/sets/${_id}/edit`}>Edit</Link>
-                      <button onClick={()=>dispatch(deleteSet(_id))}>Delete</button>
+                      <DeleteSetButton s_id={_id} isLoading={isLoading}/>
                   </div>
               })}
           </div>

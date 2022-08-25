@@ -5,6 +5,7 @@ const initialForm = {
     name: '',
     tags: [],
     isPublic: false,
+    owner: ''
 }
 const initialState = {
     isLoading: false,
@@ -51,10 +52,19 @@ export const getSets = createAsyncThunk(
 
 export const createSet = createAsyncThunk(
     'set/createSet',
-    async (_, thunkAPI) => {
+    async ({token}, thunkAPI) => {
         try {
             const form = thunkAPI.getState().set.formNew
-            const res = await axios.post('/api/sets/new', form);
+            const user = thunkAPI.getState().user.user
+            const res = await axios.post(
+                '/api/sets/new',
+                { ...form, owner: user._id },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
@@ -76,10 +86,17 @@ export const populateSetForm = createAsyncThunk(
 
 export const editSet = createAsyncThunk(
     'set/editSet',
-    async (s_id, thunkAPI) => {
+    async ({ s_id, token }, thunkAPI) => {
         try {
             const form = thunkAPI.getState().set.formEdit
-            const res = await axios.patch(`/api/sets/${s_id}`, form);
+            const res = await axios.patch(
+                `/api/sets/${s_id}`,
+                form,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
@@ -89,9 +106,14 @@ export const editSet = createAsyncThunk(
 
 export const deleteSet = createAsyncThunk(
     'set/deleteSet',
-    async (s_id, thunkAPI) => {
+    async ({ s_id, token }, thunkAPI) => {
         try {
-            const res = await axios.delete(`/api/sets/${s_id}`);
+            const res = await axios.delete(`/api/sets/${s_id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             if (res.data?.deletedSet) {
                 thunkAPI.dispatch(getSets())
             }

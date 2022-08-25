@@ -38,7 +38,8 @@ const initialForm= {
     },
     stats: {
         difficulty: 0,
-    }
+    },
+    owner: ''
 }
 
 const initialState = {
@@ -112,10 +113,18 @@ export const populateFlashcardForm = createAsyncThunk(
 
 export const createFlashcard = createAsyncThunk(
     'flashcard/createFlashcard',
-    async (s_id, thunkAPI) => {
+    async ({ s_id, token }, thunkAPI) => {
         try {
             const form = thunkAPI.getState().flashcard.formNew
-            const res = await axios.post(`/api/flashcards/new/${s_id}`, { ...form });
+            const user = thunkAPI.getState().user.user
+            const res = await axios.post(
+                `/api/flashcards/new/${s_id}`,
+                { ...form, owner: user._id },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
@@ -125,10 +134,17 @@ export const createFlashcard = createAsyncThunk(
 
 export const editFlashcard = createAsyncThunk(
     'flashcard/editFlashcard',
-    async (f_id, thunkAPI) => {
+    async ({ f_id, token }, thunkAPI) => {
         try {
             const form= thunkAPI.getState().flashcard.formEdit
-            const res = await axios.patch(`/api/flashcards/${f_id}`, { ...form });
+            const res = await axios.patch(
+                `/api/flashcards/${f_id}`,
+                { ...form },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
@@ -138,9 +154,15 @@ export const editFlashcard = createAsyncThunk(
 
 export const deleteFlashcard = createAsyncThunk(
     'flashcard/deleteFlashcard',
-    async ({ f_id, s_id }, thunkAPI) => {
+    async ({ f_id, s_id, token }, thunkAPI) => {
         try {
-            const res = await axios.delete(`/api/flashcards/${f_id}`);
+            const res = await axios.delete(
+                `/api/flashcards/${f_id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             if (res.data?.deletedFlashcard) {
                 thunkAPI.dispatch(getFlashcards(s_id));
                 thunkAPI.dispatch(getSingleSet(s_id))

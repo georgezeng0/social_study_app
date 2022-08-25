@@ -14,7 +14,7 @@ const mongoose = require('mongoose');
 const wrapAsync = require('./utils/wrapAsync')
 const AppError = require('./utils/appError')
 const session = require('express-session')
-const MongoDBStore = require('connect-mongodb-session')(session);
+const MongoDBStore = require('connect-mongodb-session')(session)
 
 // Mongoose models
 

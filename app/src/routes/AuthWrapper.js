@@ -23,7 +23,7 @@ function AuthWrapper({ children }) {
       dispatch(clearUser())
       // If no user in auth0 (e.g. logged out), then clear the Redux user store if there is one
     }
-  },[user,isAuthenticated,reduxUser])
+  },[user,isAuthenticated])
 
     // Return Loading component if auth is loading
     if (isLoading) {

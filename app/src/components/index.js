@@ -9,9 +9,10 @@ import AsyncModal from "./AsyncModal";
 import MessageModal from "./MessageModal";
 import PlayWindow from "./PlayWindow";
 import Redirect from "./Redirect";
+import DeleteSetButton from "./DeleteSetButton";
 
 export {
     Navbar, FlashcardForm, SetForm, Flashcards, Flashcard,
     TextEditor, Loading, AsyncModal, MessageModal, PlayWindow,
-    Redirect
+    Redirect, DeleteSetButton
 }

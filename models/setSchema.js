@@ -14,7 +14,7 @@ const setSchema = new mongoose.Schema(
         stats: {
             numFlashcards: { type: Number, default: 0 }
         },
-        // owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
+        owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         isPublic: Boolean
     });
 

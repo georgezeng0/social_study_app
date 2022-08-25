@@ -13,6 +13,7 @@ const flashcardSchema = new mongoose.Schema(
         back: String,
         notes: String,
         parentSet: { type: mongoose.Schema.Types.ObjectId, ref: "Set" },
+        owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         reversible: { type: Boolean, default: false}, // Can the card be reversed
         stats: {
             difficulty: Number, // 0-3 : Easy, Medium, Hard, Very Hard

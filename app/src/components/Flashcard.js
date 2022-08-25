@@ -6,8 +6,11 @@ import styled from 'styled-components'
 import dompurifyHTML from '../utils/dompurifyHTML'
 import FlashcardForm from './FlashcardForm'
 import Loading from './Loading'
+import getToken from '../utils/getToken'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const Flashcard = ({ f_id }) => {
+    const {getAccessTokenSilently } = useAuth0()
     const dispatch = useDispatch()
     const navigate = useNavigate();
     const { flashcards, activeCard: { card, index }, isLoading, gameMode: {isPlaying, score} } = useSelector(state => state.flashcard)
@@ -54,7 +57,7 @@ const Flashcard = ({ f_id }) => {
     
     // Logic for next/ previous card buttons
     useEffect(() => {
-        if (flashcards.length && card._id===f_id) {
+        if (flashcards.length && card?._id===f_id) {
             const n = flashcards.length
             if (index > 0 && index < n - 1) {
                 setPrevCardId(flashcards[index - 1]._id)
@@ -97,12 +100,15 @@ const Flashcard = ({ f_id }) => {
 
           <div>
               <button onClick={()=>navigate(`/flashcards/${f_id}/edit`)}> Edit </button>
-              <button onClick={() => {
-                  dispatch(deleteFlashcard({ f_id, s_id: card.parentSet }))
+              <button onClick={async () => {
+                  const token = await getToken(getAccessTokenSilently)
+                  dispatch(deleteFlashcard({ f_id, s_id: card.parentSet, token }))
                   if (nextCardId) {
                     navigate(`/flashcards/${nextCardId}`)
-                  } else {
+                  } else if (prevCardId) {
                     navigate(`/flashcards/${prevCardId}`)
+                  } else {
+                    navigate(`/sets/${card.parentSet}`)
                   }
               }}> Delete </button>
               <button onClick={()=>setCardState({...cardState, flip: !cardState.flip})}>Flip Card</button>

@@ -7,8 +7,11 @@ import { createFlashcard, updateForm, resetForm, editFlashcard, populateFlashcar
 import TextEditor from './TextEditor'
 import axios from 'axios'
 import AsyncModal from './AsyncModal'
+import { useAuth0 } from '@auth0/auth0-react'
+import getToken from '../utils/getToken'
 
-const FlashcardForm = ({formType, editNotesOnly}) => {
+const FlashcardForm = ({ formType, editNotesOnly }) => {
+  const {getAccessTokenSilently} = useAuth0()
   const dispatch = useDispatch()
   const navigate = useNavigate();
     const { f_id } = useParams();
@@ -40,6 +43,7 @@ const FlashcardForm = ({formType, editNotesOnly}) => {
   useEffect(() => {
     if (isSuccess && formType === 'formNew') {
       setTimeout(() => {
+        dispatch(resetForm({ formType }))
         dispatch(resetSuccess())
         if (newCardId) {
           navigate(`/flashcards/${newCardId}`)
@@ -52,6 +56,7 @@ const FlashcardForm = ({formType, editNotesOnly}) => {
     }
     if (isSuccess && formType === 'formEdit') {
       setTimeout(() => {
+        dispatch(resetForm({ formType }))
         dispatch(resetSuccess())
         if (window.history.state && window.history.state.idx > 0) {
           navigate(-1); // Go back if there is history
@@ -89,19 +94,19 @@ const FlashcardForm = ({formType, editNotesOnly}) => {
 
   // Form Handling
   const handleSubmit = async (e) => {
-        e.preventDefault()
+    e.preventDefault()
+    const token = await getToken(getAccessTokenSilently)
     if (formType === 'formNew') {
       if (image) {
-            await imageUpload()
-          }
-            dispatch(createFlashcard(s_id))
-            dispatch(resetForm({ formType }))
+        await imageUpload()
+      }
+      dispatch(createFlashcard({s_id, token}))
         } 
     if (formType === 'formEdit') {
       if (image) {
         await imageUpload()
       }
-            dispatch(editFlashcard(f_id))
+      dispatch(editFlashcard({ f_id, token }))
             dispatch(resetForm({ formType }))
         }
     }

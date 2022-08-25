@@ -19,37 +19,63 @@ module.exports.getOneFlashcard = async (req, res, next) => {
 
 // Create flashcard within a set
 module.exports.createFlashcard = async (req, res, next) => {
+    // Get payload user id from req
+    const { payload: { sub: auth_id } } = req.auth
+
     const { s_id } = req.params
-    const set = await Set.findById(s_id)
-    const flashcard = new Flashcard(req.body); 
-    set.flashcards.push(flashcard);
-    set.stats.numFlashcards += 1;
-    flashcard.parentSet = set
-    await set.save()
-    await flashcard.save()
-    res.send({flashcard, message: "Flashcard created"})
+    const set = await Set.findById(s_id).populate('owner')
+
+    // Check authorization
+    if (auth_id === set.owner.u_id) {
+        const flashcard = new Flashcard(req.body);
+        // Update parent set
+        set.flashcards.push(flashcard);
+        set.stats.numFlashcards += 1;
+        flashcard.parentSet = set
+        await set.save()
+        await flashcard.save()
+        res.send({ flashcard, message: "Flashcard created" })
+    } else {
+        res.status(401).send({ message: "Unauthorised"})
+    }
 }
 
 module.exports.updateFlashcard = async (req, res, next) => {
-    const updatedFlashcard = await Flashcard.findByIdAndUpdate(
-        req.params.f_id,
-        req.body,
-        { runValidators: true }
-    )
-    await updatedFlashcard.save()
-    res.send({
-        oldFlashcard: updatedFlashcard,
-        message: "Flashcard updated"
-    })
+    // Get payload user id from req
+    const { payload: { sub: auth_id } } = req.auth
+    // Find flashcard to be updated
+    let flashcard = await Flashcard.findById(req.params.f_id).populate('owner')
+    // Check authorization
+    if (auth_id === flashcard.owner.u_id) {
+        Object.keys(req.body).map(key => {
+            flashcard[key]=req.body[key]
+        })
+        await flashcard.save()
+        res.send({
+            oldFLashcard: flashcard,
+            message: "Flashcard updated"
+        })
+    } else {
+        res.status(401).send({ message: "Unauthorised"})
+    }
+    
 }
 
 module.exports.deleteFlashcard = async (req, res, next) => {
-    const deletedFlashcard = await Flashcard.findOneAndDelete({ _id: req.params.f_id })
-    const set = await Set.findById(deletedFlashcard.parentSet)
-    set.stats.numFlashcards -= 1;
-    await set.save()
-    res.send({
-        deletedFlashcard: deletedFlashcard,
-        message: "Flashcard deleted"
-    })
+    // Get payload user id from req
+    const { payload: { sub: auth_id } } = req.auth
+    // Find flashcard to be deleted
+    let flashcard = await Flashcard.findById(req.params.f_id).populate('owner')
+    if (auth_id === flashcard.owner.u_id) {
+        const deletedFlashcard = await Flashcard.findOneAndDelete({ _id: req.params.f_id })
+        const set = await Set.findById(deletedFlashcard.parentSet)
+        set.stats.numFlashcards -= 1;
+        await set.save()
+        res.send({
+            deletedFlashcard: deletedFlashcard,
+            message: "Flashcard deleted"
+        })
+    } else {
+        res.status(401).send({ message: "Unauthorised"})
+    }
 }

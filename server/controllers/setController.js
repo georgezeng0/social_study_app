@@ -7,32 +7,50 @@ module.exports.getSets = async (req, res, next) => {
     res.send(sets)
 }
 
-module.exports.createSet= async (req, res, next) => {
+module.exports.createSet = async (req, res, next) => {
     const set = new Set(req.body); 
     await set.save()
     res.send({set, message: "Set created"})
 }
 
 module.exports.updateSet = async (req, res, next) => {
-    const updatedSet = await Set.findByIdAndUpdate(
-        req.params.s_id,
-        req.body,
-        { runValidators: true }
-    )
-    await updatedSet.save()
-    res.send({
-        oldSet: updatedSet,
-        message: "Set updated"
-    })
+    // Get payload user id from req
+    const { payload: { sub: auth_id } } = req.auth
+    // Find the set for editing
+    let set = await Set.findById(req.params.s_id).populate('owner')
+    // Check if user is authorised (the owner of the set)
+    if (auth_id === set.owner.u_id) {
+        Object.keys(req.body).map(key => {
+            set[key]=req.body[key]
+        })
+        await set.save()
+        res.send({
+            oldSet: set,
+            message: "Set updated"
+        })
+    } else {
+        res.status(401).send({message: "Unauthorised"})
+    }
+    
 }
 
 module.exports.deleteSet = async (req, res, next) => {
-    // Uses findOneAndDelete due to middleware that cascades the flashcard children
-    const deletedSet = await Set.findOneAndDelete({ _id: req.params.s_id })
-    res.send({
-        deletedSet: deletedSet,
-        message: "Set deleted"
-    })
+     // Get payload user id from req
+     const { payload: { sub: auth_id } } = req.auth
+     // Find the set for deleting
+     const set = await Set.findById(req.params.s_id).populate('owner')
+     // Check if user is authorised (the owner of the set)
+    if (auth_id === set.owner.u_id) {
+        // Uses findOneAndDelete due to middleware that cascades the flashcard children
+        const deletedSet = await Set.findOneAndDelete({ _id: req.params.s_id })
+        res.send({
+            deletedSet: deletedSet,
+            message: "Set deleted"
+        })
+    }
+    else {
+        res.status(401).send({message: "Unauthorised"})
+    }
 }
 
 module.exports.getSingleSet = async (req, res, next) => {

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { Flashcards, Loading } from '../components'
-import { deleteSet, getSingleSet, resetError } from '../features/setSlice'
+import { DeleteSetButton, Flashcards, Loading } from '../components'
+import {  getSingleSet, resetError } from '../features/setSlice'
 import { playSet } from '../features/flashcardSlice'
 import Error from './Error'
 
@@ -68,7 +68,7 @@ const SingleSet = () => {
       })}</h5>
       <h5>Public Set: {isPublic ? "Yes" : "No"}</h5>
       <Link to={`/sets/${s_id }/edit`}>Edit</Link>
-      <button disabled={isLoading} onClick={()=>dispatch(deleteSet(s_id ))}>Delete</button>
+      <DeleteSetButton s_id={s_id} isLoading={isLoading} />
       <button onClick={playSetButton}>Play Set</button>
       <p>Number of flashcards: {numFlashcards}</p>
       <div>
