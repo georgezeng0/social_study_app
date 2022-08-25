@@ -8,8 +8,11 @@ import SingleSet from "./SingleSet";
 import Error from "./Error";
 import Login from "./Login";
 import AuthWrapper from "./AuthWrapper";
+import PrivateRoute from "./PrivateRoute";
+import Landing from "./Landing";
 
 export {
     FlashcardEdit, FlashcardNew, Flashcards, SingleFlashcard,
-    SetEdit, SetNew, SingleSet, Error, Login, AuthWrapper
+    SetEdit, SetNew, SingleSet, Error, Login, AuthWrapper, PrivateRoute,
+    Landing
 }

@@ -8,8 +8,10 @@ import Loading from "./Loading";
 import AsyncModal from "./AsyncModal";
 import MessageModal from "./MessageModal";
 import PlayWindow from "./PlayWindow";
+import Redirect from "./Redirect";
 
 export {
     Navbar, FlashcardForm, SetForm, Flashcards, Flashcard,
-    TextEditor, Loading, AsyncModal, MessageModal, PlayWindow
+    TextEditor, Loading, AsyncModal, MessageModal, PlayWindow,
+    Redirect
 }
