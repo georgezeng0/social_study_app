@@ -4,7 +4,6 @@ import { Redirect } from '../components';
 
 const PrivateRoute = ({ component, ...args }) => {
     args = { ...args, onRedirecting: () => <Redirect/> }
-    console.log(args);
     const Component = withAuthenticationRequired(component, args);
     return <Component />;
   };
