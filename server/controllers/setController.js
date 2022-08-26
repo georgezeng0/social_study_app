@@ -15,11 +15,11 @@ module.exports.createSet = async (req, res, next) => {
 
 module.exports.updateSet = async (req, res, next) => {
     // Get payload user id from req
-    const { payload: { sub: auth_id } } = req.auth
+    const { payload: { sub: auth_id, permissions } } = req.auth
     // Find the set for editing
     let set = await Set.findById(req.params.s_id).populate('owner')
-    // Check if user is authorised (the owner of the set)
-    if (auth_id === set.owner.u_id) {
+    // Check if user is authorised (the owner of the set) or if admin
+    if (auth_id === set.owner?.u_id || permissions.indexOf('admin')>-1) {
         Object.keys(req.body).map(key => {
             set[key]=req.body[key]
         })
@@ -36,11 +36,11 @@ module.exports.updateSet = async (req, res, next) => {
 
 module.exports.deleteSet = async (req, res, next) => {
      // Get payload user id from req
-     const { payload: { sub: auth_id } } = req.auth
+     const { payload: { sub: auth_id, permissions } } = req.auth
      // Find the set for deleting
      const set = await Set.findById(req.params.s_id).populate('owner')
      // Check if user is authorised (the owner of the set)
-    if (auth_id === set.owner.u_id) {
+    if (auth_id === set.owner?.u_id || permissions.indexOf('admin')>-1) {
         // Uses findOneAndDelete due to middleware that cascades the flashcard children
         const deletedSet = await Set.findOneAndDelete({ _id: req.params.s_id })
         res.send({

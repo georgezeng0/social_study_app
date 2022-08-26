@@ -20,13 +20,13 @@ module.exports.getOneFlashcard = async (req, res, next) => {
 // Create flashcard within a set
 module.exports.createFlashcard = async (req, res, next) => {
     // Get payload user id from req
-    const { payload: { sub: auth_id } } = req.auth
+    const { payload: { sub: auth_id, permissions } } = req.auth
 
     const { s_id } = req.params
     const set = await Set.findById(s_id).populate('owner')
 
     // Check authorization
-    if (auth_id === set.owner.u_id) {
+    if (auth_id === set.owner?.u_id || permissions.indexOf('admin')>-1) {
         const flashcard = new Flashcard(req.body);
         // Update parent set
         set.flashcards.push(flashcard);
@@ -42,11 +42,11 @@ module.exports.createFlashcard = async (req, res, next) => {
 
 module.exports.updateFlashcard = async (req, res, next) => {
     // Get payload user id from req
-    const { payload: { sub: auth_id } } = req.auth
+    const { payload: { sub: auth_id, permissions } } = req.auth
     // Find flashcard to be updated
     let flashcard = await Flashcard.findById(req.params.f_id).populate('owner')
     // Check authorization
-    if (auth_id === flashcard.owner.u_id) {
+    if (auth_id === flashcard.owner?.u_id || permissions.indexOf('admin')>-1) {
         Object.keys(req.body).map(key => {
             flashcard[key]=req.body[key]
         })
@@ -63,10 +63,10 @@ module.exports.updateFlashcard = async (req, res, next) => {
 
 module.exports.deleteFlashcard = async (req, res, next) => {
     // Get payload user id from req
-    const { payload: { sub: auth_id } } = req.auth
+    const { payload: { sub: auth_id, populate } } = req.auth
     // Find flashcard to be deleted
     let flashcard = await Flashcard.findById(req.params.f_id).populate('owner')
-    if (auth_id === flashcard.owner.u_id) {
+    if (auth_id === flashcard.owner?.u_id || permissions.indexOf('admin')>-1) {
         const deletedFlashcard = await Flashcard.findOneAndDelete({ _id: req.params.f_id })
         const set = await Set.findById(deletedFlashcard.parentSet)
         set.stats.numFlashcards -= 1;
