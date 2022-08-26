@@ -42,7 +42,24 @@ export const getUserProfile = createAsyncThunk(
             });
             return res.data
         } catch (error) {
-            console.log(error);
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
+        }
+    }
+)
+
+export const updateUserProfile = createAsyncThunk(
+    'user/updateUserProfile',
+    async ({ u_id, token, nickname }, thunkAPI) => {
+        try {
+            const res = await axios.patch(`/api/users/management/${u_id}`,
+                {nickname},
+                {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            return res.data
+        } catch (error) {
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
         }
     }
@@ -83,6 +100,21 @@ export const userSlice = createSlice({
             state.authProfile = action.payload;
         },
         [getUserProfile.rejected]: (state, action) => {
+            state.isLoading = false;
+            state.error.isError = true;
+            state.error = { ...state.error, ...action.payload }
+        },
+        [updateUserProfile.pending]: (state) => {
+            state.error.isError = false;
+            state.isLoading = true
+            state.success.isSuccess = false;
+        },
+        [updateUserProfile.fulfilled]: (state,action) => {
+            state.isLoading = false;
+            state.error.isError = false;
+            state.authProfile = action.payload.user;
+        },
+        [updateUserProfile.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
             state.error = { ...state.error, ...action.payload }

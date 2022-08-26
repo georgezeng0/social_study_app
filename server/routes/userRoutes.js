@@ -9,6 +9,6 @@ router.get("/:u_id", wrapAsync(getUser))
 
 router.get("/management/:u_id", jwtCheck, wrapAsync(managementAPI_getUser))
 
-router.post("/management/:u_id", jwtCheck, wrapAsync(managementAPI_updateUser))
+router.patch("/management/:u_id", jwtCheck, wrapAsync(managementAPI_updateUser))
 
 module.exports=router
