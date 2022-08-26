@@ -10,9 +10,10 @@ import Login from "./Login";
 import AuthWrapper from "./AuthWrapper";
 import PrivateRoute from "./PrivateRoute";
 import Landing from "./Landing";
+import Profile from "./Profile";
 
 export {
     FlashcardEdit, FlashcardNew, Flashcards, SingleFlashcard,
     SetEdit, SetNew, SingleSet, Error, Login, AuthWrapper, PrivateRoute,
-    Landing
+    Landing, Profile
 }

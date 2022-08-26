@@ -5,7 +5,7 @@ import { Auth0Provider } from '@auth0/auth0-react';
 import {
   FlashcardEdit, FlashcardNew, Flashcards, SingleFlashcard,
   SetEdit, SetNew, SingleSet, Error, Login, AuthWrapper, PrivateRoute,
-  Landing
+  Landing, Profile
 } from './routes'
 
 import { Navbar } from './components'
@@ -75,6 +75,10 @@ const App = () => {
             <Route
               path="/login"
               element={<Login/>}
+            />
+            <Route
+              path="/profile"
+              element={<PrivateRoute component={Profile} />}
             />
             <Route
               path="*"

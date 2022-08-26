@@ -10,6 +10,7 @@
   "author": "George Zeng",
   "license": "ISC",
   "dependencies": {
+    "auth0": "^2.42.0",
     "axios": "^0.27.2",
     "cloudinary": "^1.30.1",
     "connect-mongodb-session": "^3.1.1",

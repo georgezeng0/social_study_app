@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import { useAuth0 } from "@auth0/auth0-react";
 
 const Navbar = () => {
-  const { loginWithRedirect, logout,user, isAuthenticated, isLoading } = useAuth0();
+  const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0();
+  
   
   return (
       <nav className='d-flex'>
@@ -16,6 +17,7 @@ const Navbar = () => {
           <button onClick={() => logout({ returnTo: window.location.origin })}>Log Out</button> :
           <button onClick={()=>loginWithRedirect()}>Log In</button> }
       </div>
+      <Link to="/profile">Profile</Link>
     </nav>
   )
 }
