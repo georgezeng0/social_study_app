@@ -11,9 +11,10 @@ import PlayWindow from "./PlayWindow";
 import Redirect from "./Redirect";
 import DeleteSetButton from "./DeleteSetButton";
 import UserForm from "./UserForm";
+import UserIcon from "./UserIcon";
 
 export {
     Navbar, FlashcardForm, SetForm, Flashcards, Flashcard,
     TextEditor, Loading, AsyncModal, MessageModal, PlayWindow,
-    Redirect, DeleteSetButton, UserForm
+    Redirect, DeleteSetButton, UserForm,UserIcon
 }

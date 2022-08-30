@@ -20,6 +20,31 @@ module.exports.getUser = async (req, res, next) => {
     }
 }
 
+// Updates database user values
+module.exports.updateUser = async (req, res, next) => {
+    const { u_id } = req.params
+    // Get payload user id from req
+    const { payload: { sub: auth_id } } = req.auth
+    if (u_id === auth_id) {
+        const user = await User.find({ u_id }); 
+        if (user.length == 0) {
+            res.status(500).send({message: "User ID not found"})
+        }
+        const FoundUser = user[0]
+        Object.keys(req.body).map(key => {
+            FoundUser[key]=req.body[key]
+        })
+        await FoundUser.save()
+        res.send({
+            updatedUser: FoundUser,
+            message: "Database User updated"
+        })
+    } else {
+        res.status(401).send({message: "Unauthorised"})
+    }
+    
+}
+
 // Get single user info from management API using user id
 module.exports.managementAPI_getUser = async (req, res, next) => {
     // Get payload user id from req

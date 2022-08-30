@@ -1,14 +1,16 @@
 import { useAuth0 } from '@auth0/auth0-react'
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Loading, UserForm } from '../components'
+import { Loading, UserForm, UserIcon } from '../components'
 import { getUserProfile,resetPasswordEmail, resetSuccess } from '../features/userSlice'
 import getToken from '../utils/getToken'
 
 const Profile = () => {
     const dispatch = useDispatch()
     const { getAccessTokenSilently, user, isAuthenticated } = useAuth0()
-    const { isLoading, authProfile, isAPILoading, success: {resetPasswordSuccess} } = useSelector(state => state.user)
+    const { isLoading, authProfile, isAPILoading,
+        success: { resetPasswordSuccess },
+        user: { icon: { color, textColor } } } = useSelector(state => state.user)
     
     useEffect(() => {
         dispatch(resetSuccess())
@@ -28,11 +30,11 @@ const Profile = () => {
         return <Loading/>
     }
 
-    const {name,nickname,email, picture} = authProfile
+    const {name,nickname,email} = authProfile
 
   return (
       <main>
-          <img src={picture} alt="" />
+          <UserIcon name={name} color={color} textColor={textColor} />
           <h1>Name: {name}</h1>
           <h2>Nickname: {nickname}</h2>
           <h4>Email: {email}</h4>
@@ -52,6 +54,7 @@ const Profile = () => {
                   You are using a social login method and cannot change your password.
               </div>
           }
+          
           <UserForm />
     </main>
   )

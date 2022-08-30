@@ -5,13 +5,20 @@ const initialState = {
     user: {
         u_id: '',
         favSets: [],
+        icon: {
+            color: '',
+            textColor: ''
+        }
     },
     authProfile: {},
-    form: {
+    auth0Form: {
         name: '',
         nickname: '',
         email: '',
-        picture: ''
+    },
+    databaseForm: {
+        color: '',
+        textColor: ''
     },
     error: {
         isError: false,
@@ -59,14 +66,41 @@ export const updateUserProfile = createAsyncThunk(
     'user/updateUserProfile',
     async ({ token }, thunkAPI) => {
         const u_id = thunkAPI.getState().user.user.u_id
-        const { name, nickname, email, picture } = thunkAPI.getState().user.form
+        const { name, nickname, email } = thunkAPI.getState().user.auth0Form
+        const { name: oldName, nickname: oldNick, email: oldEmail } = thunkAPI.getState().user.authProfile
+        // HTTP request only if form has changed
+        if (name !== oldName || nickname !== oldNick || email !== oldEmail) {
+            try {
+                const res = await axios.patch(`/api/users/management/${u_id}`,
+                    {
+                        name: name || undefined,
+                        nickname: nickname || undefined,
+                        email: email || undefined,
+                    },
+                    {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                return res.data
+            } catch (error) {
+                return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
+            }
+        }         
+    }
+)
+
+export const updateDBUser = createAsyncThunk(
+    'user/updateDBUser',
+    async ({u_id,token}, thunkAPI) => {
+        const { color,textColor } = thunkAPI.getState().user.databaseForm
         try {
-            const res = await axios.patch(`/api/users/management/${u_id}`,
+            const res = await axios.patch(`/api/users/${u_id}`,
                 {
-                    name: name || undefined,
-                    nickname: nickname || undefined,
-                    email: email || undefined,
-                    picture: picture || undefined
+                    icon: {
+                        color,
+                        textColor,
+                    }
                 },
                 {
                 headers: {
@@ -79,6 +113,7 @@ export const updateUserProfile = createAsyncThunk(
         }
     }
 )
+
 
 export const resetPasswordEmail = createAsyncThunk(
     'user/resetPasswordEmail',
@@ -107,10 +142,21 @@ export const userSlice = createSlice({
             state.user = {... initialState.user }
         },
         updateForm: (state, {payload:{name,value}}) => {
-            state.form[name]=value
+            state.auth0form[name]=value
+        },
+        updateDBForm: (state, {payload:{name,value}}) => {
+            state.databaseForm[name]=value
         },
         resetSuccess: (state, action) => {
             state.success = { ...initialState.success }
+        },
+        populateDBForm: (state, action) => {
+            state.databaseForm = {
+                ...state.databaseForm,
+                color: state.user.icon.color,
+                textColor: state.user.icon.textColor
+            }
+ 
         }
     },
     extraReducers: {
@@ -139,11 +185,10 @@ export const userSlice = createSlice({
             state.isAPILoading = false;
             state.error.isError = false;
             state.authProfile = user;
-            state.form = {
+            state.auth0Form = {
                 name: user.name,
                 email: user.email,
                 nickname: user.nickname,
-                picture: user.picture
             }
         },
         [getUserProfile.rejected]: (state, action) => {
@@ -166,6 +211,21 @@ export const userSlice = createSlice({
             state.error.isError = true;
             state.error = { ...state.error, ...action.payload }
         },
+        [updateDBUser.pending]: (state) => {
+            state.error.isError = false;
+            state.isAPILoading = true
+            state.success.isSuccess = false;
+        },
+        [updateDBUser.fulfilled]: (state,action) => {
+            state.isAPILoading = false;
+            state.error.isError = false;
+            state.user = action.payload.updatedUser
+        },
+        [updateDBUser.rejected]: (state, action) => {
+            state.isAPILoading = false;
+            state.error.isError = true;
+            state.error = { ...state.error, ...action.payload }
+        },
         [resetPasswordEmail.pending]: (state) => {
             state.error.isError = false;
             state.success.resetPasswordSuccess = false;
@@ -183,6 +243,6 @@ export const userSlice = createSlice({
     }
 })
 
-export const {clearUser,updateForm,resetSuccess } = userSlice.actions
+export const {clearUser,updateDBForm,updateForm,resetSuccess,populateDBForm } = userSlice.actions
 
 export default userSlice.reducer

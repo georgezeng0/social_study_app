@@ -52,7 +52,7 @@ module.exports.updateFlashcard = async (req, res, next) => {
         })
         await flashcard.save()
         res.send({
-            oldFLashcard: flashcard,
+            updatedFlashcard: flashcard,
             message: "Flashcard updated"
         })
     } else {
