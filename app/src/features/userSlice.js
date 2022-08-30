@@ -20,7 +20,8 @@ const initialState = {
     },
     success: {
         isSuccess: false,
-        successMessage: ''
+        successMessage: '',
+        resetPasswordSuccess: false
     },
     isLoading: false,
     isAPILoading: false
@@ -74,21 +75,42 @@ export const updateUserProfile = createAsyncThunk(
             });
             return res.data
         } catch (error) {
-            console.log(error);
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
         }
     }
 )
+
+export const resetPasswordEmail = createAsyncThunk(
+    'user/resetPasswordEmail',
+    async (email, thunkAPI) => {
+        try {
+            const res = await axios.post(`https://${process.env.REACT_APP_AUTH0_DOMAIN}/dbconnections/change_password`, 
+                {
+                    client_id: process.env.REACT_APP_AUTH0_CLIENTID,
+                    email: email,
+                    connection:  'Username-Password-Authentication'
+                });
+            console.log(res);
+            return res.data
+        } catch (error) {
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
+        }
+    }
+)
+
 
 export const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
         clearUser: (state, action) => {
-            state.user =  initialState.user
+            state.user = {... initialState.user }
         },
         updateForm: (state, {payload:{name,value}}) => {
             state.form[name]=value
+        },
+        resetSuccess: (state, action) => {
+            state.success = { ...initialState.success }
         }
     },
     extraReducers: {
@@ -144,9 +166,23 @@ export const userSlice = createSlice({
             state.error.isError = true;
             state.error = { ...state.error, ...action.payload }
         },
+        [resetPasswordEmail.pending]: (state) => {
+            state.error.isError = false;
+            state.success.resetPasswordSuccess = false;
+        },
+        [resetPasswordEmail.fulfilled]: (state, action) => {
+            state.error.isError = false;
+            if (action.payload = "We've just sent you an email to reset your password.") {
+                state.success.resetPasswordSuccess = true;
+            }
+        },
+        [resetPasswordEmail.rejected]: (state, action) => {
+            state.error.isError = true;
+            state.error = { ...state.error, ...action.payload }
+        },
     }
 })
 
-export const {clearUser,updateForm } = userSlice.actions
+export const {clearUser,updateForm,resetSuccess } = userSlice.actions
 
 export default userSlice.reducer
