@@ -41,7 +41,7 @@ const FlashcardForm = ({ formType, editNotesOnly }) => {
 
   // Navigate on successful submit
   useEffect(() => {
-    if (isSuccess && formType === 'formNew') {
+    if (isSuccess && successMessage==="Flashcard Created - Redirecting..." && formType === 'formNew') {
       setTimeout(() => {
         dispatch(resetForm({ formType }))
         dispatch(resetSuccess())
@@ -54,7 +54,7 @@ const FlashcardForm = ({ formType, editNotesOnly }) => {
     , 2000)
       
     }
-    if (isSuccess && formType === 'formEdit') {
+    if (isSuccess && successMessage==="Flashcard Updated - Redirecting..." && formType === 'formEdit') {
       setTimeout(() => {
         dispatch(resetForm({ formType }))
         dispatch(resetSuccess())

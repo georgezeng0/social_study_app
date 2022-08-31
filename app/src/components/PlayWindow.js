@@ -1,14 +1,18 @@
+import { useAuth0 } from '@auth0/auth0-react'
 import React, { useEffect, useState }from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import { correctCard, incorrectCard,resetGame } from '../features/flashcardSlice'
+import { saveGameHistory } from '../features/userSlice'
+import getToken from '../utils/getToken'
 
 const PlayWindow = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const {f_id} = useParams()
     const { gameMode: { score, correct, incorrect }, flashcards, activeCard: { card: { parentSet } } } = useSelector(state=>state.flashcard)
-    
+    const { getAccessTokenSilently } = useAuth0()
+
     const [isCorrect, setIsCorrect] = useState(false)
     const [isIncorrect, setIsIncorrect] = useState(false)
   
@@ -34,8 +38,9 @@ const PlayWindow = () => {
                 <button disabled={isCorrect} onClick={()=>dispatch(correctCard(f_id))}>Correct</button>
                 <button disabled={isIncorrect}  onClick={()=>dispatch(incorrectCard(f_id))}>Wrong</button>
             </div>
-            <button onClick={() => {
-                alert(`Your Score was ${score}/${flashcards.length}`)
+            <button onClick={async () => {
+                const token = await getToken(getAccessTokenSilently)
+                dispatch(saveGameHistory({token}))
                 dispatch(resetGame())
                 setTimeout(() => {
                     navigate(`/sets/${parentSet}`)

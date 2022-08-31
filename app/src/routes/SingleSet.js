@@ -10,20 +10,35 @@ const SingleSet = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const { selectedSet, error: { isError, message, status }, isLoading,
+  const {
+    selectedSet, error: { isError, message, status }, isLoading,
     success: { isSuccess, successMessage }
   } = useSelector(state => state.set)
-  const { activeCard: { card } } = useSelector(state=>state.flashcard)
+  const {
+    activeCard: { card },
+    gameMode: {isPlaying}
+  } = useSelector(state => state.flashcard)
+  const {
+user: {setHistory}
+  } = useSelector(state=>state.user)
   const { s_id } = useParams()
   const { name = '', stats = {}, tags=[], isPublic, flashcards } = selectedSet
   const { numFlashcards } = stats
 
   const [playButton, setPlayButton] = useState(false)
+  const [history, setHistoryState] = useState({})
   
   // Reset any errors in the "set" redux store on page load
   useEffect(() => {
     dispatch(resetError())
-  },[dispatch])
+  }, [dispatch])
+  
+  // find user history for set
+  useEffect(() => {
+    if (setHistory.length > 0) {
+      setHistoryState(setHistory.find(history => history.set === s_id))
+    }
+  },[setHistory])
 
   // Fetch the set on page load.
   useEffect(() => {
@@ -50,6 +65,10 @@ const SingleSet = () => {
     setPlayButton(true)
   }
 
+  const continueSessionButton = () => {
+    navigate(`/flashcards/${card._id}`)
+  }
+
   if (isLoading) {
     return <Loading/>
   }
@@ -70,7 +89,19 @@ const SingleSet = () => {
       <Link to={`/sets/${s_id }/edit`}>Edit</Link>
       <DeleteSetButton s_id={s_id} isLoading={isLoading} />
       <button onClick={playSetButton}>Play Set</button>
+      {isPlaying && 
+        <button onClick={continueSessionButton}>Continue Session</button>
+      }
       <p>Number of flashcards: {numFlashcards}</p>
+      <div>
+        <h4>Your History:</h4>
+        Plays: {history.numberPlays}
+        <div>
+          {history.sessions && history.sessions.map(item => {
+            return <p key={item._id}>Score - {item.score} - Date: {item.sessionEnd}</p>
+          })}
+        </div>
+      </div>
       <div>
         <h4>Flashcards</h4>
         <Flashcards/>

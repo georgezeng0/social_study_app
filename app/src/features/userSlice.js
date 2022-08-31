@@ -8,7 +8,8 @@ const initialState = {
         icon: {
             color: '',
             textColor: ''
-        }
+        },
+        setHistory: []
     },
     authProfile: {},
     auth0Form: {
@@ -125,7 +126,33 @@ export const resetPasswordEmail = createAsyncThunk(
                     email: email,
                     connection:  'Username-Password-Authentication'
                 });
-            console.log(res);
+            return res.data
+        } catch (error) {
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
+        }
+    }
+)
+
+export const saveGameHistory = createAsyncThunk(
+    'flashcard/saveGameHistory',
+    async ({ token }, thunkAPI) => {
+        const u_id = thunkAPI.getState().user.user.u_id
+        const { activeCard: { card }, gameMode: {score}, flashcards } = thunkAPI.getState().flashcard
+        try {
+            const res = await axios.post(
+                `/api/users/${u_id}/saveGameHistory`,
+                {
+                    s_id: card.parentSet,
+                    date: Date.now(),
+                    score: score,
+                    totalCards: flashcards.length
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            )
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
@@ -142,7 +169,7 @@ export const userSlice = createSlice({
             state.user = {... initialState.user }
         },
         updateForm: (state, {payload:{name,value}}) => {
-            state.auth0form[name]=value
+            state.auth0Form[name]=value
         },
         updateDBForm: (state, {payload:{name,value}}) => {
             state.databaseForm[name]=value
@@ -163,7 +190,6 @@ export const userSlice = createSlice({
         [getUser.pending]: (state) => {
             state.error.isError = false;
             state.isLoading = true
-            state.success.isSuccess = false;
         },
         [getUser.fulfilled]: (state,action) => {
             state.isLoading = false;
@@ -178,7 +204,6 @@ export const userSlice = createSlice({
         [getUserProfile.pending]: (state) => {
             state.error.isError = false;
             state.isAPILoading = true
-            state.success.isSuccess = false;
         },
         [getUserProfile.fulfilled]: (state, action) => {
             const user = action.payload
@@ -204,6 +229,7 @@ export const userSlice = createSlice({
         [updateUserProfile.fulfilled]: (state,action) => {
             state.isAPILoading = false;
             state.error.isError = false;
+            state.success.isSuccess = true;
             state.authProfile = action.payload.user;
         },
         [updateUserProfile.rejected]: (state, action) => {
@@ -214,7 +240,6 @@ export const userSlice = createSlice({
         [updateDBUser.pending]: (state) => {
             state.error.isError = false;
             state.isAPILoading = true
-            state.success.isSuccess = false;
         },
         [updateDBUser.fulfilled]: (state,action) => {
             state.isAPILoading = false;
@@ -237,6 +262,17 @@ export const userSlice = createSlice({
             }
         },
         [resetPasswordEmail.rejected]: (state, action) => {
+            state.error.isError = true;
+            state.error = { ...state.error, ...action.payload }
+        },
+        [saveGameHistory.pending]: (state) => {
+            state.error.isError = false;
+        },
+        [saveGameHistory.fulfilled]: (state, action) => {
+            state.error.isError = false;
+            state.user=action.payload.user
+        },
+        [saveGameHistory.rejected]: (state, action) => {
             state.error.isError = true;
             state.error = { ...state.error, ...action.payload }
         },

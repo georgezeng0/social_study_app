@@ -208,7 +208,12 @@ export const flashcardSlice = createSlice({
             state.success=initialState.success
         },
         playSet: (state, action) => {
-            state.gameMode.isPlaying = true;
+            state.gameMode = {
+                isPlaying: true,
+                score: 0,
+                correct: [],
+                incorrect: []
+            }
             const cards = [...action.payload]
             shuffleArray(cards) // shuffle array in place
             state.flashcards = cards

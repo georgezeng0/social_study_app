@@ -23,14 +23,15 @@ module.exports.createFlashcard = async (req, res, next) => {
     const { payload: { sub: auth_id, permissions } } = req.auth
 
     const { s_id } = req.params
-    const set = await Set.findById(s_id).populate('owner')
+    const set = await Set.findById(s_id).populate('owner').populate('flashcards')
 
     // Check authorization
     if (auth_id === set.owner?.u_id || permissions.indexOf('admin')>-1) {
         const flashcard = new Flashcard(req.body);
         // Update parent set
+        set.flashcards=[...set.flashcards] // Cleans out flashcard references that may have not been deleted
         set.flashcards.push(flashcard);
-        set.stats.numFlashcards += 1;
+        set.stats.numFlashcards = set.flashcards.length;
         flashcard.parentSet = set
         await set.save()
         await flashcard.save()
@@ -63,14 +64,15 @@ module.exports.updateFlashcard = async (req, res, next) => {
 
 module.exports.deleteFlashcard = async (req, res, next) => {
     // Get payload user id from req
-    const { payload: { sub: auth_id, populate } } = req.auth
+    const { payload: { sub: auth_id, permissions } } = req.auth
     // Find flashcard to be deleted
     let flashcard = await Flashcard.findById(req.params.f_id).populate('owner')
     if (auth_id === flashcard.owner?.u_id || permissions.indexOf('admin')>-1) {
-        const deletedFlashcard = await Flashcard.findOneAndDelete({ _id: req.params.f_id })
-        const set = await Set.findById(deletedFlashcard.parentSet)
-        set.stats.numFlashcards -= 1;
+        const set = await Set.findById(flashcard.parentSet)
+        set.flashcards.pull({_id:flashcard._id})
+        set.stats.numFlashcards = set.flashcards.length;
         await set.save()
+        const deletedFlashcard = await Flashcard.findOneAndDelete({ _id: req.params.f_id })
         res.send({
             deletedFlashcard: deletedFlashcard,
             message: "Flashcard deleted"

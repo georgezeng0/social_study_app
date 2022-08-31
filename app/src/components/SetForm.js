@@ -28,7 +28,7 @@ success: {isSuccess, successMessage}, selectedSet: {_id: createdSetID}
   
   // Navigate on successful submit
   useEffect(() => {
-    if (isSuccess && formType === 'formNew') {
+    if (isSuccess && successMessage==="Set Created - Redirecting..." && formType === 'formNew') {
       setTimeout(() => {
         dispatch(resetSuccess())
         dispatch(resetForm({ formType }))
@@ -37,7 +37,7 @@ success: {isSuccess, successMessage}, selectedSet: {_id: createdSetID}
     , 2000)
       
     }
-    if (isSuccess && formType === 'formEdit') {
+    if (isSuccess && successMessage==="Set Updated - Redirecting..." && formType === 'formEdit') {
       setTimeout(() => {
         dispatch(resetSuccess())
         dispatch(resetForm({ formType }))
@@ -45,7 +45,7 @@ success: {isSuccess, successMessage}, selectedSet: {_id: createdSetID}
       }
         , 2000)
     }
-  }, [isSuccess, formType])
+  }, [isSuccess,successMessage, formType])
 
   // Handle submit using token for API call
     const handleSubmit = async (e) => {

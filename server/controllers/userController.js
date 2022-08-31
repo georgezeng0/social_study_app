@@ -2,6 +2,7 @@
 // Documentation for node-auth0: https://auth0.github.io/node-auth0/ManagementClient.html
 // Documentation for management API: https://auth0.com/docs/api/management/v2
 
+const mongoose = require('mongoose')
 const User = require('../../models/userSchema')
 const { auth0 } = require('../utils/authorisation')
 
@@ -104,4 +105,60 @@ module.exports.managementAPI_updateUser = async (req, res, next) => {
     }
 }
 
+// Structure for setHistory property on User schema:
+// setHistory: [{
+//     set: { type: mongoose.Schema.Types.ObjectId, ref: "Set", required:true },
+//     numberPlays: { type: Number, default: 0 },
+//     sessions: [{
+//         sessionEnd: { type: Date },
+//         score: { type: Number, default: 0 },
+//         totalCards: {type: Number, required: true}
+//     }]
+// }]
 
+module.exports.saveGameHistory = async (req, res, next) => {
+    const { payload: { sub: auth_id } } = req.auth
+    const {s_id,score,totalCards,date} = req.body
+    if (auth_id === req.params.u_id) {
+        const searchUser = await User.find({ u_id: req.params.u_id })
+        if (searchUser.length === 0) {
+            res.status(500).send({ message: "User not found."})
+        }
+        const user=searchUser[0]
+        // Convert objectID to string before comparing
+        const historyIndex = user.setHistory.findIndex(item => item.set.toString() === s_id)
+
+        // If set not in user history:
+        if (historyIndex < 0) {
+            user.setHistory.push({
+                set: mongoose.Types.ObjectId(s_id),
+                numberPlays: 1,
+                sessions: [{
+                    sessionEnd: date,
+                    score: score,
+                    totalCards: totalCards
+                }]
+            })
+        }
+        // Otherwise update that history
+        else {
+            oldHistory=user.setHistory[historyIndex]
+            user.setHistory[historyIndex] = {
+                set: oldHistory.set,
+                numberPlays: oldHistory.sessions.length+1,
+                sessions:
+                    [...oldHistory.sessions,
+                    {
+                        sessionEnd: date,
+                        score: score,
+                        totalCards: totalCards
+                    }
+                    ]
+            }
+        }
+        await user.save()
+        res.send({ user, message: "User history updated" })
+    } else {
+        res.status(401).send({message: "Unauthorised"})
+    }
+}

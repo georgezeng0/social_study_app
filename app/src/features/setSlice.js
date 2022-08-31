@@ -20,8 +20,8 @@ const initialState = {
     },
     sets: [],
     selectedSet: {},
-    formNew: initialForm,
-    formEdit: initialForm,
+    formNew: { ...initialForm },
+    formEdit: { ...initialForm },
     tagsList: ["General", "Medicine", "Science", "History", "Geography", "Language", "Arts", "Movies", "Books", "IT"]
     // Fixed tags list? or can this be updated dynamically e.g. database
 } 
@@ -146,13 +146,13 @@ export const setSlice = createSlice({
             }
         },
         resetForm: (state, { payload: { formType } }) => {
-            state[formType] = initialForm
+            state[formType] = { ...initialForm }
         },
         resetError: (state, action) => {
-            state.error=initialState.error
+            state.error = { ...initialState.error }
         },
         resetSuccess: (state, action) => {
-            state.success=initialState.success
+            state.success = { ...initialState.success }
         },
         
     },

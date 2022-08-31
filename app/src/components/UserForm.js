@@ -48,23 +48,19 @@ const UserForm = () => {
               <label htmlFor="email">Email</label>
               <input name="email" id="email" type="email" value={email} onChange={handle_auth0Change} />
           </div>
-          {/* <div>
-              <label htmlFor="password">New Password</label>
-              <input name="password" id="password" type="password" value={password} onChange={handleChange} />
-          </div> */}
-          {/* <div>
-              <label htmlFor="picture">Picture</label>
-              <input name="picture" id="picture" type="text" value={picture} onChange={handleChange} />
-          </div> */}
-           <div>
-              <label htmlFor="color">Background Color</label>
-              <input name="color" id="color" type="color" value={color} onChange={handle_DBChange} />
-          </div>
           <div>
-              <label htmlFor="textColor">Text Color</label>
-              <input name="textColor" id="textColor" type="color" value={textColor} onChange={handle_DBChange} />
+              <h3>Change Icon Colours</h3>
+            <div>
+                <label htmlFor="color">Background Color</label>
+                <input name="color" id="color" type="color" value={color} onChange={handle_DBChange} />
+            </div>
+            <div>
+                <label htmlFor="textColor">Text Color</label>
+                <input name="textColor" id="textColor" type="color" value={textColor} onChange={handle_DBChange} />
+            </div>
           </div>
-          <button disabled={isLoading||isAPILoading}>Submit</button>
+           
+          <button disabled={isLoading||isAPILoading}>Save</button>
     </form>
   )
 }

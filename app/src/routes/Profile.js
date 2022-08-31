@@ -10,7 +10,7 @@ const Profile = () => {
     const { getAccessTokenSilently, user, isAuthenticated } = useAuth0()
     const { isLoading, authProfile, isAPILoading,
         success: { resetPasswordSuccess },
-        user: { icon: { color, textColor } } } = useSelector(state => state.user)
+        databaseForm: {color, textColor}} = useSelector(state => state.user)
     
     useEffect(() => {
         dispatch(resetSuccess())
