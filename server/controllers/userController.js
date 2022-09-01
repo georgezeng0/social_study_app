@@ -162,3 +162,29 @@ module.exports.saveGameHistory = async (req, res, next) => {
         res.status(401).send({message: "Unauthorised"})
     }
 }
+
+module.exports.toggleFavSet = async (req, res, next) => {
+    const { payload: { sub: auth_id } } = req.auth
+    const { u_id, s_id } = req.params
+    if (auth_id === u_id) {
+        const searchUser = await User.find({ u_id })
+        if (searchUser.length === 0) {
+            res.status(500).send({ message: "User not found."})
+        }
+        const user = searchUser[0]
+        const setObjectId = mongoose.Types.ObjectId(s_id)
+        if (user.favSets.indexOf(setObjectId) > -1) {
+            user.favSets.pull({_id: s_id})
+        } else {
+            user.favSets.push(setObjectId)
+        }
+        await user.save()
+        res.send({
+            user: user,
+            message: "Favourite Sets Updated"
+        })
+
+    } else {
+        res.status(401).send({message: "Unauthorised"})
+    }
+}

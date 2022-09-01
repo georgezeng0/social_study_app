@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { DeleteSetButton, Flashcards, Loading } from '../components'
+import { DeleteSetButton, Flashcards, Loading, ToggleFavouriteSetButton } from '../components'
 import {  getSingleSet, resetError } from '../features/setSlice'
 import { playSet } from '../features/flashcardSlice'
 import Error from './Error'
@@ -92,16 +92,23 @@ user: {setHistory}
       {isPlaying && 
         <button onClick={continueSessionButton}>Continue Session</button>
       }
+
+      Toggle Favourite: <ToggleFavouriteSetButton s_id={s_id} isLoading={isLoading} />
+      
       <p>Number of flashcards: {numFlashcards}</p>
+      
       <div>
         <h4>Your History:</h4>
-        Plays: {history.numberPlays}
+        Plays: {history? history.numberPlays:0}
         <div>
-          {history.sessions && history.sessions.map(item => {
-            return <p key={item._id}>Score - {item.score} - Date: {item.sessionEnd}</p>
+          {history && history.sessions && history.sessions.map(item => {
+            return <p key={item._id}>
+              Score - {parseInt((item.score / item.totalCards) * 100)}% - Date: {item.sessionEnd}
+            </p>
           })}
         </div>
       </div>
+      
       <div>
         <h4>Flashcards</h4>
         <Flashcards/>

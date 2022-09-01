@@ -41,8 +41,10 @@ const AsyncModal = ({ props: { isLoading, status, message, isError, isSuccess,su
                   isError? `${message}` : successMessage || <Loading/>
               }
 
-              {!isLoading && <Button variant="secondary" onClick={()=>setShow(false)}
-              >Close</Button>}
+              {!isLoading && !isSuccess && 
+                  <Button variant="secondary" onClick={() => setShow(false)}
+                  >Close</Button>
+              }
           </Modal.Body>
           {/* <Modal.Footer>              
           </Modal.Footer> */}

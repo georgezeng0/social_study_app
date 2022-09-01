@@ -31,8 +31,10 @@ const initialState = {
         successMessage: '',
         resetPasswordSuccess: false
     },
-    isLoading: false,
-    isAPILoading: false
+    isLoading: false, //Generic Loading for whole page - used for API calls to backend
+    isAPILoading: false, //Loading for third party APIs e.g. Auth0Management API
+    isButtonLoading: false //Loading state for buttons and small components e.g. toggle favourite set button that 
+    // does not require the entire page to go into loading animation
 }
 
 export const getUser = createAsyncThunk(
@@ -161,6 +163,26 @@ export const saveGameHistory = createAsyncThunk(
 )
 
 
+export const toggleFavSet = createAsyncThunk(
+    'flashcard/toggleFavSet',
+    async ({ s_id,token }, thunkAPI) => {
+        const u_id = thunkAPI.getState().user.user.u_id
+        try {
+            const res = await axios(
+                `/api/users/${u_id}/toggleFavSet/${s_id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            )
+            return res.data
+        } catch (error) {
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
+        }
+    }
+)
+
 export const userSlice = createSlice({
     name: 'user',
     initialState,
@@ -274,6 +296,20 @@ export const userSlice = createSlice({
         },
         [saveGameHistory.rejected]: (state, action) => {
             state.error.isError = true;
+            state.error = { ...state.error, ...action.payload }
+        },
+        [toggleFavSet.pending]: (state) => {
+            state.error.isError = false;
+            state.isButtonLoading = true;
+        },
+        [toggleFavSet.fulfilled]: (state, action) => {
+            state.error.isError = false;
+            state.isButtonLoading = false;
+            state.user=action.payload.user
+        },
+        [toggleFavSet.rejected]: (state, action) => {
+            state.error.isError = true;
+            state.isButtonLoading = false;
             state.error = { ...state.error, ...action.payload }
         },
     }
