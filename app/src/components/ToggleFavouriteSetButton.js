@@ -12,12 +12,15 @@ const ToggleFavouriteSetButton = ({ s_id, isLoading }) => {
     const { getAccessTokenSilently } = useAuth0()
 
     const handleClick = async () => {
+        if (isLoading || isButtonLoading) {
+            return
+        }
         const token = await getToken(getAccessTokenSilently)
         dispatch(toggleFavSet({ s_id, token }))
     }
 
   return (
-      <AiFillHeart disabled={isLoading || isButtonLoading} onClick={handleClick}
+      <AiFillHeart onClick={handleClick}
           style={{ color: favSets.indexOf(s_id)>-1?"red":"grey"}}
       >
           Toggle Favourite

@@ -22,8 +22,14 @@ const initialState = {
     selectedSet: {},
     formNew: { ...initialForm },
     formEdit: { ...initialForm },
-    tagsList: ["General", "Medicine", "Science", "History", "Geography", "Language", "Arts", "Movies", "Books", "IT"]
+    tagsList: ["General", "Medical and Health", "Science", "History", "Geography", "Language", "Arts", "Movies", "Books", "IT", "Video Games", "Popular Culture"],
     // Fixed tags list? or can this be updated dynamically e.g. database
+    // Tags must not contain "+" symbol as used in query string to and backend to split string
+    filter: {
+        search: '',
+        tags: [],
+        isFavourite: false
+    }
 } 
 
 export const getSingleSet = createAsyncThunk(
@@ -38,11 +44,32 @@ export const getSingleSet = createAsyncThunk(
     }
 )
 
+// TBD backend logic for pagination
 export const getSets = createAsyncThunk(
     'set/getSets',
     async (_, thunkAPI) => {
+        const { search, tags, isFavourite } = thunkAPI.getState().set.filter
+        const {u_id} = thunkAPI.getState().user.user
+        let searchQuery = "";
+        // Add query string if any search values truthy
+        if (search || tags.length > 0 || isFavourite && u_id) {
+            searchQuery = '?'
+            if (search) {
+                searchQuery = `${searchQuery}search=${search}&`
+            }
+            if (tags.length > 0) {
+                let tagString = ""
+                tags.map(tag => {
+                    tagString = `${tagString}tags=${tag}&`
+                })
+                searchQuery = `${searchQuery}${tagString}`
+            }
+            if (isFavourite) {
+                searchQuery=`${searchQuery}isFavourite=${u_id}&`
+            }
+        }
         try {
-            const res = await axios('/api/sets');
+            const res = await axios(`/api/sets${searchQuery}`);
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
@@ -144,6 +171,25 @@ export const setSlice = createSlice({
             else {
                 state[formType][name] = value
             }
+        },
+        updateFilter: (state, { payload: { name, value } }) => {
+            if (name === "search") {
+                state.filter.search=value
+            }
+            if (name === "favourite") {
+                state.filter.isFavourite=!state.filter.isFavourite
+            }
+            if (name === "tags") {
+                const index = state.filter.tags.indexOf(value)
+                if (index>-1) {
+                    state.filter.tags.splice(index, 1)
+                } else {
+                    state.filter.tags.push(value)
+                }
+            } 
+        },
+        resetFilter: (state, action) => {
+            state.filter={...initialState.filter}
         },
         resetForm: (state, { payload: { formType } }) => {
             state[formType] = { ...initialForm }
@@ -260,6 +306,6 @@ export const setSlice = createSlice({
     }
 })
 
-export const { updateForm, resetForm, resetError, resetSuccess} = setSlice.actions
+export const { updateForm, resetForm, resetError, resetSuccess, updateFilter, resetFilter} = setSlice.actions
 
 export default setSlice.reducer

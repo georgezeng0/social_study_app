@@ -1,9 +1,29 @@
 // const mongoose = require('mongoose');
 const Set = require('../../models/setSchema');
-const AppError = require('../utils/appError')
+const User = require('../../models/userSchema');
+const AppError = require('../utils/appError');
 
 module.exports.getSets = async (req, res, next) => {
-    const sets = await Set.find(); 
+    // Backend pagination TBD
+    const { search = "", tags = "", isFavourite = "" } = req.query
+    let sets = await Set.find(
+        {
+            name: { "$regex": search, "$options": "i" },
+            tags:
+                tags ? { "$in": tags } :
+                /.*/g // Regex to match anything if no tags in search query
+        }
+    );
+    // Filter for user favourite 
+    if (sets.length > 0 && isFavourite) {
+        const [user] = await User.find({u_id: isFavourite })//user id is passed here rather than "isFavourite" boolean which is True if id is truthy
+        if (user) {
+            const favSets = user.favSets
+            sets = sets.filter(set => {
+                return favSets.indexOf(set._id) > -1
+            })
+        }
+    }
     res.send(sets)
 }
 

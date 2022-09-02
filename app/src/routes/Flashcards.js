@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect } from 'react'
 import { deleteSet,getSets, resetError, resetSuccess} from '../features/setSlice'
-import { DeleteSetButton, Loading, MessageModal } from '../components'
+import { DeleteSetButton, Loading, MessageModal, SortFilterSets } from '../components'
 import Error from './Error'
 
 const Flashcards = () => {
@@ -36,8 +36,11 @@ const Flashcards = () => {
   return (
       <Wrapper>
           <div>
-              <h1>Sets</h1>
+              <h1>Flashcard Sets</h1>
               <Link to='/sets/create'>New Set</Link>
+          </div>
+          <div>
+              <SortFilterSets/>
           </div>
           <div>
               {sets.map(set => {

@@ -187,7 +187,7 @@ export const flashcardSlice = createSlice({
             }
         },
         resetForm: (state, { payload: { formType } }) => {
-            state[formType] = initialState.formNew
+            state[formType] = { ...initialState.formNew }
         },
         setActiveCard: (state, { payload }) => {
             if (state.activeCard.card?._id!==payload) {
@@ -205,7 +205,7 @@ export const flashcardSlice = createSlice({
             }
         },
         resetSuccess: (state, action) => {
-            state.success=initialState.success
+            state.success = { ...initialState.success }
         },
         playSet: (state, action) => {
             state.gameMode = {
@@ -250,7 +250,7 @@ export const flashcardSlice = createSlice({
             }
         },
         resetGame: (state, action) => {
-            state.gameMode = initialState.gameMode
+            state.gameMode = { ...initialState.gameMode }
             saveGameState(state)
         }
     },
