@@ -13,7 +13,7 @@ module.exports.getUser = async (req, res, next) => {
     const { u_id } = req.params
     const user = await User.find({ u_id}); 
     if (user.length > 0) {
-        res.send(user)
+        res.send(user[0])
     } else {
         const newUser = new User({ u_id })
         await newUser.save()

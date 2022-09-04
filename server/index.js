@@ -15,6 +15,7 @@ const wrapAsync = require('./utils/wrapAsync')
 const AppError = require('./utils/appError')
 const session = require('express-session')
 const MongoDBStore = require('connect-mongodb-session')(session)
+const cors = require('cors');
 
 // Mongoose models
 
@@ -58,6 +59,9 @@ store.on('error', function(error) {
 
 const app = express()
 
+// Use cors for data transfer between client and server for chat app
+app.use(cors());
+
 // JSON body parser & url encoded bodies
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
@@ -76,6 +80,43 @@ app.use(session({
     saveUninitialized: true,
 }))
 
+// Socket.io
+const http = require('http').Server(app);
+const socketIO = require('socket.io')(http, {
+    cors: {
+        origin: process.env.CLIENT_URL || "http://localhost:3000"
+    }
+});
+let users = []
+socketIO.on('connection', (socket) => {
+    //socket.id - id created when connection is made
+    console.log(`⚡: ${socket.id} user just connected!`);
+
+    // Listens when new user joins server
+    socket.on('newUser', (data) => {
+        //Adds the new user to the list of users
+        if (users.findIndex(item=>item.u_id==data.u_id)==-1){users.push(data)}
+        
+        //Sends the list of users to the client
+        socketIO.emit('newUserResponse', users);
+      });
+
+    // Listen for message
+    socket.on('message', (data) => {
+        console.log(data);
+        socketIO.emit('messageResponse', data)
+    })
+
+    // Disconnect
+    socket.on('disconnect', () => {
+        console.log(`🔥: ${socket.id} user disconnected`);
+        users = users.filter((user) => user.socketID !== socket.id);
+        //Sends the list of users to the client
+        socketIO.emit('newUserResponse', users);
+        socket.disconnect();
+    });
+});
+
 /**
  * Routes Definitions
  */
@@ -90,7 +131,7 @@ app.use("/api/flashcards", flashcardRoutes)
 // Set routes
 app.use("/api/sets", setRoutes)
 
-// User ROutes
+// User routes
 app.use("/api/users", userRoutes)
 
 // Sends session for development purposes.
@@ -128,6 +169,7 @@ app.use((err, req, res, next) => {
  * Server Activation
  */
 
-app.listen(PORT, () => {
+http.listen(PORT, () => {
     console.log(`Listening on PORT ${PORT}`);
 })
+

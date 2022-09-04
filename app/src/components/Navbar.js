@@ -10,7 +10,7 @@ const Navbar = () => {
       <nav className='d-flex'>
           <Link to="/">Home</Link>
           <Link to="/flashcards">Flashcards</Link>
-      <Link to="/login">Login</Link>
+          <Link to="/chatrooms">Chatrooms</Link>
       <div>
         {(!isLoading && isAuthenticated) && user.name}
         {(!isLoading && isAuthenticated) ?

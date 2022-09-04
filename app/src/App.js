@@ -5,9 +5,8 @@ import { Auth0Provider } from '@auth0/auth0-react';
 import {
   FlashcardEdit, FlashcardNew, Flashcards, SingleFlashcard,
   SetEdit, SetNew, SingleSet, Error, Login, AuthWrapper, PrivateRoute,
-  Landing, Profile
+  Landing, Profile, ChatRoom, ChatRooms
 } from './routes'
-
 import { Navbar } from './components'
 
 // Auth0 provider with RedirectCallback as per example below
@@ -72,13 +71,21 @@ const App = () => {
               path="/sets/:s_id/edit"
               element={<PrivateRoute component={SetEdit} />}
             />
-            <Route
+            {/* <Route
               path="/login"
               element={<Login/>}
-            />
+            /> */}
             <Route
               path="/profile"
               element={<PrivateRoute component={Profile} />}
+            />
+            <Route
+              path="/chatrooms"
+              element={<ChatRooms/>}
+            />
+            <Route
+              path="/chatrooms/testroom"
+              element={<PrivateRoute component={ChatRoom} />}
             />
             <Route
               path="*"

@@ -11,9 +11,11 @@ import AuthWrapper from "./AuthWrapper";
 import PrivateRoute from "./PrivateRoute";
 import Landing from "./Landing";
 import Profile from "./Profile";
+import ChatRoom from "./ChatRoom";
+import ChatRooms from "./ChatRooms";
 
 export {
     FlashcardEdit, FlashcardNew, Flashcards, SingleFlashcard,
     SetEdit, SetNew, SingleSet, Error, Login, AuthWrapper, PrivateRoute,
-    Landing, Profile
+    Landing, Profile, ChatRoom, ChatRooms
 }
