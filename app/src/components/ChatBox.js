@@ -1,4 +1,3 @@
-import { useAuth0 } from '@auth0/auth0-react'
 import React,{ useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
@@ -6,16 +5,15 @@ import { resetForm, updateForm, sendMessage, updateMessages, addUser,updateUsers
 
 const ChatBox = () => {
     const dispatch = useDispatch()
-    const { form: { message }, isLoading, socket,
+    const { inputForm: { message }, isLoading, socket,
         chatRoom: {messages, users}
     } = useSelector(state => state.chat)
-    const { user: { u_id}} = useSelector(state => state.user)
-    const { user: { nickname } } = useAuth0()
+    const { user: { u_id, nickname}} = useSelector(state => state.user)
 
     // Listen for new messages from server
     useEffect(() => {
         socket.on('messageResponse', (data) => {
-             dispatch(updateMessages(data))
+            dispatch(updateMessages(data))
         })
         socket.on('newUserResponse', (data) => {
             dispatch(updateUsers(data))
@@ -26,12 +24,14 @@ const ChatBox = () => {
         }
     }, [])
     
+    // Adds User to list of online users
     useEffect(() => {
         if (nickname) {
             dispatch(addUser(nickname))
         }
     },[nickname])
 
+    // Submits message
     const handleSubmit = (e) => {
         e.preventDefault()
         // If not empty and logged in - send message
@@ -40,6 +40,7 @@ const ChatBox = () => {
         }
     }
 
+    // Handle form change
     const handleChange = (e) => {
         const name = e.target.name;
         const value = e.target.value;
@@ -49,7 +50,6 @@ const ChatBox = () => {
   return (
       <Wrapper className='d-flex'>
           <div>
-              
             <div className="messages">
                   {messages.map(message => {
                       return <p>{message.name} - {message.message}</p>
@@ -65,7 +65,6 @@ const ChatBox = () => {
                       <button>Send</button>
                 </form>
             </div>
-
           </div>
           
           <div className="chatBar">

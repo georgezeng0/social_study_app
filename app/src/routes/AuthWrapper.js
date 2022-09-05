@@ -6,7 +6,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { Loading } from '../components';
 import Error from './Error'
 import { useDispatch, useSelector } from 'react-redux';
-import { getUser,clearUser } from '../features/userSlice'
+import { getUser,clearUser,addUserToRedux } from '../features/userSlice'
 
 function AuthWrapper({ children }) {
   const { isLoading, error, user, isAuthenticated } = useAuth0();
@@ -18,6 +18,7 @@ function AuthWrapper({ children }) {
     if (isAuthenticated && user) {
       dispatch(getUser(user.sub)) // "sub" property contains the user id from auth0
       // If user authenticated, get the user info from app DB
+      dispatch(addUserToRedux(user))
     }
     if (!isLoading && !user && reduxUser._id) {
       dispatch(clearUser())

@@ -84,7 +84,7 @@ const App = () => {
               element={<ChatRooms/>}
             />
             <Route
-              path="/chatrooms/testroom"
+              path="/chatrooms/:c_id"
               element={<PrivateRoute component={ChatRoom} />}
             />
             <Route

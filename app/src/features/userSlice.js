@@ -9,7 +9,10 @@ const initialState = {
             color: '',
             textColor: ''
         },
-        setHistory: []
+        setHistory: [],
+        name: '',
+        nickname: '',
+        email: ''
     },
     authProfile: {},
     auth0Form: {
@@ -206,6 +209,10 @@ export const userSlice = createSlice({
                 textColor: state.user.icon.textColor
             }
  
+        },
+        addUserToRedux: (state, { payload }) => {
+            const {name,nickname,email} = payload
+            state.user = {...state.user, name, nickname, email}
         }
     },
     extraReducers: {
@@ -216,7 +223,7 @@ export const userSlice = createSlice({
         [getUser.fulfilled]: (state,action) => {
             state.isLoading = false;
             state.error.isError = false;
-            state.user = action.payload;
+            state.user = { ...state.user, ...action.payload };
         },
         [getUser.rejected]: (state, action) => {
             state.isLoading = false;
@@ -266,7 +273,7 @@ export const userSlice = createSlice({
         [updateDBUser.fulfilled]: (state,action) => {
             state.isAPILoading = false;
             state.error.isError = false;
-            state.user = action.payload.updatedUser
+            state.user = { ...state.user, ...action.payload.updatedUser }
         },
         [updateDBUser.rejected]: (state, action) => {
             state.isAPILoading = false;
@@ -292,7 +299,7 @@ export const userSlice = createSlice({
         },
         [saveGameHistory.fulfilled]: (state, action) => {
             state.error.isError = false;
-            state.user=action.payload.user
+            state.user = { ...state.user, ...action.payload.user }
         },
         [saveGameHistory.rejected]: (state, action) => {
             state.error.isError = true;
@@ -305,7 +312,7 @@ export const userSlice = createSlice({
         [toggleFavSet.fulfilled]: (state, action) => {
             state.error.isError = false;
             state.isButtonLoading = false;
-            state.user=action.payload.user
+            state.user={ ...state.user, ...action.payload.user }
         },
         [toggleFavSet.rejected]: (state, action) => {
             state.error.isError = true;
@@ -315,6 +322,6 @@ export const userSlice = createSlice({
     }
 })
 
-export const {clearUser,updateDBForm,updateForm,resetSuccess,populateDBForm } = userSlice.actions
+export const {clearUser,updateDBForm,updateForm,resetSuccess,populateDBForm,addUserToRedux } = userSlice.actions
 
 export default userSlice.reducer
