@@ -3,12 +3,6 @@ import axios from 'axios'
 import socketIO from 'socket.io-client';
 import { v4 as uuidv4 } from 'uuid';
 
-const connectSocket = () => {
-    // Socket connection with backend
-    const socket = socketIO.connect();
-    return socket
-}
-
 const initialState = {
     isLoading: false,
     error: {
@@ -16,12 +10,16 @@ const initialState = {
         message: '',
         status: ''
     },
-    socket: connectSocket(),
+    socket: {
+        isConnecting: false,
+        isConnected: false
+    },
     // Message input form
     inputForm: {
         message: ""
     },
     chatRoom: {
+        c_id: '',
         messages: [],
         users: []
     },
@@ -66,48 +64,6 @@ export const getRooms = createAsyncThunk(
     }
 )
 
-
-export const sendMessage = createAsyncThunk(
-    'chat/sendMessage',
-    async (_, thunkAPI) => {
-        try {
-            const { socket, form: { message } } = thunkAPI.getState().chat
-            const { user: {u_id, nickname} } = thunkAPI.getState().user
-            socket.emit('message', {
-                message: message,
-                name: nickname, // Passed as parameter (retrieved from auth0 user info)
-                u_id: u_id,
-                m_id: uuidv4(), // Message ID
-                socketID: socket.id,
-            });
-        } catch (error) {
-            return error.message
-            // Use below if use axios
-            // return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
-        }
-        
-    }
-)
-
-export const addUser = createAsyncThunk(
-    'chat/addUser',
-    async (_, thunkAPI) => {
-        try {
-            const { socket } = thunkAPI.getState().chat
-            const { user: {u_id, nickname} } = thunkAPI.getState().user
-            socket.emit('newUser', {
-                name: nickname, // Passed as parameter (retrieved from auth0 user info)
-                u_id: u_id,
-                socketID: socket.id,
-            });
-        } catch (error) {
-            return error.message
-            // Use below if use axios
-            // return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
-        }
-    }
-)
-
 export const chatSlice = createSlice({
     name: 'chat',
     initialState,
@@ -124,26 +80,18 @@ export const chatSlice = createSlice({
         resetRoomForm: (state, action) => {
             state.roomForm={...initialState.roomForm}
         },
-        updateMessages: (state, action) => {
-            state.chatRoom.messages=[...state.chatRoom.messages, action.payload]
+        startConnecting: (state, action) => {
+            state.socket.isConnecting = true;
         },
-        updateUsers: (state, action) => {
-            state.chatRoom.users=action.payload
+        connectionEstablished: (state, action) => {
+            state.socket.isConnected = true;
+            state.socket.isConnecting = false;
+        },
+        disconnectedSocket: (state, action) => {
+            state.socket.isConnected = false;
         }
     },
     extraReducers: {
-        [sendMessage.pending]: (state) => {
-            state.error.isError = false;
-            state.isLoading = true
-        },
-        [sendMessage.fulfilled]: (state,action) => {
-            state.isLoading = false;
-            state.error.isError = false;
-        },
-        [sendMessage.rejected]: (state, action) => {
-            state.isLoading = false;
-            state.error.isError = true;
-        },
         [createRoom.pending]: (state) => {
             state.error.isError = false;
             state.isLoading = true
@@ -172,6 +120,9 @@ export const chatSlice = createSlice({
     }
 })
 
-export const {updateForm,resetForm,updateMessages,updateUsers,updateRoomForm,resetRoomForm} = chatSlice.actions
+export const {
+    updateForm, resetForm, updateRoomForm, resetRoomForm,
+    startConnecting, connectionEstablished, disconnectedSocket
+} = chatSlice.actions
 
 export default chatSlice.reducer

@@ -1,42 +1,21 @@
 import React,{ useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
-import { resetForm, updateForm, sendMessage, updateMessages, addUser,updateUsers } from '../features/chatSlice'
+import { resetForm, updateForm, } from '../features/chatSlice'
 
 const ChatBox = () => {
     const dispatch = useDispatch()
-    const { inputForm: { message }, isLoading, socket,
+    const { inputForm: { message }, isLoading,
         chatRoom: {messages, users}
     } = useSelector(state => state.chat)
     const { user: { u_id, nickname}} = useSelector(state => state.user)
-
-    // Listen for new messages from server
-    useEffect(() => {
-        socket.on('messageResponse', (data) => {
-            dispatch(updateMessages(data))
-        })
-        socket.on('newUserResponse', (data) => {
-            dispatch(updateUsers(data))
-        })
-        return () => {
-            socket.off('messageResponse')
-            socket.off('newUserResponse')
-        }
-    }, [])
-    
-    // Adds User to list of online users
-    useEffect(() => {
-        if (nickname) {
-            dispatch(addUser(nickname))
-        }
-    },[nickname])
 
     // Submits message
     const handleSubmit = (e) => {
         e.preventDefault()
         // If not empty and logged in - send message
         if (message.trim() && u_id) {
-            dispatch(sendMessage(nickname));
+            dispatch();
         }
     }
 
