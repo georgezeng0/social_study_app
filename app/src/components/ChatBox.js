@@ -48,7 +48,7 @@ const ChatBox = () => {
           
           <div className="chatBar">
               {users.map(user => {
-                  return <p>{user.name}</p>
+                  return <p>{user._id}</p>
               })}
           </div>
     </Wrapper>

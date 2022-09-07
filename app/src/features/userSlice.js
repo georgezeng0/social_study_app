@@ -3,6 +3,7 @@ import axios from 'axios'
 
 const initialState = {
     user: {
+        _id:'',
         u_id: '',
         favSets: [],
         icon: {
@@ -12,7 +13,7 @@ const initialState = {
         setHistory: [],
         name: '',
         nickname: '',
-        email: ''
+        email: '',
     },
     authProfile: {},
     auth0Form: {

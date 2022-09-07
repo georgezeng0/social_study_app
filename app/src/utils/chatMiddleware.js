@@ -1,5 +1,5 @@
 import { io } from 'socket.io-client';
-import { connectionEstablished, disconnectedSocket } from '../features/chatSlice';
+import { connectionEstablished, disconnectedSocket, updateRoomUsers } from '../features/chatSlice';
 
 const chatMiddleware = store => {
     // Initialise socket - only connect upon logged in user otherwise remain undefined.
@@ -24,6 +24,7 @@ const chatMiddleware = store => {
                 socket = io();
                 socket.on('connect', () => {
                     store.dispatch(connectionEstablished());
+                    // Emit user connected 
                     socket.emit("USER_CONNECTED", {
                         userMongoID: action.payload._id,
                     })
@@ -32,11 +33,36 @@ const chatMiddleware = store => {
                 socket.on('disconnect', (reason) => {
                     console.log(`Disconnected from websocket, reason: ${reason}`);
                     store.dispatch(disconnectedSocket());
-                    // Handle disconnect logic on backend
+                    // TBD - Handle disconnect logic on backend (remove socket from chatroom users)
                 })
             }
         }
 
+        // emit user and chatroom data when user joins chatroom
+        if (action.type === "chat/joinRoom/fulfilled") {
+            const { user: { _id } } = store.getState().user;
+            const c_id = action.payload._id
+            const users = [...action.payload.users] || []
+            // Emit info
+            socket.emit("USER_JOIN_ROOM", {
+                userMongoID: _id ,
+                socketID: socket.id,
+                c_id: c_id
+            })
+
+            // Update socket info - add socket ID to user that joined chat and update state
+            const ind = users.findIndex(item => item.user === _id)
+            if (ind > -1) {
+                const sockets = users[ind].socketID
+                if (sockets.indexOf(socket.id) < 0) {
+                    users[ind].socketID.push(socket.id)
+                    store.dispatch(updateRoomUsers([users]))
+                }
+            }
+        
+        }
+
+        //test
         if (action.type === "chat/updateForm") {
             // Test
         }

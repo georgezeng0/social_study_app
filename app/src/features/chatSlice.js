@@ -19,7 +19,6 @@ const initialState = {
         message: ""
     },
     chatRoom: {
-        c_id: '',
         messages: [],
         users: []
     },
@@ -64,6 +63,64 @@ export const getRooms = createAsyncThunk(
     }
 )
 
+// Gets chat room data
+// TBD - if private room, will only return if user has been added by owner
+// Or consider password for private room rather than auth stuff
+export const getOneChatRoom = createAsyncThunk(
+    'chat/getOneChatRoom',
+    async ({ token, c_id }, thunkAPI) => {
+        try {
+            const res = await axios(`/api/chat/${c_id}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            return res.data
+        } catch (error) {
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
+        }
+    }
+)
+
+// Join a chat room 
+export const joinRoom = createAsyncThunk(
+    'chat/joinRoom',
+    async ({c_id, token}, thunkAPI) => {
+        try {
+            const res = await axios.post(`/api/chat/${c_id}/join`, {
+                user: thunkAPI.getState().user.user?._id
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            return res.data
+        } catch (error) {
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
+        }
+    }
+)
+
+export const leaveRoom = createAsyncThunk(
+    'chat/leaveRoom',
+    async({c_id, token}, thunkAPI) => {
+        try {
+            const res = await axios.post(`/api/chat/${c_id}/leave`, {
+                user: thunkAPI.getState().user.user?._id
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            return res.data
+        } catch (error) {
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
+        }
+    }
+)
+
 export const chatSlice = createSlice({
     name: 'chat',
     initialState,
@@ -89,6 +146,9 @@ export const chatSlice = createSlice({
         },
         disconnectedSocket: (state, action) => {
             state.socket.isConnected = false;
+        },
+        updateRoomUsers: (state, action) => {
+            state.chatRoom.users=action.payload
         }
     },
     extraReducers: {
@@ -117,11 +177,50 @@ export const chatSlice = createSlice({
             state.isLoading = false;
             state.error.isError = true;
         },
+        [getOneChatRoom.pending]: (state) => {
+            state.error.isError = false;
+            state.isLoading = true
+        },
+        [getOneChatRoom.fulfilled]: (state,action) => {
+            state.isLoading = false;
+            state.error.isError = false;
+            state.chatRoom=action.payload
+        },
+        [getOneChatRoom.rejected]: (state, action) => {
+            state.isLoading = false;
+            state.error.isError = true;
+        },
+        [joinRoom.pending]: (state) => {
+            state.error.isError = false;
+            state.isLoading = true
+        },
+        [joinRoom.fulfilled]: (state,action) => {
+            state.isLoading = false;
+            state.error.isError = false;
+            state.chatRoom=action.payload
+        },
+        [joinRoom.rejected]: (state, action) => {
+            state.isLoading = false;
+            state.error.isError = true;
+        },
+        [leaveRoom.pending]: (state) => {
+            state.error.isError = false;
+            state.isLoading = true
+        },
+        [leaveRoom.fulfilled]: (state,action) => {
+            state.isLoading = false;
+            state.error.isError = false;
+            state.chatRoom=action.payload
+        },
+        [leaveRoom.rejected]: (state, action) => {
+            state.isLoading = false;
+            state.error.isError = true;
+        },
     }
 })
 
 export const {
-    updateForm, resetForm, updateRoomForm, resetRoomForm,
+    updateForm, resetForm, updateRoomForm, resetRoomForm, updateRoomUsers,
     startConnecting, connectionEstablished, disconnectedSocket
 } = chatSlice.actions
 
