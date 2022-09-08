@@ -6,7 +6,7 @@ import { resetForm, updateForm, } from '../features/chatSlice'
 const ChatBox = () => {
     const dispatch = useDispatch()
     const { inputForm: { message }, isLoading,
-        chatRoom: {messages, users}
+        chatRoom: {messages, users=[]}
     } = useSelector(state => state.chat)
     const { user: { u_id, nickname}} = useSelector(state => state.user)
 
@@ -47,8 +47,8 @@ const ChatBox = () => {
           </div>
           
           <div className="chatBar">
-              {users.map(user => {
-                  return <p>{user._id}</p>
+              {users.map((user,i) => {
+                  return <p key={i}>{user?.user?._id}</p>
               })}
           </div>
     </Wrapper>

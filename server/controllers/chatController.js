@@ -3,6 +3,7 @@ const Chat = require('../../models/chatSchema');
 const Message = require('../../models/messageSchema');
 const User = require('../../models/userSchema');
 const mongoose = require('mongoose')
+const AppError = require('../utils/appError')
 
 module.exports.createRoom = async (req, res, next) => {
     // Get payload user id from req
@@ -34,11 +35,11 @@ module.exports.joinRoom = async (req, res, next) => {
     const mongoUserID = req.body.user
     const user = await User.findById(mongoUserID)
     if (auth_id === user?.u_id) {
-        const room = await Chat.findById(req.params.c_id)
+        const room = await Chat.findById(req.params.c_id).populate({path:'users',populate:'user'})
         // If user not in room, push. Socket ID will be added by socket handler.
-        if (room.users.findIndex(item => item.user === mongoose.Types.ObjectId(mongoUserID)) < 0) {
+        if (room.users.findIndex(item => item.user._id.toString() === user._id.toString()) < 0) {
             room.users.push({
-                user: mongoose.Types.ObjectId(mongoUserID),
+                user: user,
                 socketIDList: []
             })
         } 
@@ -57,7 +58,10 @@ module.exports.getOneChatRoom = async (req, res, next) => {
     //
     // TBD - private room - only return room if user is member
     //
-    const room = await Chat.findById(req.params.c_id).populate({path:'users',populate:'user'})
+    const room = await Chat.findById(c_id).populate({ path: 'users', populate: 'user' })
+    if (!room) {
+        return next(new AppError(404,"Chatroom Not Found"))
+    }
     res.send(room)
 }
 

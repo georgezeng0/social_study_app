@@ -149,6 +149,15 @@ export const chatSlice = createSlice({
         },
         updateRoomUsers: (state, action) => {
             state.chatRoom.users=action.payload
+        },
+        updateUserSockets: (state, action) => {
+            const { c_id, userMongoID, socketID } = action.payload
+            // c_id is strinified mongoose object id?
+            // will need to recode this for background chat functionality
+            const ind = state.chatRoom.users.findIndex(item => item.user._id === userMongoID)
+            if (ind > -1) {
+                state.chatRoom.users[ind].socketID=[...socketID]
+            }
         }
     },
     extraReducers: {
@@ -163,6 +172,7 @@ export const chatSlice = createSlice({
         [createRoom.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
+            state.error = { ...state.error, ...action.payload }
         },
         [getRooms.pending]: (state) => {
             state.error.isError = false;
@@ -176,6 +186,7 @@ export const chatSlice = createSlice({
         [getRooms.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
+            state.error = { ...state.error, ...action.payload }
         },
         [getOneChatRoom.pending]: (state) => {
             state.error.isError = false;
@@ -189,6 +200,7 @@ export const chatSlice = createSlice({
         [getOneChatRoom.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
+            state.error = { ...state.error, ...action.payload }
         },
         [joinRoom.pending]: (state) => {
             state.error.isError = false;
@@ -202,6 +214,7 @@ export const chatSlice = createSlice({
         [joinRoom.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
+            state.error = { ...state.error, ...action.payload }
         },
         [leaveRoom.pending]: (state) => {
             state.error.isError = false;
@@ -215,13 +228,14 @@ export const chatSlice = createSlice({
         [leaveRoom.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
+            state.error = { ...state.error, ...action.payload }
         },
     }
 })
 
 export const {
     updateForm, resetForm, updateRoomForm, resetRoomForm, updateRoomUsers,
-    startConnecting, connectionEstablished, disconnectedSocket
+    startConnecting, connectionEstablished, disconnectedSocket, updateUserSockets,
 } = chatSlice.actions
 
 export default chatSlice.reducer

@@ -16,7 +16,7 @@ const ChatRoom = () => {
   const [isJoined, setIsJoined] = useState(false)
 
   useEffect(() => {
-    if (chatRoom.users.findIndex(item=>item.user === user._id)>-1) {
+    if (chatRoom.users.findIndex(item=>item.user?._id === user?._id)>-1) {
       setIsJoined(true)
     } else {
       setIsJoined(false)

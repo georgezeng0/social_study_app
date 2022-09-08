@@ -1,5 +1,5 @@
 import { io } from 'socket.io-client';
-import { connectionEstablished, disconnectedSocket, updateRoomUsers } from '../features/chatSlice';
+import { connectionEstablished, disconnectedSocket, updateRoomUsers, updateUserSockets } from '../features/chatSlice';
 
 const chatMiddleware = store => {
     // Initialise socket - only connect upon logged in user otherwise remain undefined.
@@ -29,11 +29,17 @@ const chatMiddleware = store => {
                         userMongoID: action.payload._id,
                     })
                 })
+
                 // Client side disconnect event
                 socket.on('disconnect', (reason) => {
                     console.log(`Disconnected from websocket, reason: ${reason}`);
                     store.dispatch(disconnectedSocket());
                     // TBD - Handle disconnect logic on backend (remove socket from chatroom users)
+                })
+
+                // UPDATE_CLIENT_SINGLE_USER_SOCKETS
+                socket.on('UPDATE_CLIENT_SINGLE_USER_SOCKETS', (data) => {
+                    store.dispatch(updateUserSockets(data))
                 })
             }
         }
@@ -51,7 +57,7 @@ const chatMiddleware = store => {
             })
 
             // Update socket info - add socket ID to user that joined chat and update state
-            const ind = users.findIndex(item => item.user === _id)
+            const ind = users.findIndex(item => item.user._id === _id)
             if (ind > -1) {
                 const sockets = users[ind].socketID
                 if (sockets.indexOf(socket.id) < 0) {
