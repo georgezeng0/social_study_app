@@ -148,7 +148,13 @@ export const chatSlice = createSlice({
             state.socket.isConnected = false;
         },
         updateRoomUsers: (state, action) => {
-            state.chatRoom.users=action.payload
+            const { c_id, updatedUsers }=action.payload
+            if (state.chatRoom._id === c_id) {
+                state.chatRoom.users = state.chatRoom.users.map((item,i) => {
+                    item.socketID = updatedUsers[i].socketID
+                    return item
+                })
+            }
         },
         updateUserSockets: (state, action) => {
             const { c_id, userMongoID, socketID } = action.payload

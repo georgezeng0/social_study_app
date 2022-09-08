@@ -41,6 +41,11 @@ const chatMiddleware = store => {
                 socket.on('UPDATE_CLIENT_SINGLE_USER_SOCKETS', (data) => {
                     store.dispatch(updateUserSockets(data))
                 })
+
+                //UPDATE_CLIENT_SOCKET_DISCONNECT
+                socket.on('UPDATE_CLIENT_SOCKET_DISCONNECT', (data) => {
+                    store.dispatch(updateRoomUsers(data))
+                })
             }
         }
 

@@ -17,7 +17,8 @@ module.exports = (server) => {
         socket.on('USER_CONNECTED', async (data) => {
             // Join user room (so can broadcast to user's open tabs/devices)
             const { userMongoID } = data
-            socket.join(userMongoID)
+            socket.join(`USER_${userMongoID}`) // Add USER_ to differnetiate from chatroom ID
+
             // Potentially change user status to "online" - TBD feature
             //
             //
@@ -31,14 +32,16 @@ module.exports = (server) => {
                 socket.join(c_id)
             
                 const socketRooms = socketIO.of("/").adapter.rooms // Map object - for read purposes, do not alter
-                const socketUserRoom = Array.from(socketRooms.get(userMongoID)) // Set object of socket IDs with user logged in (different tabs/devices)
+                const socketUserRoom = Array.from(socketRooms.get(`USER_${userMongoID}`)) // Set object of socket IDs with user logged in (different tabs/devices)
                 // Need to convert to array for mongoose schema
 
                 // Update socketIDs of user in chatroom
-                await Chat.updateMany(
+                const user = await User.findById(userMongoID)
+                const updatedRoom = await Chat.findOneAndUpdate(
                     { users: { $elemMatch: { user: mongoose.Types.ObjectId(userMongoID) } } },
                     { $set: { "users.$[el].socketID": socketUserRoom } },
-                    { arrayFilters: [{ "el._id": userMongoID }] })
+                    { arrayFilters: [{ "el.user": { $eq: user } }], new: true },
+                )
                 
                 socketIO.emit('UPDATE_CLIENT_SINGLE_USER_SOCKETS', {
                     c_id: c_id,
@@ -81,13 +84,21 @@ module.exports = (server) => {
         // Disconnect
         socket.on('disconnect', async () => {
             console.log(`🔥: ${socket.id} user disconnected`);
-            const rooms = await Chat.updateMany(
-                // Find all rooms that have matching socketID (even though should only be in one room at a time)
+
+            // Update DB - pull relevant socket ids from one room
+            const room = await Chat.findOneAndUpdate(
                 { users: { $elemMatch: { socketID: { $in: [socket.id] } } } },
-                { $pull: {users: {socketID: socket.id} } }
+                { $pull: {"users.$.socketID": { $in: [socket.id] } } } ,
+                {new: true}
             )
-            // Sends the list of updated users to the client
-            // socketIO.emit('newUserResponse', users);
+            if (room) {
+                // Sends the list of updated users to the client
+                socketIO.emit('UPDATE_CLIENT_SOCKET_DISCONNECT', {
+                    c_id: room._id,
+                    updatedUsers: room.users
+                })
+            }
+            
             socket.disconnect();
         });
     });
