@@ -1,9 +1,12 @@
+import { useAuth0 } from '@auth0/auth0-react'
 import React,{ useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
-import { resetForm, updateForm, } from '../features/chatSlice'
+import { resetForm, updateForm, sendMessage } from '../features/chatSlice'
+import getToken from '../utils/getToken'
 
 const ChatBox = () => {
+    const { getAccessTokenSilently } = useAuth0()
     const dispatch = useDispatch()
     const { inputForm: { message }, isLoading,
         chatRoom: {messages, users=[]}
@@ -11,11 +14,12 @@ const ChatBox = () => {
     const { user: { u_id, nickname}} = useSelector(state => state.user)
 
     // Submits message
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
         // If not empty and logged in - send message
         if (message.trim() && u_id) {
-            dispatch();
+            const token = await getToken(getAccessTokenSilently)
+            dispatch(sendMessage({token}));
         }
     }
 
@@ -31,7 +35,7 @@ const ChatBox = () => {
           <div>
             <div className="messages">
                   {messages.map(message => {
-                      return <p>{message.name} - {message.message}</p>
+                      return <p key={message._id}>{message.authorName} - {message.body}</p>
                 })}
             </div>
             <div className="chatInput">

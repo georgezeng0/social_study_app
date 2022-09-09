@@ -76,10 +76,11 @@ module.exports = (server) => {
         });
 
         // Listen for message
-        // socket.on('message', (data) => {
-        //     console.log(data);
-        //     socketIO.emit('messageResponse', data)
-        // })
+        socket.on('NEW_MESSAGE', (data) => {
+            const c_id = data.chatRoom
+            // Emit message to room
+            socketIO.to(c_id).emit('MESSAGE_RESPONSE', data)
+        })
 
         // Disconnect
         socket.on('disconnect', async () => {

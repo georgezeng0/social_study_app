@@ -58,7 +58,7 @@ module.exports.getOneChatRoom = async (req, res, next) => {
     //
     // TBD - private room - only return room if user is member
     //
-    const room = await Chat.findById(c_id).populate({ path: 'users', populate: 'user' })
+    const room = await Chat.findById(c_id).populate({ path: 'users', populate: 'user' }).populate('messages')
     if (!room) {
         return next(new AppError(404,"Chatroom Not Found"))
     }
@@ -79,3 +79,38 @@ module.exports.leaveRoom = async (req, res, next) => {
     }
 }
 
+// message Schema for reference
+// {
+//     body: {type: String, required: true},
+//     author: { type: mongoose.Schema.Types.ObjectId, ref: "User",required: true },
+//     authorName: { type: String, required: true },
+//     date: { type: Date, required: true },
+//     chatroom: { type: mongoose.Schema.Types.ObjectId, ref: "Chat" , required: true}
+// }
+
+module.exports.createMessage = async (req, res, next) => {
+    const { payload: { sub: auth_id, permissions } } = req.auth
+    const { mongoUserID, body } = req.body
+    const { c_id } = req.params
+    const user = await User.findById(mongoUserID)
+    if (auth_id === user?.u_id) {
+        const room = await Chat.findById(c_id)
+        if (!room) {
+            return next(new AppError(404,'Chatroom not found.'))
+        }
+        const message = new Message({
+            body: body,
+            author: user,
+            authorName: user._id, // Need to change this later when names added to DB
+            date: Date.now(),
+            chatRoom: mongoose.Types.ObjectId(c_id)
+        })
+        await message.save()
+        room.messages.push(message)
+        await room.save()
+        res.send(message)
+            
+    } else {
+        res.status(401).send({ message: "Unauthorised"})
+    }
+}

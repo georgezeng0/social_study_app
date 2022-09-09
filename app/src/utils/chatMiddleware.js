@@ -1,5 +1,5 @@
 import { io } from 'socket.io-client';
-import { connectionEstablished, disconnectedSocket, updateRoomUsers, updateUserSockets } from '../features/chatSlice';
+import { connectionEstablished, disconnectedSocket, updateRoomUsers, updateUserSockets, updateMessages } from '../features/chatSlice';
 
 const chatMiddleware = store => {
     // Initialise socket - only connect upon logged in user otherwise remain undefined.
@@ -42,9 +42,14 @@ const chatMiddleware = store => {
                     store.dispatch(updateUserSockets(data))
                 })
 
-                //UPDATE_CLIENT_SOCKET_DISCONNECT
+                // UPDATE_CLIENT_SOCKET_DISCONNECT
                 socket.on('UPDATE_CLIENT_SOCKET_DISCONNECT', (data) => {
                     store.dispatch(updateRoomUsers(data))
+                })
+
+                // MESSAGE_RESPONSE - listens for new messages from other users
+                socket.on('MESSAGE_RESPONSE', (data) => {
+                    store.dispatch(updateMessages(data))
                 })
             }
         }
@@ -71,6 +76,13 @@ const chatMiddleware = store => {
                 }
             }
         
+        }
+
+        // Message successfully created on database - emit new message 
+        if (action.type === "chat/sendMessage/fulfilled") {
+            const message = action.payload;
+            console.log(message);
+            socket.emit("NEW_MESSAGE", message)
         }
 
         //test

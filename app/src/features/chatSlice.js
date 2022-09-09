@@ -1,7 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
-import socketIO from 'socket.io-client';
-import { v4 as uuidv4 } from 'uuid';
 
 const initialState = {
     isLoading: false,
@@ -121,6 +119,29 @@ export const leaveRoom = createAsyncThunk(
     }
 )
 
+export const sendMessage = createAsyncThunk(
+    'chat/sendMessage',
+    async ({ token }, thunkAPI) => {
+        const mongoUserID = thunkAPI.getState().user.user?._id
+        const {chatRoom: {_id: c_id}, inputForm: {message}} = thunkAPI.getState().chat
+        try {
+            const res = await axios.post(`/api/chat/${c_id}/message`, {
+                mongoUserID: mongoUserID,
+                body: message
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            return res.data
+        } catch (error) {
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
+        }
+    }
+
+)
+
 export const chatSlice = createSlice({
     name: 'chat',
     initialState,
@@ -159,11 +180,24 @@ export const chatSlice = createSlice({
         updateUserSockets: (state, action) => {
             const { c_id, userMongoID, socketID } = action.payload
             // c_id is strinified mongoose object id?
-            // will need to recode this for background chat functionality
+            // will need to recode this for background chat functionality (have a separate property for background chat)
             const ind = state.chatRoom.users.findIndex(item => item.user._id === userMongoID)
             if (ind > -1) {
                 state.chatRoom.users[ind].socketID=[...socketID]
             }
+        },
+        updateMessages: (state, action) => {
+            const newMessage = action.payload;
+            // Check that message is for correct chatroom
+            if (state.chatRoom._id === newMessage.chatRoom) {
+                // Check that message isn't already in messages (should not happen)
+                if (state.chatRoom.messages.findIndex(msg => msg._id === newMessage._id) < 0) {
+                    state.chatRoom.messages.push(newMessage)
+                }
+                
+            }
+            
+
         }
     },
     extraReducers: {
@@ -236,12 +270,27 @@ export const chatSlice = createSlice({
             state.error.isError = true;
             state.error = { ...state.error, ...action.payload }
         },
+        [sendMessage.pending]: (state) => {
+            state.error.isError = false;
+            state.isLoading = true
+        },
+        [sendMessage.fulfilled]: (state,action) => {
+            state.isLoading = false;
+            state.error.isError = false;
+        },
+        [sendMessage.rejected]: (state, action) => {
+            state.isLoading = false;
+            state.error.isError = true;
+            state.error = { ...state.error, ...action.payload }
+        },
     }
 })
 
 export const {
     updateForm, resetForm, updateRoomForm, resetRoomForm, updateRoomUsers,
     startConnecting, connectionEstablished, disconnectedSocket, updateUserSockets,
+    updateMessages
+    
 } = chatSlice.actions
 
 export default chatSlice.reducer

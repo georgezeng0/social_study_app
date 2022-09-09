@@ -6,7 +6,7 @@ const messageSchema = new mongoose.Schema(
         author: { type: mongoose.Schema.Types.ObjectId, ref: "User",required: true },
         authorName: { type: String, required: true },
         date: { type: Date, required: true },
-        chatroom: { type: mongoose.Schema.Types.ObjectId, ref: "Chat" , required: true}
+        chatRoom: { type: mongoose.Schema.Types.ObjectId, ref: "Chat" , required: true}
     });
 
 const Message = mongoose.model('Message', messageSchema);
