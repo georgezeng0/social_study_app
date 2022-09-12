@@ -1,15 +1,16 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import React,{ useEffect,useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom';
-import { ChatBox } from '../components'
-import { joinRoom,leaveRoom, getOneChatRoom } from '../features/chatSlice';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ChatBox, ChatRoomForm } from '../components'
+import { joinRoom,leaveRoom, getOneChatRoom,toggleShowEdit, deleteRoom } from '../features/chatSlice';
 import getToken from '../utils/getToken';
 
 const ChatRoom = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { getAccessTokenSilently } = useAuth0()
-  const { chatRoom } = useSelector(state => state.chat)
+  const { chatRoom,showEdit } = useSelector(state => state.chat)
   const { user } = useSelector(state => state.user)
   const { c_id } = useParams()
 
@@ -43,11 +44,22 @@ const ChatRoom = () => {
     }
   }
 
+  const handleDeleteButton = async () => {
+    const token = await getToken(getAccessTokenSilently)
+    dispatch(deleteRoom({ c_id, token }))
+    navigate('/chatrooms')
+  }
+
   return (
       <main>
-      <h1>Chat Room
+      <h1>{chatRoom.title}
         <button onClick={handleJoinLeave}> {isJoined ? "Leave" : "Join"}</button>
       </h1>
+      {showEdit && <ChatRoomForm isEdit/>}
+      <div>
+        <button onClick={()=>dispatch(toggleShowEdit())}>Edit</button>
+        <button onClick={handleDeleteButton}>Delete</button>
+      </div>
           <ChatBox/>
     </main>
   )

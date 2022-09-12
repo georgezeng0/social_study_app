@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 import { resetForm, updateForm, sendMessage } from '../features/chatSlice'
 import getToken from '../utils/getToken'
+import UserIcon from './UserIcon'
 
 const ChatBox = () => {
     const { getAccessTokenSilently } = useAuth0()
@@ -35,7 +36,7 @@ const ChatBox = () => {
           <div>
             <div className="messages">
                   {messages.map(message => {
-                      return <p key={message._id}>{message.authorName} - {message.body}</p>
+                      return <p key={message._id}>{message.author.nickname} - {message.body}</p>
                 })}
             </div>
             <div className="chatInput">
@@ -51,8 +52,13 @@ const ChatBox = () => {
           </div>
           
           <div className="chatBar">
-              {users.map((user,i) => {
-                  return <p key={i}>{user?.user?._id}</p>
+              {users.map((user, i) => {
+                  // Display user nickname if exists, otherwise name
+                  return <p key={i}>
+                      {user?.user?.nickname || user?.user?.name}
+                      <UserIcon name={user.user.name} height={"50px"} width={"50px"} color={user.user.icon.color} textColor={user.user.icon.textColor} />
+                      {user.socketID.length ? "Online" : "Offline"}
+                  </p>
               })}
           </div>
     </Wrapper>

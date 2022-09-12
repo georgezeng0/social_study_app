@@ -5,7 +5,7 @@ const UserIcon = ({name="", color="lightblue", textColor="white", height="100px"
   return (
       <Wrapper height={height} width={width} color={color} textColor={textColor}
           className="d-flex justify-content-center align-items-center">
-          <p className='display-2 my-auto'>{name.trim()[0]}</p>
+          <p className='h2 my-auto'>{name.toUpperCase().trim()[0]}</p>
           </Wrapper>
   )
 }

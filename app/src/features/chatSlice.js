@@ -21,27 +21,33 @@ const initialState = {
         users: []
     },
     roomForm: {
-        name: ''
+        name: '',
+        isPublic: false,
     },
-    rooms: []
+    rooms: [],
+    showEdit: false
 }
 
 export const createRoom = createAsyncThunk(
     'chat/createRoom',
     async ({token}, thunkAPI) => {
         try {
-            const { name } = thunkAPI.getState().chat.roomForm
+            const { name, isPublic } = thunkAPI.getState().chat.roomForm
             const { user: {_id} } = thunkAPI.getState().user
             const res = await axios.post('/api/chat',
                 {
                     title: name,
                     owner: _id,
+                    isPublic: isPublic
                 },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 })
+            if (res.data) {
+                thunkAPI.dispatch(getRooms())
+            }
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
@@ -73,6 +79,47 @@ export const getOneChatRoom = createAsyncThunk(
                     Authorization: `Bearer ${token}`
                 }
             })
+            return res.data
+        } catch (error) {
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
+        }
+    }
+)
+
+// Edit Room details - name, public
+export const editRoom = createAsyncThunk(
+    'chat/editRoom',
+    async ({token,c_id}, thunkAPI) => {
+        try {
+            const { name, isPublic } = thunkAPI.getState().chat.roomForm
+            const res = await axios.patch(`/api/chat/${c_id}`,
+                {
+                    title: name,
+                    isPublic: isPublic
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+            return res.data
+        } catch (error) {
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
+        }
+    }
+)
+
+// Delete Room
+export const deleteRoom = createAsyncThunk(
+    'chat/deleteRoom',
+    async ({token,c_id}, thunkAPI) => {
+        try {
+            const res = await axios.delete(`/api/chat/${c_id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
@@ -152,8 +199,12 @@ export const chatSlice = createSlice({
         resetForm: (state, action) => {
             state.inputForm={...initialState.inputForm}
         },
-        updateRoomForm: (state, {payload: {name,value}}) => {
-            state.roomForm[name]=value
+        updateRoomForm: (state, { payload: { name, value } }) => {
+            if (name === "isPublic") {
+                state.roomForm.isPublic = !state.roomForm.isPublic
+            } else {
+                state.roomForm[name] = value
+            }
         },
         resetRoomForm: (state, action) => {
             state.roomForm={...initialState.roomForm}
@@ -193,11 +244,18 @@ export const chatSlice = createSlice({
                 // Check that message isn't already in messages (should not happen)
                 if (state.chatRoom.messages.findIndex(msg => msg._id === newMessage._id) < 0) {
                     state.chatRoom.messages.push(newMessage)
-                }
-                
+                }                
             }
-            
-
+        },
+        populateRoomForm: (state, action) => {
+            state.roomForm = {
+                ...state.roomForm,
+                name: state.chatRoom.title,
+                isPublic: state.chatRoom.isPublic
+            }
+        },
+        toggleShowEdit: (state, action) => {
+            state.showEdit= !state.showEdit
         }
     },
     extraReducers: {
@@ -283,13 +341,41 @@ export const chatSlice = createSlice({
             state.error.isError = true;
             state.error = { ...state.error, ...action.payload }
         },
+        [editRoom.pending]: (state) => {
+            state.error.isError = false;
+            state.isLoading = true
+        },
+        [editRoom.fulfilled]: (state,action) => {
+            state.isLoading = false;
+            state.error.isError = false;
+            state.chatRoom=action.payload
+            state.showEdit=false
+        },
+        [editRoom.rejected]: (state, action) => {
+            state.isLoading = false;
+            state.error.isError = true;
+            state.error = { ...state.error, ...action.payload }
+        },
+        [deleteRoom.pending]: (state) => {
+            state.error.isError = false;
+            state.isLoading = true
+        },
+        [deleteRoom.fulfilled]: (state,action) => {
+            state.isLoading = false;
+            state.error.isError = false;
+        },
+        [deleteRoom.rejected]: (state, action) => {
+            state.isLoading = false;
+            state.error.isError = true;
+            state.error = { ...state.error, ...action.payload }
+        },
     }
 })
 
 export const {
     updateForm, resetForm, updateRoomForm, resetRoomForm, updateRoomUsers,
     startConnecting, connectionEstablished, disconnectedSocket, updateUserSockets,
-    updateMessages
+    updateMessages,populateRoomForm,toggleShowEdit
     
 } = chatSlice.actions
 

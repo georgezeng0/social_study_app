@@ -23,11 +23,33 @@ module.exports.getRooms = async (req, res, next) => {
     res.send(rooms)
 }
 // Update room (settings)
-//   TBD
-//
+module.exports.editChatRoom = async (req, res, next) => {
+    // Get payload user id from req
+    const { payload: { sub: auth_id, permissions } } = req.auth
+    const room = await Chat.findById(req.params.c_id).populate('owner')
+    if (auth_id === room.owner.u_id) {
+        Object.keys(req.body).map(key => {
+            room[key]=req.body[key]
+        })
+        await room.save()
+        res.send(room)
+    } else {
+        res.status(401).send({ message: "Unauthorised"})
+    } 
+}
+
 // Deleting room - remember to use find one and delete method for casade
-//   TBD
-//   
+module.exports.deleteChatRoom = async (req, res, next) => {
+    // Get payload user id from req
+    const { payload: { sub: auth_id, permissions } } = req.auth
+    const room = await Chat.findById(req.params.c_id).populate('owner')
+    if (auth_id === room.owner.u_id) {
+        const deletedRoom = await Chat.findOneAndDelete({ _id: req.params.c_id })
+        res.send(deletedRoom)
+    } else {
+        res.status(401).send({ message: "Unauthorised"})
+    } 
+}
 
 module.exports.joinRoom = async (req, res, next) => {
     // Get payload user id from req
@@ -58,7 +80,7 @@ module.exports.getOneChatRoom = async (req, res, next) => {
     //
     // TBD - private room - only return room if user is member
     //
-    const room = await Chat.findById(c_id).populate({ path: 'users', populate: 'user' }).populate('messages')
+    const room = await Chat.findById(c_id).populate({ path: 'users', populate: 'user' }).populate('messages').populate({path: 'messages',populate:'author'})
     if (!room) {
         return next(new AppError(404,"Chatroom Not Found"))
     }
@@ -101,7 +123,6 @@ module.exports.createMessage = async (req, res, next) => {
         const message = new Message({
             body: body,
             author: user,
-            authorName: user._id, // Need to change this later when names added to DB
             date: Date.now(),
             chatRoom: mongoose.Types.ObjectId(c_id)
         })
