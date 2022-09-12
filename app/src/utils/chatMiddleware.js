@@ -81,7 +81,6 @@ const chatMiddleware = store => {
         // Message successfully created on database - emit new message 
         if (action.type === "chat/sendMessage/fulfilled") {
             const message = action.payload;
-            console.log(message);
             socket.emit("NEW_MESSAGE", message)
         }
 

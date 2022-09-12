@@ -43,9 +43,19 @@ const initialState = {
 
 export const getUser = createAsyncThunk(
     'user/getUser',
-    async (u_id, thunkAPI) => {
+    async ({ user, token }, thunkAPI) => {
         try {
-            const res = await axios(`/api/users/${u_id}`);
+            const res = await axios.post(
+                `/api/users/${user.sub}`,
+                {
+                    auth0User: user
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
@@ -211,10 +221,6 @@ export const userSlice = createSlice({
             }
  
         },
-        addUserToRedux: (state, { payload }) => {
-            const {name,nickname,email} = payload
-            state.user = {...state.user, name, nickname, email}
-        }
     },
     extraReducers: {
         [getUser.pending]: (state) => {
@@ -323,6 +329,6 @@ export const userSlice = createSlice({
     }
 })
 
-export const {clearUser,updateDBForm,updateForm,resetSuccess,populateDBForm,addUserToRedux } = userSlice.actions
+export const {clearUser,updateDBForm,updateForm,resetSuccess,populateDBForm } = userSlice.actions
 
 export default userSlice.reducer

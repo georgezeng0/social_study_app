@@ -6,6 +6,9 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
     {
+        name: String,
+        nickname: String,
+        email: String,
         u_id: { type: String, required: true }, // references the auth0 id
         icon: {
             color: { type: String, default: "#3297a8" },

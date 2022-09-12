@@ -11,11 +11,18 @@ const { auth0 } = require('../utils/authorisation')
 // for storing authentication related information.
 module.exports.getUser = async (req, res, next) => {
     const { u_id } = req.params
-    const user = await User.find({ u_id}); 
+    const user = await User.find({ u_id }); 
+    const { name, nickname, email } = req.body.auth0User
     if (user.length > 0) {
-        res.send(user[0])
+        const foundUser = user[0]
+        // Overwrite name, nickname, email from auth-0 (as these can be changed outside mongoDB in auth0 API)
+        foundUser.name = name
+        foundUser.nickname = nickname
+        foundUser.email = email
+        await foundUser.save()
+        res.send(foundUser)
     } else {
-        const newUser = new User({ u_id })
+        const newUser = new User({ u_id, name, nickname, email })
         await newUser.save()
         res.send(newUser)
     }

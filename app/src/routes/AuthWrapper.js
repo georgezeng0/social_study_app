@@ -6,19 +6,24 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { Loading } from '../components';
 import Error from './Error'
 import { useDispatch, useSelector } from 'react-redux';
-import { getUser,clearUser,addUserToRedux } from '../features/userSlice'
+import { getUser,clearUser } from '../features/userSlice'
+import getToken from '../utils/getToken';
 
 function AuthWrapper({ children }) {
   const { isLoading, error, user, isAuthenticated } = useAuth0();
-  const { user: reduxUser } = useSelector(state=>state.user)
+  const { user: reduxUser } = useSelector(state => state.user)
+  const { getAccessTokenSilently } = useAuth0();
   
   const dispatch = useDispatch()
   
   useEffect(() => {
     if (isAuthenticated && user) {
-      dispatch(getUser(user.sub)) // "sub" property contains the user id from auth0
-      // If user authenticated, get the user info from app DB
-      dispatch(addUserToRedux(user))
+      const getUserFn = async () => {
+        const token = await getToken(getAccessTokenSilently)
+        dispatch(getUser({ user,token })) // "sub" property contains the user id from auth0
+      // If user authenticated, get the user info from app DB and add on auth0 info
+      }
+      getUserFn()
     }
     if (!isLoading && !user && reduxUser._id) {
       dispatch(clearUser())

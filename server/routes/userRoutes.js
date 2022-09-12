@@ -6,7 +6,7 @@ const { jwtCheck } = require('../utils/authorisation');
 const { getUser, managementAPI_getUser, managementAPI_updateUser,
     updateUser, saveGameHistory, toggleFavSet } = require('../controllers/userController')
 
-router.get("/:u_id", wrapAsync(getUser))
+router.post("/:u_id", wrapAsync(getUser))
 
 router.patch("/:u_id", jwtCheck, wrapAsync(updateUser))
 
