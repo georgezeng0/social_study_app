@@ -70,6 +70,7 @@ const Wrapper = styled.div`
     height: 500px;
     width: 500px;
     border: 1px solid black;
+    overflow: scroll;
 }
 .chatInput{
     border: 1px solid blue;
@@ -80,6 +81,7 @@ const Wrapper = styled.div`
     height: 550px;
     width: 200px;
     border: 1px solid green;
+    overflow: scroll;
 }
 `
 

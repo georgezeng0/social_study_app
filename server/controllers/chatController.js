@@ -18,10 +18,29 @@ module.exports.createRoom = async (req, res, next) => {
     } 
 }
 
+// Get all rooms
 module.exports.getRooms = async (req, res, next) => {
     const rooms = await Chat.find()
     res.send(rooms)
 }
+
+// Get user rooms
+module.exports.getUserRooms = async (req, res, next) => {
+    // Get payload user id from req
+    const { payload: { sub: auth_id, permissions } } = req.auth
+    const { u_id } = req.params
+    const [user] = await User.find({ u_id: u_id })
+    if (auth_id === u_id) {
+        const joinedRooms = await Chat.find({ "users.user": user })
+            .populate({ path: 'users', populate: 'user' })
+            .populate('messages')
+            .populate({ path: 'messages', populate: 'author' })
+        res.send(joinedRooms)
+    } else {
+        res.status(401).send({ message: "Unauthorised"})
+    } 
+}
+
 // Update room (settings)
 module.exports.editChatRoom = async (req, res, next) => {
     // Get payload user id from req

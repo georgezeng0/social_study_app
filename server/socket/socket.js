@@ -26,28 +26,30 @@ module.exports = (server) => {
             // Check if user is in a room and if so, sync this socket to it
             const rooms = await Chat.find({ users: { $elemMatch: { user: mongoose.Types.ObjectId(userMongoID) } } }) //not populated user object
 
-            let c_id 
-            if (rooms.length) {
-                c_id = rooms[0]._id.toString()
-                socket.join(c_id)
+            const socketRooms = socketIO.of("/").adapter.rooms // Map object - for read purposes, do not alter
+            const socketUserRoom = Array.from(socketRooms.get(`USER_${userMongoID}`)) // Set object of socket IDs with user logged in (different tabs/devices)
+                    // Need to convert to array for mongoose schema
             
-                const socketRooms = socketIO.of("/").adapter.rooms // Map object - for read purposes, do not alter
-                const socketUserRoom = Array.from(socketRooms.get(`USER_${userMongoID}`)) // Set object of socket IDs with user logged in (different tabs/devices)
-                // Need to convert to array for mongoose schema
-
+            if (rooms.length) {
                 // Update socketIDs of user in chatroom
                 const user = await User.findById(userMongoID)
-                const updatedRoom = await Chat.findOneAndUpdate(
+                const updatedRoom = await Chat.updateMany(
                     { users: { $elemMatch: { user: mongoose.Types.ObjectId(userMongoID) } } },
                     { $set: { "users.$[el].socketID": socketUserRoom } },
                     { arrayFilters: [{ "el.user": { $eq: user } }], new: true },
                 )
-                
-                socketIO.emit('UPDATE_CLIENT_SINGLE_USER_SOCKETS', {
-                    c_id: c_id,
-                    userMongoID,
-                    socketID: socketUserRoom
+
+                // Loop through each room user has joined > add socket to room and update client per room
+                for (let i = 0; i < rooms.length; i++) {
+                    const c_id = rooms[i]._id.toString()
+                    socket.join(c_id)
+
+                    socketIO.emit('UPDATE_CLIENT_SINGLE_USER_SOCKETS', {
+                        c_id: c_id,
+                        userMongoID,
+                        socketID: socketUserRoom
                     })
+                }
             }
             
         });

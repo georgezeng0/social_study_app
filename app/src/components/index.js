@@ -16,10 +16,11 @@ import ToggleFavouriteSetButton from "./ToggleFavouriteSetButton";
 import SortFilterSets from "./SortFilterSets";
 import ChatBox from "./ChatBox";
 import ChatRoomForm from "./ChatRoomForm";
+import NavChatModal from "./NavChatModal";
 
 export {
     Navbar, FlashcardForm, SetForm, Flashcards, Flashcard,
     TextEditor, Loading, AsyncModal, MessageModal, PlayWindow,
     Redirect, DeleteSetButton, UserForm, UserIcon, ToggleFavouriteSetButton,
-    SortFilterSets,ChatBox,ChatRoomForm
+    SortFilterSets,ChatBox,ChatRoomForm, NavChatModal
 }

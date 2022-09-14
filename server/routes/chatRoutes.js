@@ -3,7 +3,9 @@ const router = express.Router();
 const wrapAsync = require('../utils/wrapAsync');
 const { jwtCheck } = require('../utils/authorisation');
 
-const { createRoom, getRooms,joinRoom,leaveRoom,getOneChatRoom,createMessage,editChatRoom, deleteChatRoom } = require('../controllers/chatController')
+const { createRoom, getRooms, joinRoom, leaveRoom,
+    getOneChatRoom, createMessage, editChatRoom,
+    deleteChatRoom, getUserRooms } = require('../controllers/chatController')
 
 router.post("/", jwtCheck, wrapAsync(createRoom))
 
@@ -20,5 +22,7 @@ router.post("/:c_id/join", jwtCheck, wrapAsync(joinRoom))
 router.post("/:c_id/leave", jwtCheck, wrapAsync(leaveRoom))
 
 router.post("/:c_id/message", jwtCheck, wrapAsync(createMessage))
+
+router.get("/userRooms/:u_id", jwtCheck, wrapAsync(getUserRooms))
 
 module.exports=router

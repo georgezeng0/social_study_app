@@ -20,12 +20,15 @@ const initialState = {
         messages: [],
         users: []
     },
+    joinedRooms: [],
     roomForm: {
         name: '',
         isPublic: false,
     },
     rooms: [],
-    showEdit: false
+    showEdit: false,
+    newMessages: {}, // key is chat_id, value is number of new messages for that chatroom
+
 }
 
 export const createRoom = createAsyncThunk(
@@ -55,11 +58,31 @@ export const createRoom = createAsyncThunk(
     }
 )
 
+// Get all chatrooms
 export const getRooms = createAsyncThunk(
     'chat/getRooms',
     async (_, thunkAPI) => {
         try {
             const res = await axios('/api/chat')
+            return res.data
+        } catch (error) {
+            return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
+        }
+    }
+)
+
+// Get all chatrooms that user has joined
+export const getUserRooms = createAsyncThunk(
+    'chat/getUserRooms',
+    async ({ u_id, token }, thunkAPI) => {
+        try {
+            const res = await axios(`/api/chat/userRooms/${u_id}/`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            )
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
@@ -239,12 +262,31 @@ export const chatSlice = createSlice({
         },
         updateMessages: (state, action) => {
             const newMessage = action.payload;
+            const messageRoomID=newMessage.chatRoom
             // Check that message is for correct chatroom
-            if (state.chatRoom._id === newMessage.chatRoom) {
+            if (state.chatRoom._id === messageRoomID) {
                 // Check that message isn't already in messages (should not happen)
                 if (state.chatRoom.messages.findIndex(msg => msg._id === newMessage._id) < 0) {
                     state.chatRoom.messages.push(newMessage)
-                }                
+                }             
+            }
+            // Add message to joined rooms if not in that chatroom route
+            state.joinedRooms = state.joinedRooms.map(
+                room => {
+                    const { _id, messages } = room
+                    if (_id === messageRoomID) {
+                        if (messages.findIndex(msg => msg._id === newMessage._id) < 0) {
+                            messages.push(newMessage)
+                        }         
+                    }
+                    return room
+                }
+            )
+            // New message notificationS
+            if (state.newMessages[messageRoomID]) {
+                state.newMessages[messageRoomID]+=1
+            } else {
+                state.newMessages[messageRoomID]=1
             }
         },
         populateRoomForm: (state, action) => {
@@ -256,6 +298,9 @@ export const chatSlice = createSlice({
         },
         toggleShowEdit: (state, action) => {
             state.showEdit= !state.showEdit
+        },
+        resetMessageCount: (state, action) => {
+            state.newMessages[action.payload]=undefined
         }
     },
     extraReducers: {
@@ -369,13 +414,27 @@ export const chatSlice = createSlice({
             state.error.isError = true;
             state.error = { ...state.error, ...action.payload }
         },
+        [getUserRooms.pending]: (state) => {
+            state.error.isError = false;
+            state.isLoading = true
+        },
+        [getUserRooms.fulfilled]: (state,action) => {
+            state.isLoading = false;
+            state.error.isError = false;
+            state.joinedRooms = action.payload;
+        },
+        [getUserRooms.rejected]: (state, action) => {
+            state.isLoading = false;
+            state.error.isError = true;
+            state.error = { ...state.error, ...action.payload }
+        },
     }
 })
 
 export const {
     updateForm, resetForm, updateRoomForm, resetRoomForm, updateRoomUsers,
     startConnecting, connectionEstablished, disconnectedSocket, updateUserSockets,
-    updateMessages,populateRoomForm,toggleShowEdit
+    updateMessages,populateRoomForm,toggleShowEdit,resetMessageCount
     
 } = chatSlice.actions
 

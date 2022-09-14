@@ -3,14 +3,14 @@ import React,{ useEffect,useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChatBox, ChatRoomForm } from '../components'
-import { joinRoom,leaveRoom, getOneChatRoom,toggleShowEdit, deleteRoom } from '../features/chatSlice';
+import { joinRoom,leaveRoom, getOneChatRoom,toggleShowEdit, deleteRoom, resetMessageCount } from '../features/chatSlice';
 import getToken from '../utils/getToken';
 
 const ChatRoom = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { getAccessTokenSilently } = useAuth0()
-  const { chatRoom,showEdit } = useSelector(state => state.chat)
+  const { chatRoom,showEdit, newMessages } = useSelector(state => state.chat)
   const { user } = useSelector(state => state.user)
   const { c_id } = useParams()
 
@@ -23,6 +23,12 @@ const ChatRoom = () => {
       setIsJoined(false)
     }
   }, [chatRoom, c_id])
+
+  useEffect(() => {
+    if (newMessages[c_id]) {
+      dispatch(resetMessageCount(c_id))
+    }
+  }, [dispatch, newMessages, c_id])
 
   const fetchChatRoom = async () => {
     const token = await getToken(getAccessTokenSilently)

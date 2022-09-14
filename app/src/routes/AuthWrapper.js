@@ -8,6 +8,7 @@ import Error from './Error'
 import { useDispatch, useSelector } from 'react-redux';
 import { getUser,clearUser } from '../features/userSlice'
 import getToken from '../utils/getToken';
+import { getUserRooms } from '../features/chatSlice';
 
 function AuthWrapper({ children }) {
   const { isLoading, error, user, isAuthenticated } = useAuth0();
@@ -22,6 +23,9 @@ function AuthWrapper({ children }) {
         const token = await getToken(getAccessTokenSilently)
         dispatch(getUser({ user,token })) // "sub" property contains the user id from auth0
       // If user authenticated, get the user info from app DB and add on auth0 info
+        
+        // Also get user chatrooms that they have joined
+        dispatch(getUserRooms({ u_id: user.sub, token }))
       }
       getUserFn()
     }
