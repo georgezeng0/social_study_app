@@ -5,6 +5,7 @@ const chatSchema = new mongoose.Schema(
     {
         title: { type: String, default: "Untitled Room" },
         isPublic: { type: Boolean, default: false },
+        passcode: { type: String, select: false }, // will not be returned on query unless selected via .select('+passcode')
         messages: [{ type: mongoose.Schema.Types.ObjectId, ref: "Message" }],
         owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
         users: [{

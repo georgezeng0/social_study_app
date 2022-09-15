@@ -17,6 +17,8 @@ const initialState = {
         message: ""
     },
     chatRoom: {
+        _id: '',
+        isPublic: false,
         messages: [],
         users: []
     },
@@ -153,10 +155,11 @@ export const deleteRoom = createAsyncThunk(
 // Join a chat room 
 export const joinRoom = createAsyncThunk(
     'chat/joinRoom',
-    async ({c_id, token}, thunkAPI) => {
+    async ({c_id, token, passcode}, thunkAPI) => {
         try {
             const res = await axios.post(`/api/chat/${c_id}/join`, {
-                user: thunkAPI.getState().user.user?._id
+                user: thunkAPI.getState().user.user?._id,
+                passcode: passcode
             },
             {
                 headers: {
@@ -338,7 +341,7 @@ export const chatSlice = createSlice({
         [getOneChatRoom.fulfilled]: (state,action) => {
             state.isLoading = false;
             state.error.isError = false;
-            state.chatRoom=action.payload
+            state.chatRoom = { ...initialState.chatRoom,...action.payload }
         },
         [getOneChatRoom.rejected]: (state, action) => {
             state.isLoading = false;
@@ -352,7 +355,7 @@ export const chatSlice = createSlice({
         [joinRoom.fulfilled]: (state,action) => {
             state.isLoading = false;
             state.error.isError = false;
-            state.chatRoom=action.payload
+            state.chatRoom={ ...initialState.chatRoom,...action.payload }
         },
         [joinRoom.rejected]: (state, action) => {
             state.isLoading = false;
@@ -366,7 +369,7 @@ export const chatSlice = createSlice({
         [leaveRoom.fulfilled]: (state,action) => {
             state.isLoading = false;
             state.error.isError = false;
-            state.chatRoom=action.payload
+            state.chatRoom={ ...initialState.chatRoom,...action.payload }
         },
         [leaveRoom.rejected]: (state, action) => {
             state.isLoading = false;
@@ -393,7 +396,7 @@ export const chatSlice = createSlice({
         [editRoom.fulfilled]: (state,action) => {
             state.isLoading = false;
             state.error.isError = false;
-            state.chatRoom=action.payload
+            state.chatRoom={ ...initialState.chatRoom,...action.payload }
             state.showEdit=false
         },
         [editRoom.rejected]: (state, action) => {

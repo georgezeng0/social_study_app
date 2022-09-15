@@ -56,8 +56,8 @@ const ChatBox = () => {
                   // Display user nickname if exists, otherwise name
                   return <p key={i}>
                       {user?.user?.nickname || user?.user?.name}
-                      <UserIcon name={user.user.name} height={"50px"} width={"50px"} color={user.user.icon.color} textColor={user.user.icon.textColor} />
-                      {user.socketID.length ? "Online" : "Offline"}
+                      <UserIcon name={user.user?.name} height={"50px"} width={"50px"} color={user.user?.icon?.color} textColor={user.user?.icon?.textColor} />
+                      {user?.socketID.length ? "Online" : "Offline"}
                   </p>
               })}
           </div>
