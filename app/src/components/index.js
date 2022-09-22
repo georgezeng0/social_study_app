@@ -17,10 +17,11 @@ import SortFilterSets from "./SortFilterSets";
 import ChatBox from "./ChatBox";
 import ChatRoomForm from "./ChatRoomForm";
 import NavChatModal from "./NavChatModal";
+import VideoPlayer from "./VideoPlayer";
 
 export {
     Navbar, FlashcardForm, SetForm, Flashcards, Flashcard,
     TextEditor, Loading, AsyncModal, MessageModal, PlayWindow,
     Redirect, DeleteSetButton, UserForm, UserIcon, ToggleFavouriteSetButton,
-    SortFilterSets,ChatBox,ChatRoomForm, NavChatModal
+    SortFilterSets,ChatBox,ChatRoomForm, NavChatModal, VideoPlayer
 }

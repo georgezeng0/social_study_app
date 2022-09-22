@@ -181,7 +181,7 @@ module.exports.createMessage = async (req, res, next) => {
     const { c_id } = req.params
     const user = await User.findById(mongoUserID)
     if (auth_id === user?.u_id) {
-        const room = await Chat.findById(c_id)
+        const room = await Chat.findById(c_id).populate({path:"users",populate:"user"})
         if (!room) {
             return next(new AppError(404,'Chatroom not found.'))
         }

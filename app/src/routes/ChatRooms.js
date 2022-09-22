@@ -24,6 +24,7 @@ const ChatRooms = () => {
           </p>
         })}
       </div>
+      
         </main>
   )
 }
