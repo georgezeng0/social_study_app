@@ -20,7 +20,8 @@ const initialState = {
         _id: '',
         isPublic: false,
         messages: [],
-        users: []
+        users: [],
+        videoId: ''
     },
     joinedRooms: [],
     roomForm: {
@@ -309,8 +310,14 @@ export const chatSlice = createSlice({
             // Chat middleware will send socket
         },
         videoResponse: (state, action) => {
-            const { actionType } = action.payload
-            state.videoResponse=actionType
+            const { actionType, payload, c_id } = action.payload
+            // Action only for the relevant chatroom
+            if (state.chatRoom._id === c_id) {
+                state.videoResponse = actionType
+                if (actionType === "SET_VIDEO_ID") {
+                    state.chatRoom.videoId = payload
+                }
+            }
         },
         resetVideoResponse: (state, action) => {
             state.videoResponse=''

@@ -7,10 +7,9 @@ import { videoControl, resetVideoResponse } from '../features/chatSlice'
 const VideoPlayer = () => {
     const dispatch = useDispatch();
     const { c_id } = useParams()
-    const { videoResponse } = useSelector(state=>state.chat)
+    const { videoResponse, chatRoom: {videoId} } = useSelector(state=>state.chat)
 
     const [urlInput, setUrlInput] = useState('')
-    const [videoId, setVideoId] = useState('')
     const [seekTime, setSeekTime] = useState({ min: 0, sec: 0 })
 
     // Sets the videoplayer element on videoplayer load - then can control playback using code
@@ -28,6 +27,9 @@ const VideoPlayer = () => {
                 playerElement.pauseVideo()
                 dispatch(resetVideoResponse())
             }
+            if (videoResponse === "SET_VIDEO") {
+                dispatch(resetVideoResponse())
+            }
         }
     },[videoResponse, dispatch, playerElement])
 
@@ -42,7 +44,7 @@ const VideoPlayer = () => {
         e.preventDefault()
         const url_parsed = youtube_parser(urlInput)
         if (url_parsed) {
-            setVideoId(url_parsed)
+            dispatch(videoControl({c_id, actionType: "SET_VIDEO_ID", payload: url_parsed}))
         }
     }
 

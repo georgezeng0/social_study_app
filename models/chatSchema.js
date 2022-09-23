@@ -11,7 +11,8 @@ const chatSchema = new mongoose.Schema(
         users: [{
                 user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
                 socketID: [{type: String}]
-            }],
+        }],
+        videoId: String
     });
 
 // Cascade - deleting chatroom will delete its messages 

@@ -91,8 +91,8 @@ const chatMiddleware = store => {
 
         // Play video
         if (action.type === "chat/videoControl") {
-            const { c_id, actionType } = action.payload
-            socket.emit("VIDEO_CONTROL", {chatroom: c_id, actionType})
+            const { c_id, actionType, payload } = action.payload
+            socket.emit("VIDEO_CONTROL", {chatroom: c_id, actionType, payload})
         }
 
         //test

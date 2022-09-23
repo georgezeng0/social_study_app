@@ -85,9 +85,13 @@ module.exports = (server) => {
         })
 
         // Video controls
-        socket.on('VIDEO_CONTROL', (data) => {
-            const { chatroom:c_id, actionType } = data
-            socketIO.to(c_id).emit('VIDEO_RESPONSE', {actionType})
+        socket.on('VIDEO_CONTROL', async (data) => {
+            const { chatroom:c_id, actionType, payload } = data
+            socketIO.to(c_id).emit('VIDEO_RESPONSE', { c_id,actionType, payload })
+            if (actionType === "SET_VIDEO_ID") {
+                // Updates database with video for incoming chat joiners
+                await Chat.findByIdAndUpdate(c_id,{videoId: payload})
+            }
         })
 
         // Disconnect
