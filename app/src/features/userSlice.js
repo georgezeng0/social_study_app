@@ -37,8 +37,16 @@ const initialState = {
     },
     isLoading: false, //Generic Loading for whole page - used for API calls to backend
     isAPILoading: false, //Loading for third party APIs e.g. Auth0Management API
-    isButtonLoading: false //Loading state for buttons and small components e.g. toggle favourite set button that 
+    isButtonLoading: false, //Loading state for buttons and small components e.g. toggle favourite set button that
     // does not require the entire page to go into loading animation
+    
+    timer: {
+        form: {
+            studyTime: '',
+            breakTime: ''
+        },
+        
+    }
 }
 
 export const getUser = createAsyncThunk(

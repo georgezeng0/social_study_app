@@ -31,7 +31,10 @@ const initialState = {
     rooms: [],
     showEdit: false,
     newMessages: {}, // key is chat_id, value is number of new messages for that chatroom
-    videoResponse: '',
+    videoResponse: {
+        type: '',
+        payload: null,
+    }
 }
 
 export const createRoom = createAsyncThunk(
@@ -313,14 +316,15 @@ export const chatSlice = createSlice({
             const { actionType, payload, c_id } = action.payload
             // Action only for the relevant chatroom
             if (state.chatRoom._id === c_id) {
-                state.videoResponse = actionType
+                state.videoResponse.type = actionType
+                state.videoResponse.payload= payload
                 if (actionType === "SET_VIDEO_ID") {
                     state.chatRoom.videoId = payload
                 }
             }
         },
         resetVideoResponse: (state, action) => {
-            state.videoResponse=''
+            state.videoResponse = {...initialState.videoResponse}
         }
 
     },

@@ -7,7 +7,7 @@ import { videoControl, resetVideoResponse } from '../features/chatSlice'
 const VideoPlayer = () => {
     const dispatch = useDispatch();
     const { c_id } = useParams()
-    const { videoResponse, chatRoom: {videoId} } = useSelector(state=>state.chat)
+    const { videoResponse: {type:videoResponseType, payload: videoResponsePayload}, chatRoom: {videoId} } = useSelector(state=>state.chat)
 
     const [urlInput, setUrlInput] = useState('')
     const [seekTime, setSeekTime] = useState({ min: 0, sec: 0 })
@@ -18,20 +18,25 @@ const VideoPlayer = () => {
     // Handle video response logic from state
     // Youtube iframe API https://developers.google.com/youtube/iframe_api_reference#Operations
     useEffect(() => {
-        if (playerElement && videoResponse) {
-            if (videoResponse === "PLAY") {
+        if (playerElement && videoResponseType) {
+            if (videoResponseType === "PLAY") {
                 playerElement.playVideo()
                 dispatch(resetVideoResponse())
             }
-            if (videoResponse === "PAUSE") {
+            if (videoResponseType === "PAUSE") {
                 playerElement.pauseVideo()
                 dispatch(resetVideoResponse())
             }
-            if (videoResponse === "SET_VIDEO") {
+            if (videoResponseType === "SET_VIDEO") {
+                // videoId updated in redux state
+                dispatch(resetVideoResponse())
+            }
+            if (videoResponseType === "SEEK") {
+                playerElement.seekTo(videoResponsePayload)
                 dispatch(resetVideoResponse())
             }
         }
-    },[videoResponse, dispatch, playerElement])
+    },[videoResponseType,videoResponsePayload, dispatch, playerElement])
 
     // Taken from stackoverflow
     function youtube_parser(url){
@@ -57,7 +62,8 @@ const VideoPlayer = () => {
     }
 
     const handleSeekButton = () => {
-
+        const seekTimeInSeconds = parseInt(seekTime.min) * 60 + parseInt(seekTime.sec)
+        dispatch(videoControl({c_id, actionType: "SEEK", payload: seekTimeInSeconds}))
     }
 
     return (
@@ -68,10 +74,10 @@ const VideoPlayer = () => {
                     onChange={e => setUrlInput(e.target.value)}
                     placeholder="Youtube url"                
                 />
-                <button>Set Video for everyone</button>
+                <button>Set Youtube Video for Chat</button>
             </form>
             <div>
-                <h4>Group Controls</h4>
+                <h4>Group Controls - Affects playback for those in the chatroom</h4>
                 <button onClick={handlePlayButton}>Play</button>
                 <button onClick={handlePauseButton}>Pause</button>
                 <label htmlFor="min">Minutes:</label>
