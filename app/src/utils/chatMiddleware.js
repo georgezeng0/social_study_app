@@ -1,5 +1,5 @@
 import { io } from 'socket.io-client';
-import { connectionEstablished, disconnectedSocket, updateRoomUsers, updateUserSockets, updateMessages } from '../features/chatSlice';
+import { connectionEstablished, disconnectedSocket, updateRoomUsers, updateUserSockets, updateMessages, videoResponse } from '../features/chatSlice';
 
 const chatMiddleware = store => {
     // Initialise socket - only connect upon logged in user otherwise remain undefined.
@@ -51,6 +51,11 @@ const chatMiddleware = store => {
                 socket.on('MESSAGE_RESPONSE', (data) => {
                     store.dispatch(updateMessages(data))
                 })
+
+                // VIDEO RESPONSE - control video player
+                socket.on('VIDEO_RESPONSE', (data) => {
+                    store.dispatch(videoResponse(data))
+                })
             }
         }
 
@@ -82,6 +87,12 @@ const chatMiddleware = store => {
         if (action.type === "chat/sendMessage/fulfilled") {
             const message = action.payload;
             socket.emit("NEW_MESSAGE", message)
+        }
+
+        // Play video
+        if (action.type === "chat/videoControl") {
+            const { c_id, actionType } = action.payload
+            socket.emit("VIDEO_CONTROL", {chatroom: c_id, actionType})
         }
 
         //test

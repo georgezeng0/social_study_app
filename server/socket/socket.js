@@ -84,6 +84,12 @@ module.exports = (server) => {
             socketIO.to(c_id).emit('MESSAGE_RESPONSE', data)
         })
 
+        // Video controls
+        socket.on('VIDEO_CONTROL', (data) => {
+            const { chatroom:c_id, actionType } = data
+            socketIO.to(c_id).emit('VIDEO_RESPONSE', {actionType})
+        })
+
         // Disconnect
         socket.on('disconnect', async () => {
             console.log(`🔥: ${socket.id} user disconnected`);

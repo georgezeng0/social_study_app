@@ -30,7 +30,7 @@ const initialState = {
     rooms: [],
     showEdit: false,
     newMessages: {}, // key is chat_id, value is number of new messages for that chatroom
-
+    videoResponse: '',
 }
 
 export const createRoom = createAsyncThunk(
@@ -304,7 +304,18 @@ export const chatSlice = createSlice({
         },
         resetMessageCount: (state, action) => {
             state.newMessages[action.payload]=undefined
+        },
+        videoControl: (state, action) => {
+            // Chat middleware will send socket
+        },
+        videoResponse: (state, action) => {
+            const { actionType } = action.payload
+            state.videoResponse=actionType
+        },
+        resetVideoResponse: (state, action) => {
+            state.videoResponse=''
         }
+
     },
     extraReducers: {
         [createRoom.pending]: (state) => {
@@ -437,7 +448,8 @@ export const chatSlice = createSlice({
 export const {
     updateForm, resetForm, updateRoomForm, resetRoomForm, updateRoomUsers,
     startConnecting, connectionEstablished, disconnectedSocket, updateUserSockets,
-    updateMessages,populateRoomForm,toggleShowEdit,resetMessageCount
+    updateMessages, populateRoomForm, toggleShowEdit, resetMessageCount,
+    videoControl, videoResponse,resetVideoResponse
     
 } = chatSlice.actions
 
