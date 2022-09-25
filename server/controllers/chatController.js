@@ -97,7 +97,7 @@ module.exports.joinRoom = async (req, res, next) => {
             .select("+passcode").populate({ path: 'users', populate: 'user' })
             .populate('messages').populate({ path: 'messages', populate: 'author' })
         // Check if passcode is correct or if use is owner
-        if (passcode === room.passcode || room.owner.toString() === mongoUserID) {
+        if (room.isPublic || passcode === room.passcode || room.owner.toString() === mongoUserID) {
             // If user not in room, push. Socket ID will be added by socket handler.
             if (room.users.findIndex(item => item.user._id.toString() === user._id.toString()) < 0) {
                 room.users.push({

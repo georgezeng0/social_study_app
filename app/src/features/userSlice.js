@@ -42,10 +42,17 @@ const initialState = {
     
     timer: {
         form: {
-            studyTime: '',
-            breakTime: ''
+            studyTimeInput: 25,
+            breakTimeInput: 5,
+            repeatInput: 0
         },
-        
+        startTime: 0,
+        expiresAt: 0,
+        isStudy: true,
+        studyTime: 0,
+        breaktime: 0,
+        repeat:0,
+        isPaused: false
     }
 }
 
@@ -229,6 +236,31 @@ export const userSlice = createSlice({
             }
  
         },
+        updateTimerForm: (state, {payload:{name,value}}) => {
+            state.timer.form[name]=value
+        },
+        // timer: {
+        //     form: {
+        //         studyTimeInput: 25,
+        //         breakTimeInput: 5,
+        //         repeatInput: 1
+        //     },
+        //     timeLeft: 0,
+        //     isStudy: true,
+        //     studyTime: 0,
+        //     breaktime: 0,
+        //     repeat:0,
+        //     isPaused: false
+        // }
+        startNewTimer: (state, action) => {
+            const { studyTimeInput, breakTimeInput, repeatInput } = state.timer.form
+            const timeNow = Date.now()
+            state.timer.startTime = timeNow
+            state.timer.expiresAt = timeNow + studyTimeInput * 60 * 1000 // ms
+            state.timer.studyTime = studyTimeInput*60*1000
+            state.timer.breaktime = breakTimeInput*60*1000
+            state.timer.repeat = repeatInput
+        }
     },
     extraReducers: {
         [getUser.pending]: (state) => {
@@ -337,6 +369,7 @@ export const userSlice = createSlice({
     }
 })
 
-export const {clearUser,updateDBForm,updateForm,resetSuccess,populateDBForm } = userSlice.actions
+export const { clearUser, updateDBForm, updateForm, resetSuccess, populateDBForm,
+    updateTimerForm, startNewTimer} = userSlice.actions
 
 export default userSlice.reducer

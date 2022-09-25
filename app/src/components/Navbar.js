@@ -4,12 +4,14 @@ import { useAuth0 } from "@auth0/auth0-react";
 import NavChatModal from './NavChatModal';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
+import StudyTimer from './StudyTimer';
 
 const Navbar = () => {
   const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0();
   const { newMessages } = useSelector(state=>state.chat)
   
   const [showMessages, setShowMessages] = useState(false)
+  const [showTimer, setShowTimer] = useState(false)
 
   let messageTotal = Object.values(newMessages).reduce((total,count)=>(total+count),0)
   
@@ -32,7 +34,15 @@ const Navbar = () => {
       </div>
       <div className='NavChatModal-Wrapper'>
         {showMessages && <NavChatModal />}
-        </div>
+      </div>
+
+      <div>
+        <button onClick={()=>setShowTimer(!showTimer)}>
+          Timer
+          </button>
+      </div>
+      {showTimer && <StudyTimer props={{ setShowTimer,showTimer }} />}
+      
     </Wrapper>
   )
 }
