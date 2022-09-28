@@ -21,7 +21,7 @@ function getGameState() {
     data = JSON.parse(data)
     if (data?.flashcards) { return data }
     else {
-        return initialState
+        return { ...initialState }
     }
 }
 

@@ -1,6 +1,41 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
 
+// Function to set state to local storage - for timer
+function saveTimerState(state) {
+    localStorage.setItem("timerState", JSON.stringify({ ...state }));
+}
+
+function getTimerState() {
+    let data = localStorage.getItem("timerState")
+    data = JSON.parse(data)
+    if (data?.expiresAt > 0) {
+        return {
+            ...data,
+            isPaused: true,
+            timeLeftAtPause: data.savedTimeLeft
+        }
+    }
+    else {
+        return {
+            form: {
+                studyTimeInput: 25,
+                breakTimeInput: 5,
+                repeatInput: 0
+            },
+            startTime: 0,
+            expiresAt: 0,
+            isStudy: true,
+            studyTime: 0,
+            breakTime: 0,
+            repeat: 0,
+            timeLeftAtPause: 0,
+            isPaused: false,
+            savedTimeLeft: 0, // timeleft saved to localstorage - if user closes tab/ refresh
+        }
+    }
+}
+
 const initialState = {
     user: {
         _id:'',
@@ -40,20 +75,7 @@ const initialState = {
     isButtonLoading: false, //Loading state for buttons and small components e.g. toggle favourite set button that
     // does not require the entire page to go into loading animation
     
-    timer: {
-        form: {
-            studyTimeInput: 25,
-            breakTimeInput: 5,
-            repeatInput: 0
-        },
-        startTime: 0,
-        expiresAt: 0,
-        isStudy: true,
-        studyTime: 0,
-        breaktime: 0,
-        repeat:0,
-        isPaused: false
-    }
+    timer: getTimerState()
 }
 
 export const getUser = createAsyncThunk(
@@ -243,23 +265,62 @@ export const userSlice = createSlice({
         //     form: {
         //         studyTimeInput: 25,
         //         breakTimeInput: 5,
-        //         repeatInput: 1
+        //         repeatInput: 0
         //     },
-        //     timeLeft: 0,
+        //     startTime: 0,
+        //     expiresAt: 0,
         //     isStudy: true,
         //     studyTime: 0,
-        //     breaktime: 0,
+        //     breakTime: 0,
         //     repeat:0,
         //     isPaused: false
         // }
         startNewTimer: (state, action) => {
             const { studyTimeInput, breakTimeInput, repeatInput } = state.timer.form
             const timeNow = Date.now()
-            state.timer.startTime = timeNow
-            state.timer.expiresAt = timeNow + studyTimeInput * 60 * 1000 // ms
-            state.timer.studyTime = studyTimeInput*60*1000
-            state.timer.breaktime = breakTimeInput*60*1000
-            state.timer.repeat = repeatInput
+            state.timer = {
+                ...state.timer,
+                startTime: timeNow,
+                expiresAt: timeNow + studyTimeInput * 60 * 1000, // ms
+                studyTime: studyTimeInput*60*1000,
+                breakTime: breakTimeInput*60*1000,
+                repeat: repeatInput
+            }
+            saveTimerState({...state.timer})
+            
+        },
+        endTimer: (state, action) => {
+            const { studyTime, breakTime, repeat, isStudy } = state.timer
+            // Run next iteration of timer
+            if (repeat > 0 || isStudy) { 
+                const timeNow = Date.now()
+                state.timer = {
+                    ...state.timer,
+                    startTime: timeNow,
+                    expiresAt: isStudy ? timeNow + breakTime : timeNow + studyTime,
+                    isStudy: !isStudy,
+                    repeat: isStudy? repeat: repeat-1
+                }
+            } else {
+                // Stop everything if no more repeats and reset
+                state.timer = {
+                    ...initialState.timer
+                }
+            }
+            saveTimerState({...state.timer})
+        },
+        pauseTimer: (state, action) => {
+            state.timer.isPaused = true;
+            state.timer.timeLeftAtPause = state.timer.expiresAt - Date.now()
+            saveTimerState({...state.timer})
+        },
+        continueTimer: (state, action) => {
+            state.timer.isPaused = false;
+            state.timer.expiresAt = Date.now() + state.timer.timeLeftAtPause
+            saveTimerState({...state.timer})
+        },
+        saveLocalTimerState: (state, action) => {
+            saveTimerState({...state.timer, savedTimeLeft: state.timer.expiresAt - Date.now()})
         }
     },
     extraReducers: {
@@ -370,6 +431,7 @@ export const userSlice = createSlice({
 })
 
 export const { clearUser, updateDBForm, updateForm, resetSuccess, populateDBForm,
-    updateTimerForm, startNewTimer} = userSlice.actions
+    updateTimerForm, startNewTimer, endTimer, pauseTimer, continueTimer, saveLocalTimerState,
+} = userSlice.actions
 
 export default userSlice.reducer

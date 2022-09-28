@@ -3,45 +3,73 @@ import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
-import { startNewTimer, updateTimerForm } from '../features/userSlice'
+import { startNewTimer, updateTimerForm,endTimer, pauseTimer, continueTimer, saveLocalTimerState } from '../features/userSlice'
 
 const StudyTimer = ({ props: { setShowTimer, showTimer } }) => {
     const dispatch = useDispatch()
     const { timer: { form: { studyTimeInput, breakTimeInput, repeatInput },
-        startTime, expiresAt, isStudy, studyTime, breakTime, repeat, isPaused }
+        startTime, expiresAt, isStudy, studyTime, breakTime, repeat, isPaused, timeLeftAtPause }
     } = useSelector(state => state.user)
 
+    // Calcuilate time left using expiresAt from redux state
     const calculateTimeLeft = () => {
         const timeNow = Date.now()
         if (expiresAt) {
-            return expiresAt - timeNow
+            const timeLeft = expiresAt - timeNow
+            if (timeLeft > 0) {
+                return timeLeft
+            }
+            // if timeLeft <=0 then end Timer
+            dispatch(endTimer())
         } 
         return 0
     }
 
+    // Time Left that is displayed
     const [timeLeft, setTimeLeft] = useState(calculateTimeLeft())
 
+    // Handles form submit
     const handleSubmit = (e) => {
         e.preventDefault()
         dispatch(startNewTimer())
     }
 
+    // Handles form control - redux state
     const handleChange = (e) => {
         const name = e.target.name
         const value = e.target.value
         dispatch(updateTimerForm({ name, value }))
     }
 
+    // Handle pause button
+    const handlePause = () => {
+        if (isPaused) {
+            dispatch(continueTimer())
+        } else {
+            dispatch(pauseTimer())
+        }
+    }
+
+    // Timer function - runs calculateTimeLeft() every 0.1s
     useEffect(() => {
         let timer
-        if (expiresAt) {
-            
-            timer = setInterval(() => { setTimeLeft(calculateTimeLeft()) }, 200)
+        let localStateSaveTimer
+        if (expiresAt && !isPaused) {
+            timer = setInterval(() => { setTimeLeft(calculateTimeLeft()) }, 100) // Updates time left every 0.1s
+            localStateSaveTimer = setInterval(() => {
+                dispatch(saveLocalTimerState())
+            }, 5000) // Saves current timer state to localstorage every 5s
+        }
+        if (isPaused) {
+            setTimeLeft(timeLeftAtPause)
+            dispatch(saveLocalTimerState())
         }
         return () => {
+            // Need to unmount timer with component changes
             clearInterval(timer);
+            clearInterval(localStateSaveTimer)
         }
-    },[expiresAt])
+    }, [expiresAt, isPaused, dispatch])
     
 
   return (
@@ -51,7 +79,7 @@ const StudyTimer = ({ props: { setShowTimer, showTimer } }) => {
           </Modal.Header> 
           <Modal.Body>
               <div>
-                  Time Left: {parseInt(timeLeft/1000)}s
+                  Time Left: {parseInt(timeLeft / 1000 / 60)}m {parseInt((timeLeft / 1000) % 60)}s
                   <br />
                   Current Period: {isStudy? "Study" : "Break"}
                   <br />
@@ -85,7 +113,8 @@ const StudyTimer = ({ props: { setShowTimer, showTimer } }) => {
                   
                   <br />
 
-                  <button>Start</button>
+                      <button type='submit'>Start</button>
+                      <button type='button' onClick={handlePause} disabled={timeLeft<=0}> {isPaused ? "Continue" : "Pause"}</button>
 
               </form>
               </div>
