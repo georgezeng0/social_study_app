@@ -284,7 +284,9 @@ export const userSlice = createSlice({
                 expiresAt: timeNow + studyTimeInput * 60 * 1000, // ms
                 studyTime: studyTimeInput*60*1000,
                 breakTime: breakTimeInput*60*1000,
-                repeat: repeatInput
+                repeat: repeatInput,
+                isPaused: false,
+                isStudy: true,
             }
             saveTimerState({...state.timer})
             
@@ -320,7 +322,11 @@ export const userSlice = createSlice({
             saveTimerState({...state.timer})
         },
         saveLocalTimerState: (state, action) => {
-            saveTimerState({...state.timer, savedTimeLeft: state.timer.expiresAt - Date.now()})
+            let timeLeft = state.timer.expiresAt - Date.now()
+            if (timeLeft < 0) {
+                timeLeft=0
+            }
+            saveTimerState({...state.timer, savedTimeLeft: timeLeft })
         }
     },
     extraReducers: {

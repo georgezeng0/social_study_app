@@ -2,7 +2,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import React,{ useEffect,useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChatBox, ChatRoomForm, VideoPlayer } from '../components'
+import { ChatBox, ChatRoomForm, FlashcardRoomWindow, VideoPlayer } from '../components'
 import { joinRoom,leaveRoom, getOneChatRoom,toggleShowEdit, deleteRoom, resetMessageCount } from '../features/chatSlice';
 import getToken from '../utils/getToken';
 
@@ -81,6 +81,12 @@ const ChatRoom = () => {
         <button onClick={()=>dispatch(toggleShowEdit())}>Edit</button>
         <button onClick={handleDeleteButton}>Delete</button>
       </div>
+
+      <div>
+        <h4>View flashcards</h4>
+        <FlashcardRoomWindow/>
+      </div>
+
       <ChatBox />
       <VideoPlayer />
       

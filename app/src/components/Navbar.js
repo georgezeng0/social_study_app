@@ -8,12 +8,29 @@ import StudyTimer from './StudyTimer';
 
 const Navbar = () => {
   const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0();
-  const { newMessages } = useSelector(state=>state.chat)
+  const { newMessages } = useSelector(state => state.chat)
   
   const [showMessages, setShowMessages] = useState(false)
   const [showTimer, setShowTimer] = useState(false)
+  const [timerSummary, setTimerSummary] = useState({
+    isPaused: true,
+    timeLeft: -1,
+    isStudy: true,
+  })
 
-  let messageTotal = Object.values(newMessages).reduce((total,count)=>(total+count),0)
+  let messageTotal = Object.values(newMessages).reduce((total, count) => (total + count), 0)
+  
+  const convertMiliSecsToClockString = (number) => {
+    let minutes = String(parseInt(number / 1000 / 60))
+    let seconds = String(parseInt((number / 1000) % 60))
+    if (minutes.length == 1) {
+      minutes = "0" + minutes
+    }
+    if (seconds.length == 1) {
+      seconds = "0" + seconds
+    }
+    return `${minutes}:${seconds}`
+  }
   
   return (
       <Wrapper className='d-flex'>
@@ -38,10 +55,11 @@ const Navbar = () => {
 
       <div>
         <button onClick={()=>setShowTimer(!showTimer)}>
-          Timer
+          {timerSummary.timeLeft >= 0 ? timerSummary.isPaused? "Paused " : timerSummary.isStudy ? "Study " : "Break " : "Timer "} 
+          {convertMiliSecsToClockString(timerSummary.timeLeft)}
           </button>
       </div>
-      {showTimer && <StudyTimer props={{ setShowTimer,showTimer }} />}
+      <StudyTimer props={{ setShowTimer,showTimer,setTimerSummary }} />
       
     </Wrapper>
   )

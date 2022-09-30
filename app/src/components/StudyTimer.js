@@ -5,7 +5,7 @@ import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import { startNewTimer, updateTimerForm,endTimer, pauseTimer, continueTimer, saveLocalTimerState } from '../features/userSlice'
 
-const StudyTimer = ({ props: { setShowTimer, showTimer } }) => {
+const StudyTimer = ({ props: { setShowTimer, showTimer,setTimerSummary } }) => {
     const dispatch = useDispatch()
     const { timer: { form: { studyTimeInput, breakTimeInput, repeatInput },
         startTime, expiresAt, isStudy, studyTime, breakTime, repeat, isPaused, timeLeftAtPause }
@@ -19,14 +19,25 @@ const StudyTimer = ({ props: { setShowTimer, showTimer } }) => {
             if (timeLeft > 0) {
                 return timeLeft
             }
-            // if timeLeft <=0 then end Timer
-            dispatch(endTimer())
+            // if timeLeft <=0 then end Timer if not paused
+            if (!isPaused) {
+                dispatch(endTimer())
+            }
         } 
         return 0
     }
 
     // Time Left that is displayed
     const [timeLeft, setTimeLeft] = useState(calculateTimeLeft())
+
+    // Updates parent component with timer stats
+    useEffect(() => {
+        setTimerSummary({
+            isPaused,
+            timeLeft,
+            isStudy,
+          })
+    },[timeLeft])
 
     // Handles form submit
     const handleSubmit = (e) => {
@@ -90,7 +101,7 @@ const StudyTimer = ({ props: { setShowTimer, showTimer } }) => {
           <div>
               <form onSubmit={handleSubmit}>
                   <label htmlFor="studyMinutes">Study For : </label>
-                   <input id="studyMinutes" type="number" step="1" min="0"
+                   <input id="studyMinutes" type="number" step="1" min="0" max="60"
                           name="studyTimeInput"
                           value={studyTimeInput} onChange={handleChange}
                   /> Minutes
@@ -98,7 +109,7 @@ const StudyTimer = ({ props: { setShowTimer, showTimer } }) => {
                   <br />
 
                   <label htmlFor="breakMinutes">Break For : </label>
-                  <input id="breakMinutes" type="number" step="1" min="0"
+                  <input id="breakMinutes" type="number" step="1" min="0" max="60"
                     name="breakTimeInput"
                     value={breakTimeInput} onChange={handleChange}
                   /> Minutes

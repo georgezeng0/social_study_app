@@ -66,6 +66,11 @@ const initialState = {
         score: 0,
         correct: [],
         incorrect: []
+    },
+    roomWindow: {
+        state: 'SETS', //correspounds to the route/view - "SETS","SET","FLASHCARD",
+        s_id: '',
+        f_id: ''
     }
 }
     
