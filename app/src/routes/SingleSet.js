@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { DeleteSetButton, Flashcards, Loading, ToggleFavouriteSetButton } from '../components'
 import {  getSingleSet, resetError } from '../features/setSlice'
-import { playSet } from '../features/flashcardSlice'
+import { playSet, setFlashcardsState } from '../features/flashcardSlice'
 import Error from './Error'
 
 const SingleSet = () => {
@@ -16,7 +16,7 @@ const SingleSet = () => {
   } = useSelector(state => state.set)
   const {
     activeCard: { card },
-    gameMode: {isPlaying}
+    gameMode: {isPlaying, savedCardWithIndex: {card: card_Saved}}
   } = useSelector(state => state.flashcard)
   const {
 user: {setHistory}
@@ -66,7 +66,8 @@ user: {setHistory}
   }
 
   const continueSessionButton = () => {
-    navigate(`/flashcards/${card._id}`)
+    dispatch(setFlashcardsState("SHUFFLED"))
+    navigate(`/flashcards/${card_Saved?._id || card._id}`)
   }
 
   if (isLoading) {

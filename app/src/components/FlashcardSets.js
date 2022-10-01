@@ -3,6 +3,7 @@ import { deleteSet,getSets, resetError, resetSuccess} from '../features/setSlice
 import { DeleteSetButton, SortFilterSets, Loading } from '../components'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { updateRoomWindow } from '../features/flashcardSlice'
 
 const FlashcardSets = ({ chatRoom }) => {
     // chatRoom prop is true if component is in a chatroom
@@ -30,10 +31,17 @@ const FlashcardSets = ({ chatRoom }) => {
               {sets.map(set => {
                   const { name,_id } = set
                   return <div key={_id}>
-                      {name}
+                    {name}
+                    {chatRoom ?
+                      <>
+                        <button onClick={()=>dispatch(updateRoomWindow({state: "SET",s_id:_id}))}>View</button>
+                      </> : 
+                      <>
                       <Link to={`/sets/${_id}`}>View</Link>
                       <Link to={`/sets/${_id}/edit`}>Edit</Link>
-                      <DeleteSetButton s_id={_id} isLoading={isLoading}/>
+                        <DeleteSetButton s_id={_id} isLoading={isLoading} />
+                        </>
+                    }
                   </div>
               })}
             </div>

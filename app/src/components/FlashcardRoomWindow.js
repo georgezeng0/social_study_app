@@ -1,4 +1,5 @@
 import React from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Flashcard from './Flashcard'
 import Flashcards from './Flashcards'
@@ -8,7 +9,7 @@ const FlashcardRoomWindow = () => {
     const dispatch = useDispatch()
     const { roomWindow: { f_id, s_id, state } } = useSelector(state => state.flashcard)
     
-    if (state == "SETS") {
+    if (state === "SETS") {
         return (
             <div>
                 <FlashcardSets chatRoom />
@@ -16,18 +17,18 @@ const FlashcardRoomWindow = () => {
         )
     }
 
-    if (state == "SET") {
+    if (state === "SET") {
         return (
             <div>
-                <Flashcards/>
+                <Flashcards s_id_prop={s_id} />
             </div>
         )
     }
 
-    if (state == "FLASHCARD") {
+    if (state === "FLASHCARD") {
         return (
             <div>
-                <Flashcard/>
+                <Flashcard f_id={f_id} roomWindow />
             </div>
         )
     }

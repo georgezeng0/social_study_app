@@ -13,13 +13,19 @@ function shuffleArray(array) {
 // Function to set state to sessionStorage with key "gameState"
 function saveGameState(state) {
     // Store game state in session on each flashcard visit
+    state.gameMode.savedCardWithIndex={...state.activeCard}
     sessionStorage.setItem("gameState", JSON.stringify({ ...state }));
 }
 
 function getGameState() {
     let data = sessionStorage.getItem("gameState")
     data = JSON.parse(data)
-    if (data?.flashcards) { return data }
+    if (data?.flashcards) {
+        if (data.gameMode.savedCardWithIndex?.index) {
+            data.activeCard={...data.gameMode.savedCardWithIndex}
+        }
+        return data
+    }
     else {
         return { ...initialState }
     }
@@ -44,6 +50,8 @@ const initialForm= {
 
 const initialState = {
     flashcards: [],
+    originalFlashcards: [],
+    shuffledFlashcards:[],
     activeCard: {
         card: {},
         index: -1
@@ -65,7 +73,8 @@ const initialState = {
         isPlaying: false,
         score: 0,
         correct: [],
-        incorrect: []
+        incorrect: [],
+        savedCardWithIndex: {}
     },
     roomWindow: {
         state: 'SETS', //correspounds to the route/view - "SETS","SET","FLASHCARD",
@@ -194,18 +203,18 @@ export const flashcardSlice = createSlice({
         resetForm: (state, { payload: { formType } }) => {
             state[formType] = { ...initialState.formNew }
         },
-        setActiveCard: (state, { payload }) => {
-            if (state.activeCard.card?._id!==payload) {
-                state.activeCard.card = state.flashcards.find(card => card._id === payload)
+        setActiveCard: (state, { payload: {f_id,roomWindow} }) => {
+            if (state.activeCard.card?._id!==f_id) {
+                state.activeCard.card = state.flashcards.find(card => card._id === f_id)
             }
             state.activeCard.index = state.flashcards.reduce((foundIndex, card, i) => {
-                if (card._id === payload) {
+                if (card._id === f_id) {
                     return i
                 }
                 return foundIndex
             }, -1)
-            // Save game state on each flashvard load
-            if (state.gameMode.isPlaying) {
+            // Save game state on each flashvard load -only if not in chatroom view
+            if (state.gameMode.isPlaying && !roomWindow) {
                 saveGameState(state)
             }
         },
@@ -219,9 +228,11 @@ export const flashcardSlice = createSlice({
                 correct: [],
                 incorrect: []
             }
+            state.originalFlashcards = [...action.payload]
             const cards = [...action.payload]
             shuffleArray(cards) // shuffle array in place
             state.flashcards = cards
+            state.shuffledFlashcards = [...cards]
             state.activeCard.card = cards[0]
         },
         correctCard: (state, action) => {
@@ -257,6 +268,24 @@ export const flashcardSlice = createSlice({
         resetGame: (state, action) => {
             state.gameMode = { ...initialState.gameMode }
             saveGameState(state)
+        },
+        updateRoomWindow: (state, action) => {
+            state.roomWindow = { ...state.roomWindow, ...action.payload }
+        },
+        setFlashcardsState: (state, action) => {
+            const type = action.payload
+            if (type === "ORIGINAL") {
+                state.flashcards = [...state.originalFlashcards]
+                if (state.activeCard.card?._id && state.gameMode.isPlaying) {
+                    state.gameMode.savedCardWithIndex={...state.activeCard}
+                    saveGameState(state)
+                }
+            }
+            if (type === "SHUFFLED") {
+                state.flashcards = [...state.shuffledFlashcards]
+                state.activeCard = { ...state.gameMode.savedCardWithIndex }
+                state.roomWindow.state="SET"
+            }
         }
     },
     extraReducers: {
@@ -363,6 +392,7 @@ export const flashcardSlice = createSlice({
     }
 })
 
-export const {updateForm, resetForm,resetGame,setActiveCard,resetSuccess,playSet, correctCard, incorrectCard  } = flashcardSlice.actions
+export const { updateForm, resetForm, resetGame, setActiveCard, resetSuccess,
+    playSet, correctCard, incorrectCard, updateRoomWindow, setFlashcardsState } = flashcardSlice.actions
 
 export default flashcardSlice.reducer

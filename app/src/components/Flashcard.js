@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { deleteFlashcard, getOneFlashcard, setActiveCard } from '../features/flashcardSlice'
+import { deleteFlashcard, getOneFlashcard, setActiveCard, updateRoomWindow } from '../features/flashcardSlice'
 import styled from 'styled-components'
 import dompurifyHTML from '../utils/dompurifyHTML'
 import FlashcardForm from './FlashcardForm'
@@ -9,11 +9,11 @@ import Loading from './Loading'
 import getToken from '../utils/getToken'
 import { useAuth0 } from '@auth0/auth0-react'
 
-const Flashcard = ({ f_id }) => {
+const Flashcard = ({ f_id, roomWindow }) => {
     const {getAccessTokenSilently } = useAuth0()
     const dispatch = useDispatch()
     const navigate = useNavigate();
-    const { flashcards, activeCard: { card, index }, isLoading, gameMode: {isPlaying, score} } = useSelector(state => state.flashcard)
+    const { flashcards, originalFlashcards, activeCard: { card, index }, isLoading, gameMode: {isPlaying, score} } = useSelector(state => state.flashcard)
 
     const [nextCardId, setNextCardId] = useState('')
     const [prevCardId, setPrevCardId] = useState('')
@@ -51,7 +51,7 @@ const Flashcard = ({ f_id }) => {
 
     useEffect(() => {
         if (flashcards) {
-            dispatch(setActiveCard(f_id))
+            dispatch(setActiveCard({ f_id, roomWindow }))
         }
     }, [dispatch, flashcards, f_id])
     
@@ -74,22 +74,46 @@ const Flashcard = ({ f_id }) => {
         }
     }, [card, index, flashcards])
 
+    const handleNextCard = () => {
+        if (roomWindow) {
+            dispatch(updateRoomWindow({ f_id: nextCardId }))
+        } else {
+            navigate(`/flashcards/${nextCardId}`)
+        }
+    }
+
+    const handlePrevCard = () => {
+        if (roomWindow) {
+            dispatch(updateRoomWindow({ f_id: prevCardId }))
+        } else {
+            navigate(`/flashcards/${prevCardId}`)
+        }
+    }
+
+    const handleGoBack = () => {
+        dispatch(updateRoomWindow({ state: "SET", f_id: "", s_id: card.parentSet }))
+        
+    }
+
     if (isLoading) {
         return <main className='container mt-5'>
           <Loading/>
         </main>
-      }
+    }
+    
+
 
   return (
       <Wrapper>
+          <button onClick={handleGoBack}>Go Back</button>
           <h1>{index + 1}/{flashcards.length} - {card?.title}</h1>
           <div>
               <button disabled={prevCardId.length===0}
-                onClick={() => navigate(`/flashcards/${prevCardId}`)}>
+                onClick={handlePrevCard}>
                   Previous
               </button>
               <button disabled={nextCardId.length===0}
-                onClick={() => navigate(`/flashcards/${nextCardId}`)}>
+                onClick={handleNextCard}>
                   Next
               </button>
               </div> 
@@ -99,8 +123,9 @@ const Flashcard = ({ f_id }) => {
           </div>
 
           <div>
-              <button onClick={()=>navigate(`/flashcards/${f_id}/edit`)}> Edit </button>
-              <button onClick={async () => {
+              {!roomWindow && <>
+                <button onClick={()=>navigate(`/flashcards/${f_id}/edit`)}> Edit </button>
+                <button onClick={async () => {
                   const token = await getToken(getAccessTokenSilently)
                   dispatch(deleteFlashcard({ f_id, s_id: card.parentSet, token }))
                   if (nextCardId) {
@@ -110,7 +135,8 @@ const Flashcard = ({ f_id }) => {
                   } else {
                     navigate(`/sets/${card.parentSet}`)
                   }
-              }}> Delete </button>
+                }}> Delete </button>
+              </>}
               <button onClick={()=>setCardState({...cardState, flip: !cardState.flip})}>Flip Card</button>
               <button onClick={()=>setCardState({...cardState, showNotes: !cardState.showNotes})}>Show/Hide Notes</button>
           </div>

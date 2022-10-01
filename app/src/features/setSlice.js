@@ -19,7 +19,9 @@ const initialState = {
         successMessage: ''
     },
     sets: [],
-    selectedSet: {},
+    selectedSet: {
+        flashcards: []
+    },
     formNew: { ...initialForm },
     formEdit: { ...initialForm },
     tagsList: ["General", "Medical and Health", "Science", "History", "Geography", "Language", "Arts", "Movies", "Books", "IT", "Video Games", "Popular Culture"],
@@ -200,7 +202,9 @@ export const setSlice = createSlice({
         resetSuccess: (state, action) => {
             state.success = { ...initialState.success }
         },
-        
+        resetSelectedSet: (state, action) => {
+            state.selectedSet = {...initialState.selectedSet}
+        }
     },
     extraReducers: {
         [createSet.pending]: (state) => {
@@ -306,6 +310,7 @@ export const setSlice = createSlice({
     }
 })
 
-export const { updateForm, resetForm, resetError, resetSuccess, updateFilter, resetFilter} = setSlice.actions
+export const { updateForm, resetForm, resetError,
+    resetSuccess, updateFilter, resetFilter,resetSelectedSet } = setSlice.actions
 
 export default setSlice.reducer
