@@ -36,6 +36,7 @@ const StudyTimer = ({ props: { setShowTimer, showTimer,setTimerSummary } }) => {
             isPaused,
             timeLeft,
             isStudy,
+            repeat
           })
     },[timeLeft])
 

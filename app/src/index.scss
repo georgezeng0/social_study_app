@@ -1,5 +1,25 @@
 @import 'custom';
 
+:root {
+  --primary-1: #e0fbfc;
+  --primary-2:  #c2dfe3;
+  --primary-3: #9db4c0;
+
+  --dark-1: #5c6b73;
+  --dark-2: #253237;
+  --dark-3: #212529;
+
+  --grey-1: #f8f9fa;
+  --grey-2: #dee2e6;
+  --grey-3: #adb5bd;
+  --grey-4: #495057;
+  --grey-5: #343a40;
+  --grey-6: #212529;
+
+  --black: #0a0a0a;
+  --white:  #ffffff;
+}
+
 body {
   margin: 0;
   

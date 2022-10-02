@@ -14,8 +14,9 @@ const Navbar = () => {
   const [showTimer, setShowTimer] = useState(false)
   const [timerSummary, setTimerSummary] = useState({
     isPaused: true,
-    timeLeft: -1,
+    timeLeft: 0,
     isStudy: true,
+    repeat: 0
   })
 
   let messageTotal = Object.values(newMessages).reduce((total, count) => (total + count), 0)
@@ -55,7 +56,7 @@ const Navbar = () => {
 
       <div>
         <button onClick={()=>setShowTimer(!showTimer)}>
-          {timerSummary.timeLeft >= 0 ? timerSummary.isPaused? "Paused " : timerSummary.isStudy ? "Study " : "Break " : "Timer "} 
+          {timerSummary.timeLeft === 0 && timerSummary.repeat!==0? timerSummary.isPaused? "Paused " : timerSummary.isStudy ? "Study " : "Break " : "Timer "} 
           {convertMiliSecsToClockString(timerSummary.timeLeft)}
           </button>
       </div>

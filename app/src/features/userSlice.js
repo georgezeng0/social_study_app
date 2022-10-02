@@ -1,6 +1,23 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
 
+const initialTimerState = {
+    form: {
+        studyTimeInput: 25,
+        breakTimeInput: 5,
+        repeatInput: 0
+    },
+    startTime: 0,
+    expiresAt: 0,
+    isStudy: true,
+    studyTime: 0,
+    breakTime: 0,
+    repeat: 0,
+    timeLeftAtPause: 0,
+    isPaused: false,
+    savedTimeLeft: 0, // timeleft saved to localstorage - if user closes tab/ refresh
+}
+
 // Function to set state to local storage - for timer
 function saveTimerState(state) {
     localStorage.setItem("timerState", JSON.stringify({ ...state }));
@@ -17,22 +34,7 @@ function getTimerState() {
         }
     }
     else {
-        return {
-            form: {
-                studyTimeInput: 25,
-                breakTimeInput: 5,
-                repeatInput: 0
-            },
-            startTime: 0,
-            expiresAt: 0,
-            isStudy: true,
-            studyTime: 0,
-            breakTime: 0,
-            repeat: 0,
-            timeLeftAtPause: 0,
-            isPaused: false,
-            savedTimeLeft: 0, // timeleft saved to localstorage - if user closes tab/ refresh
-        }
+        return initialTimerState
     }
 }
 
@@ -306,7 +308,7 @@ export const userSlice = createSlice({
             } else {
                 // Stop everything if no more repeats and reset
                 state.timer = {
-                    ...initialState.timer
+                    ...initialTimerState
                 }
             }
             saveTimerState({...state.timer})
