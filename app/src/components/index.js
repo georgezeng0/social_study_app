@@ -21,11 +21,12 @@ import VideoPlayer from "./VideoPlayer";
 import StudyTimer from "./StudyTimer";
 import FlashcardSets from "./FlashcardSets";
 import FlashcardRoomWindow from "./FlashcardRoomWindow";
+import FlashcardLanding from "./FlashcardLanding";
 
 export {
     Navbar, FlashcardForm, SetForm, Flashcards, Flashcard,
     TextEditor, Loading, AsyncModal, MessageModal, PlayWindow,
     Redirect, DeleteSetButton, UserForm, UserIcon, ToggleFavouriteSetButton,
     SortFilterSets, ChatBox, ChatRoomForm, NavChatModal, VideoPlayer, StudyTimer,
-    FlashcardSets,FlashcardRoomWindow
+    FlashcardSets,FlashcardRoomWindow,FlashcardLanding
 }
