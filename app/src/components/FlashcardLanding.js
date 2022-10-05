@@ -64,6 +64,9 @@ const FlashcardLanding = () => {
 
 const Wrapper = styled.section`
 height: 100%;
+:hover{
+    cursor: pointer;
+}
 ._flip-card{
     background-color: transparent;
     perspective: 5000px;

@@ -34,39 +34,64 @@ const Navbar = () => {
   }
   
   return (
-      <Wrapper className='d-flex'>
-          <Link to="/">Home</Link>
-          <Link to="/flashcards">Flashcards</Link>
-          <Link to="/chatrooms">Chatrooms</Link>
-      <div>
-        {(!isLoading && isAuthenticated) && user.name}
-        {(!isLoading && isAuthenticated) ?
-          <button onClick={() => logout({ returnTo: window.location.origin })}>Log Out</button> :
-          <button onClick={()=>loginWithRedirect()}>Log In</button> }
+    <Wrapper className='navbar navbar-expand-md sticky-top'>
+      <div className="container">
+      <Link to="/" className='navbar-brand'>RoteMate</Link>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul className="navbar-nav me-auto">
+
+          <li className="nav-item">
+             <Link to="/flashcards" className='nav-link'>Flashcards</Link>
+          </li>
+          
+          <li className="nav-item">
+            <Link to="/chatrooms" className='nav-link'>Chatrooms</Link>
+          </li>
+          
+          <li className='nav-item'>
+          {(!isLoading && isAuthenticated) && user.name}
+          {(!isLoading && isAuthenticated) ?
+            <button className='btn btn-link nav-link' onClick={() => logout({ returnTo: window.location.origin })}>Log Out</button> :
+            <button className='btn btn-link nav-link' onClick={()=>loginWithRedirect()}>Log In</button> }
+          </li>
+
+          <li className="nav-item">
+            <Link to="/profile" className='nav-link'>Profile</Link>
+          </li>
+
+          <li className="nav-item">
+              <button onClick={()=>setShowMessages(!showMessages)} className='nav-link btn btn-link'>
+              Messages ({messageTotal || 0})
+            </button>
+          </li>
+
+          <li className='nav-item'>
+            <button className='btn btn-link nav-link' onClick={()=>setShowTimer(!showTimer)}>
+              {timerSummary.timeLeft === 0 && timerSummary.repeat!==0? timerSummary.isPaused? "Paused " : timerSummary.isStudy ? "Study " : "Break " : "Timer "} 
+              {convertMiliSecsToClockString(timerSummary.timeLeft)}
+              </button>
+          </li>
+          
+        </ul>
       </div>
-      <Link to="/profile">Profile</Link>
-      <div>
-        <button onClick={()=>setShowMessages(!showMessages)}>
-          Messages ({messageTotal || 0})
-          </button>
-      </div>
-      <div className='NavChatModal-Wrapper'>
+          
+      <div className={`NavChatModal-Wrapper ${showMessages?'':'d-none'}`}>
         {showMessages && <NavChatModal />}
       </div>
 
-      <div>
-        <button onClick={()=>setShowTimer(!showTimer)}>
-          {timerSummary.timeLeft === 0 && timerSummary.repeat!==0? timerSummary.isPaused? "Paused " : timerSummary.isStudy ? "Study " : "Break " : "Timer "} 
-          {convertMiliSecsToClockString(timerSummary.timeLeft)}
-          </button>
-      </div>
       <StudyTimer props={{ setShowTimer,showTimer,setTimerSummary }} />
-      
+      </div>
     </Wrapper>
   )
 }
 
 const Wrapper = styled.nav`
+background-color: white;
 .NavChatModal-Wrapper{
   width: 400px;
   height: 500px;
@@ -74,6 +99,12 @@ const Wrapper = styled.nav`
   top: 35px; // TBD adjust depending on nav height
   left: 50%; // TBD adjust responsively
 }
+a{
+  :hover{
+    cursor: pointer !important
+  }
+}
+
 `
 
 export default Navbar

@@ -21,7 +21,7 @@ const Landing = () => {
           </div>
           <div className="col"></div>
         </div>
-        <button className='mt-5 btn btn-dark' type="button"
+        <button className='mt-5 btn btn-lg btn-dark' type="button"
           onClick={()=>navigate('/flashcards')}
         >Start Learning</button>
         
@@ -42,7 +42,7 @@ const Landing = () => {
             </div>
           </div>
         </div>
-        <button className='my-4 btn btn-dark' type="button"
+        <button className='my-4 btn btn-lg btn-outline-dark' type="button"
           onClick={()=>navigate('/flashcards')}
         >Start Learning</button>
       </div>
