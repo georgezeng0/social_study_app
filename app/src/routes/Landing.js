@@ -2,6 +2,8 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { FlashcardLanding } from '../components'
+import { BsGithub } from 'react-icons/bs'
+import breakpoints from '../utils/breakpoints'
 
 const Landing = () => {
   const navigate= useNavigate()
@@ -30,14 +32,14 @@ const Landing = () => {
         <h2 className='py-3'>Your mate for rote learning</h2>
         
         <div className='container feature-container'>
-          <div className="row d-flex justify-content-center">
-            <div className="col-md feature-item">
+          <div className="feature-container-row row d-flex justify-content-center">
+            <div className="col-md feature-item my-2 my-md-0 mx-md-2">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt sequi, nam praesentium illo dicta quaerat eius! Commodi quo alias mollitia earum suscipit, eveniet rerum nemo tempore ipsa, ea reiciendis necessitatibus.
             </div>
-            <div className="col-md feature-item middle-item">
+            <div className="col-md feature-item middle-item my-2 my-md-0 mx-md-2">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio totam officia modi minima eligendi soluta nemo maxime ex quo aliquam deleniti exercitationem quia, nam alias recusandae esse doloribus doloremque enim.
             </div>
-            <div className="col-md feature-item">
+            <div className="col-md feature-item my-2 my-md-0 mx-md-2">
               Lorem ipsum dolor, sit amet consectetur adipisicing elit. Beatae quo iure temporibus, soluta adipisci vitae recusandae, consequuntur iste eius et vel rerum id dignissimos minima numquam dicta animi ex similique.
             </div>
           </div>
@@ -46,8 +48,11 @@ const Landing = () => {
           onClick={()=>navigate('/flashcards')}
         >Start Learning</button>
       </div>
-      <footer className="container-fluid">
-        Footer
+      <footer className="container-fluid text-center py-5 d-flex flex-column">
+        <a href="https://github.com/georgezeng0/social_study_app" target="_blank"
+          className='fs-3 github-icon'        
+        ><BsGithub /></a>
+        © RoteMate 2022
       </footer>
 
     </Wrapper>
@@ -67,11 +72,15 @@ background-color: white;
   height: 300px;
   width: 500px;
 }
-.landing-info-container{
+/* .landing-info-container{
 
-}
+} */
 .feature-container{
   height: auto;
+  transition: all 0.5s;
+  @media (max-width: ${breakpoints.md}){
+    transition: none;
+  }
 }
 .feature-item{
   border-radius: 20px;
@@ -80,7 +89,6 @@ background-color: white;
   max-width: 300px;
   min-height: 300px;
   border: 2px solid var(--primary-4);
-  margin: 0 5px;
 }
 .middle-item{
   background-color: var(--primary-4);
@@ -89,6 +97,9 @@ background-color: white;
 footer{
   height: 200px;
   background-color: var(--primary-2)
+}
+footer a {
+  color: black;
 }
 `
 
