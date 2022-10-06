@@ -1,10 +1,11 @@
-import React,{ useState } from 'react'
+import React,{ useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth0 } from "@auth0/auth0-react";
 import NavChatModal from './NavChatModal';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import StudyTimer from './StudyTimer';
+import { useEffect } from 'react';
 
 const Navbar = () => {
   const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0();
@@ -32,10 +33,42 @@ const Navbar = () => {
     }
     return `${minutes}:${seconds}`
   }
+
+  // Intersection Observer for navbar
+  const navRef = useRef(null)
+  const navbarHeightRef = useRef(null)
+  const [intersectionRatio, setIntersectionRatio] = useState(1)
+
+  const observerCallback = (entries, observer) => {
+    const entry = entries[0]
+    if (entry.isIntersecting) {
+      setIntersectionRatio(entry.intersectionRatio);
+    } else {
+      setIntersectionRatio(0);
+    }
+  }
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(observerCallback,
+      {
+        root: null,
+        rootMargin: '0px',
+        threshold: [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
+      })
+    if (navRef.current) {
+      observer.observe(navRef.current)
+    }
+    return () => {
+      if (navRef.current) {
+        observer.unobserve(navRef.current)
+      }
+    }
+  },[navRef])
   
-  return (
-    <Wrapper className='navbar navbar-expand-md sticky-top'>
-      <div className="container">
+  return (<>
+    <div ref={navRef} className="position-absolute" style={{height:navbarHeightRef.current?navbarHeightRef.current.clientHeight:0, width:"100%"}}></div>
+    <Wrapper className='navbar navbar-expand-md sticky-top navbar-light' ref={navbarHeightRef}>
+      <NavDiv className="container" id="nav-container-custom" intersectionRatio={intersectionRatio}>
       <Link to="/" className='navbar-brand'>RoteMate</Link>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
           data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,12 +86,7 @@ const Navbar = () => {
             <Link to="/chatrooms" className='nav-link'>Chatrooms</Link>
           </li>
           
-          <li className='nav-item'>
-          {(!isLoading && isAuthenticated) && user.name}
-          {(!isLoading && isAuthenticated) ?
-            <button className='btn btn-link nav-link' onClick={() => logout({ returnTo: window.location.origin })}>Log Out</button> :
-            <button className='btn btn-link nav-link' onClick={()=>loginWithRedirect()}>Log In</button> }
-          </li>
+         
 
           <li className="nav-item">
             <Link to="/profile" className='nav-link'>Profile</Link>
@@ -75,7 +103,17 @@ const Navbar = () => {
               {timerSummary.timeLeft === 0 && timerSummary.repeat!==0? timerSummary.isPaused? "Paused " : timerSummary.isStudy ? "Study " : "Break " : "Timer "} 
               {convertMiliSecsToClockString(timerSummary.timeLeft)}
               </button>
-          </li>
+            </li>
+
+            <li className="nav-item">
+            {(!isLoading && isAuthenticated) && user.name}
+            </li>
+            
+            <li className='nav-item'>
+          {(!isLoading && isAuthenticated) ?
+            <button className='btn btn-link nav-link' onClick={() => logout({ returnTo: window.location.origin })}>Log Out</button> :
+            <button className='btn btn-link nav-link' onClick={()=>loginWithRedirect()}>Log In</button> }
+        </li>
           
         </ul>
       </div>
@@ -84,14 +122,18 @@ const Navbar = () => {
         {showMessages && <NavChatModal />}
       </div>
 
-      <StudyTimer props={{ setShowTimer,showTimer,setTimerSummary }} />
-      </div>
+        <StudyTimer props={{ setShowTimer, showTimer, setTimerSummary }} />
+
+        
+        
+      </NavDiv>
     </Wrapper>
-  )
+    
+    </>)
 }
 
 const Wrapper = styled.nav`
-background-color: white;
+  /* background-color: white; */
 .NavChatModal-Wrapper{
   width: 400px;
   height: 500px;
@@ -99,12 +141,13 @@ background-color: white;
   top: 35px; // TBD adjust depending on nav height
   left: 50%; // TBD adjust responsively
 }
-a{
-  :hover{
-    cursor: pointer !important
-  }
-}
-
+`
+const NavDiv = styled.div`
+  background-color: rgba(255,255,255,${props=> props.intersectionRatio>0.5?0:1});
+  /* border: 2px solid var(--grey-3); */
+  border-radius: 20px;
+  transition: background-color 0.3s;
+  box-shadow: 0px 0px ${props=> props.intersectionRatio>0.5?0:"5px"} grey;
 `
 
 export default Navbar
