@@ -6,6 +6,8 @@ import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import StudyTimer from './StudyTimer';
 import { useEffect } from 'react';
+import { IoTimerOutline } from 'react-icons/io5'
+import { AiOutlineMessage,AiFillMessage } from 'react-icons/ai'
 
 const Navbar = () => {
   const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0();
@@ -19,8 +21,18 @@ const Navbar = () => {
     isStudy: true,
     repeat: 0
   })
-
-  let messageTotal = Object.values(newMessages).reduce((total, count) => (total + count), 0)
+  const [messageTotal, setMessageTotal] = useState(0)
+  
+  useEffect(() => {
+    console.log(Object.values(newMessages));
+    if (Object.values(newMessages).length === 0 || Object.values(newMessages)[0] === undefined) {
+      console.log(newMessages)
+      setMessageTotal(0)
+    } else {
+      console.log(123,newMessages)
+      setMessageTotal(Object.values(newMessages).reduce((total, count) => (total + count), 0))
+    }
+    }, [newMessages])
   
   const convertMiliSecsToClockString = (number) => {
     let minutes = String(parseInt(number / 1000 / 60))
@@ -76,44 +88,41 @@ const Navbar = () => {
       </button>
       
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul className="navbar-nav me-auto">
+        <ul className="navbar-nav ms-auto">
 
           <li className="nav-item">
              <Link to="/flashcards" className='nav-link'>Flashcards</Link>
           </li>
           
           <li className="nav-item">
-            <Link to="/chatrooms" className='nav-link'>Chatrooms</Link>
-          </li>
-          
-         
-
-          <li className="nav-item">
-            <Link to="/profile" className='nav-link'>Profile</Link>
+            <Link to="/chatrooms" className='nav-link'>Rooms</Link>
           </li>
 
           <li className="nav-item">
-              <button onClick={()=>setShowMessages(!showMessages)} className='nav-link btn btn-link'>
-              Messages ({messageTotal || 0})
-            </button>
+              <MessagesButton onClick={() => setShowMessages(!showMessages)}
+                className='nav-link btn btn-link shadow-none'>
+                {messageTotal === 0 ? <AiOutlineMessage style={{position: "relative",bottom:"1px"}} /> : <AiFillMessage style={{ position: "relative",color: "red",bottom:"1px" }} />}
+            </MessagesButton>
           </li>
 
           <li className='nav-item'>
-            <button className='btn btn-link nav-link' onClick={()=>setShowTimer(!showTimer)}>
-              {timerSummary.timeLeft === 0 && timerSummary.repeat!==0? timerSummary.isPaused? "Paused " : timerSummary.isStudy ? "Study " : "Break " : "Timer "} 
+            <button className='btn btn-link nav-link shadow-none align-top' onClick={()=>setShowTimer(!showTimer)}>
+                {timerSummary.timeLeft !== 0 && timerSummary.repeat !== 0 ?
+                  timerSummary.isPaused ? "P " : timerSummary.isStudy ? "S "
+                    : "B " : <span className='align-top d-inline position-relative' style={{bottom:"1px"}}><IoTimerOutline /> </span>} 
               {convertMiliSecsToClockString(timerSummary.timeLeft)}
               </button>
             </li>
 
-            <li className="nav-item">
-            {(!isLoading && isAuthenticated) && user.name}
-            </li>
+            {(!isLoading && isAuthenticated) && <li className="nav-item">
+            <Link to="/profile" className='nav-link'>{user.name}</Link>
+          </li>}
             
             <li className='nav-item'>
-          {(!isLoading && isAuthenticated) ?
-            <button className='btn btn-link nav-link' onClick={() => logout({ returnTo: window.location.origin })}>Log Out</button> :
-            <button className='btn btn-link nav-link' onClick={()=>loginWithRedirect()}>Log In</button> }
-        </li>
+              {(!isLoading && isAuthenticated) ?
+              <button className='btn btn-link nav-link shadow-none' onClick={() => logout({ returnTo: window.location.origin })}>Log Out</button> :
+              <button className='btn btn-link nav-link shadow-none' onClick={()=>loginWithRedirect()}>Log In</button> }
+            </li>
           
         </ul>
       </div>
@@ -138,7 +147,7 @@ const Wrapper = styled.nav`
   width: 400px;
   height: 500px;
   position: absolute;
-  top: 35px; // TBD adjust depending on nav height
+  top: 60px; // TBD adjust depending on nav height
   left: 50%; // TBD adjust responsively
 }
 `
@@ -146,8 +155,16 @@ const NavDiv = styled.div`
   background-color: rgba(255,255,255,${props=> props.intersectionRatio>0.5?0:1});
   /* border: 2px solid var(--grey-3); */
   border-radius: 20px;
-  transition: background-color 0.3s;
+  transition: background-color 0.1s;
   box-shadow: 0px 0px ${props=> props.intersectionRatio>0.5?0:"5px"} grey;
+`
+
+const MessagesButton = styled.button`
+  span{
+    position: relative;
+    right: 17px;
+    font-size: 1rem;
+  }
 `
 
 export default Navbar
