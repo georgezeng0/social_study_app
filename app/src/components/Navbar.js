@@ -7,7 +7,8 @@ import { useSelector } from 'react-redux';
 import StudyTimer from './StudyTimer';
 import { useEffect } from 'react';
 import { IoTimerOutline } from 'react-icons/io5'
-import { AiOutlineMessage,AiFillMessage } from 'react-icons/ai'
+import { AiOutlineMessage, AiFillMessage } from 'react-icons/ai'
+import breakpoints from '../utils/breakpoints'
 
 const Navbar = () => {
   const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0();
@@ -127,15 +128,15 @@ const Navbar = () => {
         </ul>
       </div>
           
-      <div className={`NavChatModal-Wrapper ${showMessages?'':'d-none'}`}>
-        {showMessages && <NavChatModal />}
-      </div>
-
         <StudyTimer props={{ setShowTimer, showTimer, setTimerSummary }} />
 
-        
+        <div className={`NavChatModal-Wrapper container ${showMessages?'':'d-none'}`}>
+          {showMessages && <NavChatModal setShowMessages={setShowMessages} />}
+      </div>
         
       </NavDiv>
+
+      
     </Wrapper>
     
     </>)
@@ -144,19 +145,30 @@ const Navbar = () => {
 const Wrapper = styled.nav`
   /* background-color: white; */
 .NavChatModal-Wrapper{
-  width: 400px;
-  height: 500px;
+  width: 500px;
+  height: auto;
   position: absolute;
-  top: 60px; // TBD adjust depending on nav height
-  left: 50%; // TBD adjust responsively
+  top: 65px;
+  right: 0px;
+  @media (max-width: ${breakpoints.md}) {
+    width: 100%;
+    right: 0px;
+    padding: 0 20px;
+  }
+}
+#nav-container-custom{
+  @media (max-width: ${breakpoints.lg}) {
+    transition: none;
+  }
+  transition: max-width 0.2s;
 }
 `
 const NavDiv = styled.div`
-  background-color: rgba(255,255,255,${props=> props.intersectionRatio>0.5?0:1});
+  background-color: rgba(255,255,255,${props=> props.intersectionRatio>0.7?0:1});
   /* border: 2px solid var(--grey-3); */
   border-radius: 20px;
-  transition: background-color 0.1s;
-  box-shadow: 0px 0px ${props=> props.intersectionRatio>0.5?0:"5px"} grey;
+  box-shadow: 0px 0px ${props => props.intersectionRatio > 0.7 ? 0 : "5px"} grey;
+  position: relative;
 `
 
 const MessagesButton = styled.button`

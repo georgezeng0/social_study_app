@@ -149,6 +149,8 @@ export const deleteRoom = createAsyncThunk(
                         Authorization: `Bearer ${token}`
                     }
                 })
+            const u_id = thunkAPI.getState().user.user.u_id
+            thunkAPI.dispatch(getUserRooms({ u_id, token }))
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
@@ -169,7 +171,9 @@ export const joinRoom = createAsyncThunk(
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
-            })
+                })
+            const u_id = thunkAPI.getState().user.user.u_id
+            thunkAPI.dispatch(getUserRooms({ u_id, token }))
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
@@ -188,7 +192,9 @@ export const leaveRoom = createAsyncThunk(
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
-            })
+                })
+            const u_id = thunkAPI.getState().user.user.u_id
+            thunkAPI.dispatch(getUserRooms({ u_id, token }))
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
