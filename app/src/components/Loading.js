@@ -4,7 +4,10 @@ const Loading = ({ color = "#3c4880", size = 150, type = "square" }) => {
   
   if (type === "square") {
     return (
-      <SquareLoader color={color} size={size} />
+      <div className="container text-center">
+        <SquareLoader color={color} size={size} />
+      </div>
+      
     )
   }
 }

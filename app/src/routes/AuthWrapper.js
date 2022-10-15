@@ -36,8 +36,10 @@ function AuthWrapper({ children }) {
   },[user,isAuthenticated])
 
     // Return Loading component if auth is loading
-    if (isLoading) {
-      return <Loading/>
+  if (isLoading) {
+    return <div className='container p-5'>
+        <Loading/>
+      </div>
   } 
   
     // Return error page if auth error

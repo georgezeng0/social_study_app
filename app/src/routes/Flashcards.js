@@ -10,7 +10,7 @@ import Error from './Error'
 const Flashcards = () => {
     const {
         error: { isError, status, message },
-        success: { isSuccess, successMessage }} = useSelector(state => state.set)
+        success: { isSuccess, successMessage, isLoading }} = useSelector(state => state.set)
     const dispatch = useDispatch()
 
     // Deleting a set will redirect to this route, need to reset the success notification
@@ -25,10 +25,10 @@ const Flashcards = () => {
     }
 
   return (
-      <Wrapper>
-          <div>
-              <h1>Flashcard Sets</h1>
-              <Link to='/sets/create'>New Set</Link>
+      <Wrapper className='container'>
+          <div className='d-flex flex-column align-items-center'>
+              <h1 className='text-center display-1'>Flashcard Sets</h1>
+              <Link to='/sets/create' className={`btn btn-outline-dark mb-4 ${isLoading && 'disabled'}`}>New Set</Link>
           </div>
           <FlashcardSets/>
 

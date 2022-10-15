@@ -10,6 +10,7 @@ import { IoTimerOutline } from 'react-icons/io5'
 import { AiOutlineMessage, AiFillMessage } from 'react-icons/ai'
 import breakpoints from '../utils/breakpoints'
 
+
 const Navbar = () => {
   const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0();
   const { newMessages } = useSelector(state => state.chat)
@@ -38,10 +39,10 @@ const Navbar = () => {
   const convertMiliSecsToClockString = (number) => {
     let minutes = String(parseInt(number / 1000 / 60))
     let seconds = String(parseInt((number / 1000) % 60))
-    if (minutes.length == 1) {
+    if (minutes.length === 1) {
       minutes = "0" + minutes
     }
-    if (seconds.length == 1) {
+    if (seconds.length === 1) {
       seconds = "0" + seconds
     }
     return `${minutes}:${seconds}`
@@ -76,7 +77,7 @@ const Navbar = () => {
         observer.unobserve(navRef.current)
       }
     }
-  },[navRef])
+  },[])
   
   return (<>
     <div ref={navRef} className="position-absolute" style={{height:navbarHeightRef.current?navbarHeightRef.current.clientHeight:0, width:"100%"}}></div>
@@ -164,10 +165,10 @@ const Wrapper = styled.nav`
 }
 `
 const NavDiv = styled.div`
-  background-color: rgba(255,255,255,${props=> props.intersectionRatio>0.7?0:1});
+  background-color: rgba(255,255,255,${props=> props.intersectionRatio>1.0?0:1});
   /* border: 2px solid var(--grey-3); */
   border-radius: 20px;
-  box-shadow: 0px 0px ${props => props.intersectionRatio > 0.7 ? 0 : "5px"} grey;
+  box-shadow: 0px 0px ${props => props.intersectionRatio > 0.5 ? 0 : "5px"} grey;
   position: relative;
 `
 

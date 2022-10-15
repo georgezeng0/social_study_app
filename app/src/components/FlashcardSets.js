@@ -24,28 +24,48 @@ const FlashcardSets = ({ chatRoom }) => {
 
     return (
       <>
-    <div>
-            <SortFilterSets />
-    </div>
-          <div>
-              {sets.map(set => {
-                  const { name,_id } = set
-                  return <div key={_id}>
-                    {name}
+        <div className='d-flex justify-content-center'>
+                <SortFilterSets/>
+        </div>
+
+        <div className='row row-cols-2 row-cols-lg-4'>
+            {sets.map(set => {
+                const { name,_id,tags, isPublic, flashcards } = set
+              return <div key={_id} className="p-1">
+                <div className="card bg-light">
+                  <div className="card-body">
+                    <div className="card-title w-100 d-flex">
+                      <h5 className='d-inline'>{name}</h5>
+                      <Link to={`/sets/${_id}`} className="ms-auto btn btn-primary btn-sm">View</Link>
+                    </div>
+                    
+                    <h6 className='card-subtitle text-muted mb-1'>{isPublic ? "Public" : "Private"}</h6>
+                    <div>{tags.map(tag => {
+                      return <span className='badge bg-dark'>
+                        {tag}
+                      </span>
+                    })}
+
+                    </div>
                     {chatRoom ?
                       <>
                         <button onClick={()=>dispatch(updateRoomWindow({state: "SET",s_id:_id}))}>View</button>
                       </> : 
                       <>
-                      <Link to={`/sets/${_id}`}>View</Link>
-                      <Link to={`/sets/${_id}/edit`}>Edit</Link>
-                        <DeleteSetButton s_id={_id} isLoading={isLoading} />
+                      
+                      {/* <Link to={`/sets/${_id}/edit`}>Edit</Link>
+                        <DeleteSetButton s_id={_id} isLoading={isLoading} /> */}
                         </>
                     }
+                    <p className='pt-2 pb-0 mb-0'>
+                      {flashcards.length} Flashcards
+                    </p>
                   </div>
-              })}
-            </div>
-            </>
+                </div>
+                </div>
+            })}
+          </div>
+          </>
   )
 }
 
