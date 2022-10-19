@@ -79,37 +79,51 @@ user: {setHistory}
   }
 
   return (
-    <main>
-      <h1>Flashcard Set</h1>
-      <h3>Name: {name}</h3>
-      <h5>Tags: {tags.map((tag, i) => {
-        if (i<tags.length-1) return ` ${tag},`
-        else return ` ${tag}`
+    <main className='container'>
+      <h1 className='text-center display-1'>{name}</h1>
+      <hr />
+      <h3 className='text-center display-6 text-muted'>{isPublic?"Public":"Private"} Flashcard Set</h3>
+      <h5 className='rounded-pill bg-light border border-dark px-3 py-1'
+      >Tags: {tags.map((tag, i) => {
+        return <span className='badge bg-dark'>
+        {tag}
+      </span>
       })}</h5>
-      <h5>Public Set: {isPublic ? "Yes" : "No"}</h5>
-      <Link to={`/sets/${s_id }/edit`}>Edit</Link>
-      <DeleteSetButton s_id={s_id} isLoading={isLoading} />
-      <button onClick={playSetButton}>Play Set</button>
-      {isPlaying && 
-        <button onClick={continueSessionButton}>Continue Session</button>
-      }
+      {/* <h5>Public Set: {isPublic ? "Yes" : "No"}</h5> */}
+      <div className="row mt-3">
+        <div className="col-md">
+          <div className="btn-group d-block mb-2">
+            <span className='btn disabled '>Owner Actions: </span>
+            <Link to={`/sets/${s_id }/edit`} className="btn btn-primary">Edit</Link>
+            <DeleteSetButton s_id={s_id} isLoading={isLoading}/>
+          </div>
+          
 
-      Toggle Favourite: <ToggleFavouriteSetButton s_id={s_id} isLoading={isLoading} />
-      
-      <p>Number of flashcards: {numFlashcards}</p>
-      
-      <div>
-        <h4>Your History:</h4>
-        Plays: {history? history.numberPlays:0}
-        <div>
-          {history && history.sessions && history.sessions.map(item => {
-            return <p key={item._id}>
-              Score - {parseInt((item.score / item.totalCards) * 100)}% - Date: {item.sessionEnd}
-            </p>
-          })}
+          <button onClick={playSetButton} className='btn btn-dark'>Play Set</button>
+          {isPlaying && 
+            <button onClick={continueSessionButton} className='btn btn-dark'>Continue Session</button>
+          }
+
+          <div>
+          Toggle Favourite: <ToggleFavouriteSetButton s_id={s_id} isLoading={isLoading} />
+          </div>
+
+          <p>Number of flashcards: {numFlashcards}</p>
+        </div>
+
+        <div className='col-md'>
+          <h4>Your History:</h4>
+          Plays: {history? history.numberPlays:0}
+          <div>
+            {history && history.sessions && history.sessions.map(item => {
+              return <p key={item._id}>
+                Score - {parseInt((item.score / item.totalCards) * 100)}% - Date: {item.sessionEnd}
+              </p>
+            })}
+          </div>
         </div>
       </div>
-      
+
       <div>
         <h4>Flashcards</h4>
         <Flashcards/>

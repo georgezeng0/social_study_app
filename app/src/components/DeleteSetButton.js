@@ -12,7 +12,9 @@ const DeleteSetButton = ({isLoading, s_id}) => {
       <button disabled={isLoading} onClick={async () => {
           const token = await getToken(getAccessTokenSilently)
           dispatch(deleteSet({ s_id, token }))
-      }}>Delete</button>
+      }}
+          className="btn btn-danger"
+      >Delete Set</button>
   )
 }
 

@@ -19,13 +19,19 @@ const ToggleFavouriteSetButton = ({ s_id, isLoading }) => {
         dispatch(toggleFavSet({ s_id, token }))
     }
 
-  return (
-      <AiFillHeart onClick={handleClick}
-          style={{ color: favSets.indexOf(s_id)>-1?"red":"grey"}}
+    return (
+      <button className='btn btn-outline p-1' onClick={handleClick}>
+      <AiFillHeart 
+          style={{ color: favSets.indexOf(s_id) > -1 ? "red" : "grey", fontSize: "1.5rem" }}
       >
           Toggle Favourite
-      </AiFillHeart>
+            </AiFillHeart>
+            </button>
   )
 }
+
+const Wrapper = styled.div`
+
+`
 
 export default ToggleFavouriteSetButton
