@@ -3,8 +3,9 @@ import { SetForm } from '../components'
 
 const SetEdit = () => {
   return (
-      <main>
-          <h1>Edit Set</h1>
+      <main className='container'>
+      <h1 className='text-center display-1'>Edit Set</h1>
+      <hr/>
           <div>
               <SetForm formType='formEdit'/>
           </div>

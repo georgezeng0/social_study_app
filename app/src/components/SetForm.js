@@ -24,7 +24,7 @@ success: {isSuccess, successMessage}, selectedSet: {_id: createdSetID}
     if (formType === "formEdit") {
         dispatch(populateSetForm(s_id))
       }
-  }, [dispatch, formType])
+  }, [dispatch, formType, s_id])
   
   // Navigate on successful submit
   useEffect(() => {
@@ -45,7 +45,7 @@ success: {isSuccess, successMessage}, selectedSet: {_id: createdSetID}
       }
         , 2000)
     }
-  }, [isSuccess,successMessage, formType])
+  }, [isSuccess,successMessage, formType, s_id, dispatch, navigate, createdSetID])
 
   // Handle submit using token for API call
     const handleSubmit = async (e) => {
@@ -67,34 +67,57 @@ success: {isSuccess, successMessage}, selectedSet: {_id: createdSetID}
 
   return (
     <>
-    <form onSubmit={handleSubmit}>
-      <div>
-        <h3><label htmlFor="name">Set Name</label></h3>
-        <input type="text" name="name" id="name" onChange={handleChange} value={name} />
-      </div>
-
-      <fieldset>
-        <legend>Tags:</legend>
-        {tagsList.map((tag, i) => {
-          return <div key={i}>
-            <label htmlFor={tag}>{tag}</label>
-            <input type="checkbox" id={tag} name="tags" value={tag}
-              checked={tags.indexOf(tag) > -1}
-            onChange={handleChange}
+      <div className="row">
+        <div className="col-xxl-2"></div>
+      <form onSubmit={handleSubmit} className="col">
+        
+        <div className='mb-3'>
+          <label htmlFor="name" className='form-label h4 d-block text-center'>Set Name</label>
+            <input type="text" name="name" id="name" onChange={handleChange} value={name}
+            className='form-control'
             />
+          </div>
+  
+          <div className='d-flex flex-column align-items-center'>
+            <label htmlFor="isPublic" className='h4'>Make Public</label>
+            <div className='form-check form-switch'>
+            <input type="checkbox" name="isPublic" id="isPublic" onChange={handleChange} checked={isPublic}
+              className='form-check-input me-2'
+              /> 
             </div>
+         </div>
+  
+          <fieldset className='container px-2 py-2 mt-3 card bg-light'>
+            <h4 className='text-center form-label'>Tags</h4>
+        <div className='row px-2 py-1'>
+          {tagsList.map((tag, i) => {
+            return <div key={i} className="col-3 col-md-2 form-check">
+              <label htmlFor={tag} className="" style={{fontSize:"0.8rem"}}>{tag}</label>
+              <input type="checkbox" id={tag} name="tags" value={tag}
+                  checked={tags.indexOf(tag) > -1}
+                    onChange={handleChange}
+                    className="form-check-input"
+              />
+              </div>            
           })}
-      </fieldset>
+                  </div>
+          </fieldset>
+          
+          {formType === "formNew" ?
+            <p className='text-center form-text mt-2'>
+              You will be the owner of the new Flashcard set which will initially be empty. Name, privacy and tags all can be changed after creation.
+            </p> :
+            <br />
+          }
+  
+          <div className='d-flex justify-content-center'>
+            <button disabled={isSuccess || isLoading} className="btn btn-dark btn-lg">Submit</button>
+            </div>
+        </form>
 
-      <br />
-
-      <div>
-          <label htmlFor="isPublic">Public Set?</label>
-        <input type="checkbox" name="isPublic" id="isPublic" onChange={handleChange} checked={isPublic} />
+        <div className="col-xxl-2"></div>
       </div>
-
-      <button disabled={isSuccess || isLoading}>Submit</button>
-      </form>
+      
       
       <AsyncModal props={{ isError, status, message, isLoading, isSuccess, successMessage }} />
       </>

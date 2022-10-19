@@ -35,7 +35,7 @@ const FlashcardSets = ({ chatRoom }) => {
                 <div className="card bg-light">
                   <div className="card-body">
                     <div className="card-title w-100 d-flex">
-                      <h5 className='d-inline'>{name}</h5>
+                      <h5 className='d-inline mb-0'>{name}</h5>
                       <Link to={`/sets/${_id}`} className="ms-auto btn btn-primary btn-sm">View</Link>
                     </div>
                     

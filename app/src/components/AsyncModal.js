@@ -2,7 +2,6 @@
 // Displays the error if there is error.
 // Automatically closes if successful async
 
-
 import React,{ useState, useEffect }  from 'react'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
@@ -18,12 +17,10 @@ const AsyncModal = ({ props: { isLoading, status, message, isError, isSuccess,su
             if (!isError && isSuccess) {
                 setTimeout(()=>setShow(false),2000)
             } else if (!isError) {
-                setShow(false)
+                setTimeout(()=>setShow(false),400)
             }
         }
-    }, [isLoading, isError])
-
-
+    }, [isLoading, isError, isSuccess])
 
   return (
       <Modal show={show} onHide={() => { if (!isLoading) setShow(false) }}>
@@ -42,7 +39,7 @@ const AsyncModal = ({ props: { isLoading, status, message, isError, isSuccess,su
               }
 
               {!isLoading && !isSuccess && 
-                  <Button variant="secondary" onClick={() => setShow(false)}
+                  <Button variant="dark" onClick={() => setShow(false)}
                   >Close</Button>
               }
           </Modal.Body>

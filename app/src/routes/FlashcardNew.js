@@ -5,7 +5,7 @@ const FlashcardNew = () => {
     
 
   return (
-      <main>
+      <main className='container'>
           <FlashcardForm formType='formNew'/>
     </main>
   )
