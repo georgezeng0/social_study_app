@@ -83,7 +83,7 @@ const Navbar = () => {
     <div ref={navRef} className="position-absolute" style={{height:navbarHeightRef.current?navbarHeightRef.current.clientHeight:0, width:"100%"}}></div>
     <Wrapper className='navbar navbar-expand-md sticky-top navbar-light' ref={navbarHeightRef}>
       <NavDiv className="container" id="nav-container-custom" intersectionRatio={intersectionRatio}>
-      <Link to="/" className='navbar-brand'>RoteMate</Link>
+      <Link to="/" className='navbar-brand text-dark'>RoteMate</Link>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
           data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>

@@ -105,7 +105,9 @@ const Flashcard = ({ f_id, roomWindow }) => {
 
   return (
       <Wrapper>
-          <button onClick={handleGoBack}>Go Back</button>
+          {roomWindow &&
+              <button onClick={handleGoBack}>Go Back</button>
+          }
           <h1>{index + 1}/{flashcards.length} - {card?.title}</h1>
           <div>
               <button disabled={prevCardId.length===0}

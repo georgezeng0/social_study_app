@@ -19,7 +19,7 @@ const SingleSet = () => {
     gameMode: {isPlaying, savedCardWithIndex: {card: card_Saved}}
   } = useSelector(state => state.flashcard)
   const {
-user: {setHistory}
+user: {setHistory, _id:userMongoID}
   } = useSelector(state=>state.user)
   const { s_id } = useParams()
   const { name = '', stats = {}, tags=[], isPublic, flashcards } = selectedSet
@@ -92,11 +92,15 @@ user: {setHistory}
       {/* <h5>Public Set: {isPublic ? "Yes" : "No"}</h5> */}
       <div className="row mt-3">
         <div className="col-md">
-          <div className="btn-group d-block mb-2">
-            <span className='btn disabled '>Owner Actions: </span>
-            <Link to={`/sets/${s_id }/edit`} className="btn btn-primary">Edit</Link>
-            <DeleteSetButton s_id={s_id} isLoading={isLoading}/>
-          </div>
+
+          {/* Owner actions */}
+          {userMongoID === selectedSet.owner &&
+            <div className="btn-group d-block mb-2">
+              <span className='btn disabled '>Owner Actions: </span>
+              <Link to={`/sets/${s_id}/edit`} className="btn btn-primary">Edit</Link>
+              <DeleteSetButton s_id={s_id} isLoading={isLoading} />
+            </div>
+          }
           
 
           <button onClick={playSetButton} className='btn btn-dark'>Play Set</button>
@@ -104,7 +108,7 @@ user: {setHistory}
             <button onClick={continueSessionButton} className='btn btn-dark'>Continue Session</button>
           }
 
-          <div>
+          <div className='d-flex align-items-center'>
           Toggle Favourite: <ToggleFavouriteSetButton s_id={s_id} isLoading={isLoading} />
           </div>
 
@@ -124,8 +128,8 @@ user: {setHistory}
         </div>
       </div>
 
-      <div>
-        <h4>Flashcards</h4>
+      <div className='rounded-4 border bg-dark p-3'>
+        <h4 className='text-white text-center'>Flashcards</h4>
         <Flashcards/>
       </div>
     </main>

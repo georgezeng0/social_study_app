@@ -206,6 +206,7 @@ const Wrapper = styled.form`
 }
 .preview-container{
     position: relative;
+    width: 400px;
 }
 #preview-text{
     position: absolute;
@@ -217,23 +218,7 @@ const Wrapper = styled.form`
     text-shadow: 0px 0px 5px black;
 }
 .preview-img{
-    width: 250px;
-    margin: 5px
-}
-.preview-container{
-    position: relative;
-}
-#preview-text{
-    position: absolute;
-    top: 40%;
-    width: 100%;
-    text-align: center;
-    font-size: 1.2rem;
-    color: white;
-    text-shadow: 0px 0px 5px black;
-}
-.preview-img{
-    width: 250px;
+    width: 400px;
     margin: 5px
 }
 `
