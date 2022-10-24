@@ -77,9 +77,9 @@ const Flashcards = ({s_id_prop}) => {
               {flashcards.length===0 && "No Flashcards in Set"}
               {flashcards && flashcards.map((flashcard,i) => {
                   const { _id, front, back, title, parentSet } = flashcard
-                  return <div className='col-lg-6 col-xl-4'>
-                        <div key={_id} className={`${_id===f_id?"bg-primary":""} card text-black`}>
-                            <h4 className='card-title'>{i + 1} - {title}</h4>
+                  return <div className='col-lg-6 col-xl-4' key={_id}>
+                        <div  className={`${_id===f_id?"bg-primary":""} card text-black`}>
+                            <h4 className='card-title'>{i + 1} - {title.slice(0,50)}</h4>
                             <div className="btn-group btn-group-sm">
                             {s_id_prop ?
                                 <button onClick={()=>handleViewButton(_id)} className="btn btn-light">View</button> :

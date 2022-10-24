@@ -85,13 +85,13 @@ user: {setHistory, _id:userMongoID}
       <h3 className='text-center display-6 text-muted'>{isPublic?"Public":"Private"} Flashcard Set</h3>
       <h5 className='rounded-pill bg-light border border-dark px-3 py-1'
       >Tags: {tags.map((tag, i) => {
-        return <span className='badge bg-dark'>
+        return <span className='badge bg-dark' key={i}>
         {tag}
       </span>
       })}</h5>
       {/* <h5>Public Set: {isPublic ? "Yes" : "No"}</h5> */}
       <div className="row mt-3">
-        <div className="col-md">
+        <div className="col-md text-center">
 
           {/* Owner actions */}
           {userMongoID === selectedSet.owner &&
@@ -108,27 +108,35 @@ user: {setHistory, _id:userMongoID}
             <button onClick={continueSessionButton} className='btn btn-dark'>Continue Session</button>
           }
 
-          <div className='d-flex align-items-center'>
+          <div className='d-flex align-items-center justify-content-center'>
           Toggle Favourite: <ToggleFavouriteSetButton s_id={s_id} isLoading={isLoading} />
           </div>
 
           <p>Number of flashcards: {numFlashcards}</p>
         </div>
 
-        <div className='col-md'>
-          <h4>Your History:</h4>
-          Plays: {history? history.numberPlays:0}
-          <div>
-            {history && history.sessions && history.sessions.map(item => {
-              return <p key={item._id}>
-                Score - {parseInt((item.score / item.totalCards) * 100)}% - Date: {item.sessionEnd}
+        <div className='col-md px-3'>
+          <div className="card">
+            <div className="card-body">
+              <h4 className='card-title text-center'>Your History</h4>
+              <p className="card-subtitle text-center mb-2">
+              Number of Plays: {history? history.numberPlays:0}
               </p>
-            })}
+              
+              <div className='d-flex flex-column list-group' style={{maxHeight:"300px",overflowX:"hidden",overflorY:"auto"}}>
+                {history && history.sessions && history.sessions.map(item => {
+                  return <div key={item._id} className="list-group-item d-flex justify-content-between">
+                    <span> Score - <b>{parseInt((item.score / item.totalCards) * 100)}%</b></span>
+                    <span className="text-muted align-end">{new Date(item.sessionEnd).toLocaleDateString("en-GB")}</span>
+                  </div>
+                })}
+              </div>
+            </div>
+            </div>
           </div>
-        </div>
       </div>
 
-      <div className='rounded-4 border bg-dark p-3'>
+      <div className='rounded-4 border bg-dark p-3 mt-3'>
         <h4 className='text-white text-center'>Flashcards</h4>
         <Flashcards/>
       </div>

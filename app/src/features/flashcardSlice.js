@@ -74,7 +74,9 @@ const initialState = {
         score: 0,
         correct: [],
         incorrect: [],
-        savedCardWithIndex: {}
+        savedCardWithIndex: {
+            card: undefined
+        }
     },
     roomWindow: {
         state: 'SETS', //correspounds to the route/view - "SETS","SET","FLASHCARD",
@@ -223,6 +225,7 @@ export const flashcardSlice = createSlice({
         },
         playSet: (state, action) => {
             state.gameMode = {
+                ...state.gameMode,
                 isPlaying: true,
                 score: 0,
                 correct: [],

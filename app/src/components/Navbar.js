@@ -26,12 +26,9 @@ const Navbar = () => {
   const [messageTotal, setMessageTotal] = useState(0)
   
   useEffect(() => {
-    console.log(Object.values(newMessages));
     if (Object.values(newMessages).length === 0 || Object.values(newMessages)[0] === undefined) {
-      console.log(newMessages)
       setMessageTotal(0)
     } else {
-      console.log(123,newMessages)
       setMessageTotal(Object.values(newMessages).reduce((total, count) => (total + count), 0))
     }
     }, [newMessages])
@@ -84,12 +81,12 @@ const Navbar = () => {
     <Wrapper className='navbar navbar-expand-md sticky-top navbar-light' ref={navbarHeightRef}>
       <NavDiv className="container" id="nav-container-custom" intersectionRatio={intersectionRatio}>
       <Link to="/" className='navbar-brand text-dark'>RoteMate</Link>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+        <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
           data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
+          <span className="navbar-toggler-icon"></span>
       </button>
       
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <div className="collapse navbar-collapse" id="navbarSupportedContent">
         <ul className="navbar-nav ms-auto">
 
           <li className="nav-item">
