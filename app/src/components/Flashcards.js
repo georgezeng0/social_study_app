@@ -74,31 +74,31 @@ const Flashcards = ({s_id_prop}) => {
           }
           {s_id && <hr />}
           <div className='text-center row g-2'>
-              {flashcards.length===0 && "No Flashcards in Set"}
+              {flashcards.length===0 &&    <span className='text-center'>No flashcards to show</span> }
               {flashcards && flashcards.map((flashcard,i) => {
                   const { _id, front, back, title, parentSet } = flashcard
                   return <div className='col-lg-6 col-xl-4' key={_id}>
-                        <div  className={`${_id===f_id?"bg-primary":""} card text-black`}>
-                            <h4 className='card-title'>{i + 1} - {title.slice(0,50)}</h4>
-                            <div className="btn-group btn-group-sm">
+                        <div  className={`${_id===f_id?"bg-primary":""} card text-black d-flex align-items-center overflow-hidden`}>
+                            <h4 className='card-title py-3 px-2 mb-0'>{i + 1} - {title.slice(0,50)}</h4>
+                            
                             {s_id_prop ?
-                                <button onClick={()=>handleViewButton(_id)} className="btn btn-light">View</button> :
-                                <Link to={`/flashcards/${_id}`} className="btn btn-light">View</Link>
+                                <button onClick={()=>handleViewButton(_id)} className="btn btn-primary rounded-0 w-100">View</button> :
+                                <Link to={`/flashcards/${_id}`} className="btn btn-primary rounded-0 w-100">View</Link>
                                 }
                             {/* Edit/delete only when in "set" view */}
-                              {s_id && isOwner && <>
-                                <span className='btn disabled btn-dark '>Owner Actions: </span>
-                                <Link to={`/flashcards/${_id}/edit`} className="btn btn-primary">Edit</Link>
+                              {s_id && isOwner && <div className="btn-group-sm row w-100">
+                                <span className='btn disabled btn-dark col rounded-0'>Owner Actions: </span>
+                                <Link to={`/flashcards/${_id}/edit`} className="btn btn-light col rounded-0">Edit</Link>
                                 <button onClick={async () => {
                                     const token = await getToken(getAccessTokenSilently)
                                     dispatch(deleteFlashcard({ f_id: _id, s_id: parentSet,token }))
                                 }}
-                                className="btn btn-danger"
+                                className="btn btn-danger col rounded-0"
                                 >Delete</button>
-                                </>}
+                                </div>}
                             </div>
                          </div>
-                      </div>
+                      
               })}
           </div>
     </section>

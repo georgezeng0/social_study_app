@@ -3,24 +3,29 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toggleFavSet } from '../features/userSlice';
 import getToken from '../utils/getToken';
-import {AiFillHeart,AiOutlineHeart} from 'react-icons/ai'
+import {AiFillHeart} from 'react-icons/ai'
 import styled from 'styled-components';
 
 const ToggleFavouriteSetButton = ({ s_id, isLoading }) => {
     const dispatch = useDispatch();
-    const { user: {favSets}, isButtonLoading } = useSelector(state => state.user)
-    const { getAccessTokenSilently } = useAuth0()
+    const { user: {favSets, u_id}, isButtonLoading } = useSelector(state => state.user)
+    const { getAccessTokenSilently,loginWithRedirect } = useAuth0()
 
     const handleClick = async () => {
         if (isLoading || isButtonLoading) {
             return
         }
-        const token = await getToken(getAccessTokenSilently)
-        dispatch(toggleFavSet({ s_id, token }))
+        if (u_id) {
+            const token = await getToken(getAccessTokenSilently)
+            dispatch(toggleFavSet({ s_id, token }))
+        } else {
+            loginWithRedirect()
+        }
     }
 
     return (
-      <button className='btn btn-outline p-1' onClick={handleClick}>
+        <button className='btn btn-outline p-1' onClick={handleClick}>
+            {"Favourite "}
       <AiFillHeart 
           style={{ color: favSets.indexOf(s_id) > -1 ? "red" : "grey", fontSize: "1.5rem" }}
       >
@@ -30,8 +35,8 @@ const ToggleFavouriteSetButton = ({ s_id, isLoading }) => {
   )
 }
 
-const Wrapper = styled.div`
+// const Wrapper = styled.div`
 
-`
+// `
 
 export default ToggleFavouriteSetButton

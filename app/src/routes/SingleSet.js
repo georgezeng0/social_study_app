@@ -5,10 +5,12 @@ import { DeleteSetButton, Flashcards, Loading, ToggleFavouriteSetButton } from '
 import {  getSingleSet, resetError } from '../features/setSlice'
 import { playSet, setFlashcardsState } from '../features/flashcardSlice'
 import Error from './Error'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const SingleSet = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const { loginWithRedirect } = useAuth0();
 
   const {
     selectedSet, error: { isError, message, status }, isLoading,
@@ -61,8 +63,12 @@ user: {setHistory, _id:userMongoID}
 
 
   const playSetButton = () => {
-    dispatch(playSet(flashcards))
-    setPlayButton(true)
+    if (userMongoID) {
+      dispatch(playSet(flashcards))
+      setPlayButton(true)
+    } else {
+      loginWithRedirect()
+    }
   }
 
   const continueSessionButton = () => {
@@ -108,8 +114,8 @@ user: {setHistory, _id:userMongoID}
             <button onClick={continueSessionButton} className='btn btn-dark'>Continue Session</button>
           }
 
-          <div className='d-flex align-items-center justify-content-center'>
-          Toggle Favourite: <ToggleFavouriteSetButton s_id={s_id} isLoading={isLoading} />
+          <div className='d-flex align-items-center justify-content-center my-1'>
+          <ToggleFavouriteSetButton s_id={s_id} isLoading={isLoading} />
           </div>
 
           <p>Number of flashcards: {numFlashcards}</p>
@@ -120,12 +126,15 @@ user: {setHistory, _id:userMongoID}
             <div className="card-body">
               <h4 className='card-title text-center'>Your History</h4>
               <p className="card-subtitle text-center mb-2">
-              Number of Plays: {history? history.numberPlays:0}
+                {userMongoID ?
+                  <>Number of Plays: {history?.numberPlays || 0}</>:
+                  "Log in to view"
+                }
               </p>
               
               <div className='d-flex flex-column list-group' style={{maxHeight:"300px",overflowX:"hidden",overflorY:"auto"}}>
-                {history && history.sessions && history.sessions.map(item => {
-                  return <div key={item._id} className="list-group-item d-flex justify-content-between">
+                {history && history.sessions && history.sessions.map((item,i) => {
+                  return <div key={item._id} className={`list-group-item d-flex justify-content-between ${i%2==0 && "bg-light"}`} >
                     <span> Score - <b>{parseInt((item.score / item.totalCards) * 100)}%</b></span>
                     <span className="text-muted align-end">{new Date(item.sessionEnd).toLocaleDateString("en-GB")}</span>
                   </div>

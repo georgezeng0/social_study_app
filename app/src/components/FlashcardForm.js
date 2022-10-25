@@ -132,66 +132,73 @@ const FlashcardForm = ({ formType, editNotesOnly }) => {
 
   return (
     <>
-    <Wrapper onSubmit={handleSubmit}>
-      <div>
-        <h3><label htmlFor="front">Title</label></h3>
-        <input type="text" name="title" value={title}
-          onChange={handleChange}
-          placeholder="Something to describe this flashcard" />
-      </div>
-      <h3>Options</h3>
-      <div>
-        <label htmlFor="difficulty">Difficulty</label>
-        <input type="range" id="difficulty" name="difficulty"
-          min="0" max="3" value={difficulty} onChange={handleChange}
-        />
-      </div>
-      <div>
-        <label htmlFor="reversible">Reversible</label>
-        <input type="checkbox" id="reversible" name="reversible"
-         value={reversible} onChange={handleChange}
-        />
-      </div>
-
-      <div>
-        <h3>Main Image</h3>
-        
-        {/* Image */}
-        <div>
-            {image && <div className='preview-container'>
-                <span id='preview-text'>PREVIEW</span>
-                <img className="preview-img" src={URL.createObjectURL(image)} alt="" />
-                </div>
-            }
-            <label htmlFor="image">{formType==="formNew" ? `Select` : `Edit`} Image</label>
-            
-            <input type="file" accept="image/*" name="image" id="image"
-                onChange={e => setImage(e.target.files[0])}
+      <Wrapper onSubmit={handleSubmit} className="card mt-2 text-center">
+        <div className="card-body">
+          <div className='mb-3'>
+            <label htmlFor="front" className='h4 form-label'>Title</label>
+            <input type="text" name="title" value={title}
+              onChange={handleChange} className='form-control'
+              placeholder="Something brief to describe this flashcard e.g. 'Image based question'" />
+          </div>
+          
+          <div className='mb-3'>
+            <h4>Options</h4>
+            <div className="d-flex flex-column justify-content-center align-items-center">
+            <label htmlFor="difficulty" className='form-label'>Difficulty (0-3)</label>
+            <input type="range" id="difficulty" name="difficulty"
+                min="0" max="3" value={difficulty} onChange={handleChange}
+                className='form-control'
+                style={{maxWidth:"400px"}}
             />
+            <label htmlFor="reversible" className='form-label mt-2'>Reversibility</label>
+            <input type="checkbox" id="reversible" name="reversible"
+            value={reversible} onChange={handleChange}
+              />
+              <div className="form-text">During playthrough, the positions of the cards may be reversed.</div>
+              </div>
+          </div>
+
+          <div>
+            <h3>Image (Optional)</h3>
             
-        </div>
-        <div>
-          <img src={currentImage?.url} alt="" width="200px" />
-        </div>
-      </div>
+            {/* Image */}
+            <div className='d-flex justify-content-center align-items-center border'>
+                {image && <div className='preview-container'>
+                    <span id='preview-text'>PREVIEW</span>
+                    <img className="preview-img" src={URL.createObjectURL(image)} alt="" />
+                    </div>
+                }
+              <label htmlFor="image">{formType === "formNew" ? `Select` : `Edit`} Image</label>
+                
+                <input type="file" accept="image/*" name="image" id="image"
+                onChange={e => setImage(e.target.files[0])}
+                className="border my-2"
+                />
+                
+            </div>
+            <div>
+              <img src={currentImage?.url} alt="" width="200px" />
+            </div>
+          </div>
 
-      <div>
-        <h3><label htmlFor="front">Front</label></h3>
-            <TextEditor name='front' value={front} formType={formType}/>
-      </div>
-      
-      <div>
-        <h3><label htmlFor="back">Back</label></h3>
-            <TextEditor name='back' value={back} formType={formType}/>
-      </div>
+          <div>
+            <h3><label htmlFor="front">Front</label></h3>
+                <TextEditor name='front' value={front} formType={formType}/>
+          </div>
+          
+          <div>
+            <h3><label htmlFor="back">Back</label></h3>
+                <TextEditor name='back' value={back} formType={formType}/>
+          </div>
 
-      <div>
-        <h3><label htmlFor="notes">Notes</label></h3>
-            <TextEditor name='notes' value={notes} formType={formType}/>
+          <div>
+            <h3><label htmlFor="notes">Notes</label></h3>
+                <TextEditor name='notes' value={notes} formType={formType}/>
+          </div>
+                  
+          <button>Submit</button>
+          
       </div>
-              
-      <button>Submit</button>
-      
     </Wrapper>
     <AsyncModal props={{ isError, status, message, isLoading, isSuccess, successMessage }} />
     </>
