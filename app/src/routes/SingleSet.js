@@ -123,7 +123,7 @@ user: {setHistory, _id:userMongoID}
 
         <div className='col-md px-3'>
           <div className="card">
-            <div className="card-body">
+            <div className="card-body custom-scroll">
               <h4 className='card-title text-center'>Your History</h4>
               <p className="card-subtitle text-center mb-2">
                 {userMongoID ?

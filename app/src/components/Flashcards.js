@@ -83,7 +83,7 @@ const Flashcards = ({s_id_prop}) => {
                             
                             {s_id_prop ?
                                 <button onClick={()=>handleViewButton(_id)} className="btn btn-primary rounded-0 w-100">View</button> :
-                                <Link to={`/flashcards/${_id}`} className="btn btn-primary rounded-0 w-100">View</Link>
+                                <Link to={`/flashcards/${_id}`} className="btn btn-secondary rounded-0 w-100">View</Link>
                                 }
                             {/* Edit/delete only when in "set" view */}
                               {s_id && isOwner && <div className="btn-group-sm row w-100">

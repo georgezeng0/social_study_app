@@ -25,6 +25,7 @@ const FlashcardForm = ({ formType, editNotesOnly }) => {
   } = useSelector(state => state.flashcard)
   const [parentSet_,setParentSet_]=useState('')
   const [image, setImage] = useState('');
+  const [textEditorShow, setTextEditorShow] = useState('FRONT')
 
   // Populate form if in editing state
   useEffect(() => {
@@ -117,6 +118,11 @@ const FlashcardForm = ({ formType, editNotesOnly }) => {
         dispatch(updateForm({formType,name, value}))
   }
 
+  // Handle show editor buttons
+  const handleClick = (input) => {
+    setTextEditorShow(input)
+  }
+
   // Return only the notes editor of the form
   if (editNotesOnly) {
     return <form onSubmit={handleSubmit}>
@@ -132,15 +138,16 @@ const FlashcardForm = ({ formType, editNotesOnly }) => {
 
   return (
     <>
-      <Wrapper onSubmit={handleSubmit} className="card mt-2 text-center">
+      <Wrapper onSubmit={handleSubmit} className="card mt-2 mb-5 text-center">
         <div className="card-body">
+          <div className="card-title display-2 mb-3">New Flashcard</div>
           <div className='mb-3'>
             <label htmlFor="front" className='h4 form-label'>Title</label>
             <input type="text" name="title" value={title}
-              onChange={handleChange} className='form-control'
+              onChange={handleChange} className='form-control text-center'
               placeholder="Something brief to describe this flashcard e.g. 'Image based question'" />
           </div>
-          
+                    
           <div className='mb-3'>
             <h4>Options</h4>
             <div className="d-flex flex-column justify-content-center align-items-center">
@@ -151,15 +158,15 @@ const FlashcardForm = ({ formType, editNotesOnly }) => {
                 style={{maxWidth:"400px"}}
             />
             <label htmlFor="reversible" className='form-label mt-2'>Reversibility</label>
-            <input type="checkbox" id="reversible" name="reversible"
+            <input type="checkbox" id="reversible" name="reversible" className='form-check-input'
             value={reversible} onChange={handleChange}
               />
-              <div className="form-text">During playthrough, the positions of the cards may be reversed.</div>
+              <div className="form-text">During playthrough, the front and back positions of the cards may be reversed.</div>
               </div>
           </div>
 
           <div>
-            <h3>Image (Optional)</h3>
+            <h4>Image (Optional)</h4>
             
             {/* Image */}
             <div className='d-flex justify-content-center align-items-center border'>
@@ -181,22 +188,32 @@ const FlashcardForm = ({ formType, editNotesOnly }) => {
             </div>
           </div>
 
-          <div>
-            <h3><label htmlFor="front">Front</label></h3>
-                <TextEditor name='front' value={front} formType={formType}/>
-          </div>
-          
-          <div>
-            <h3><label htmlFor="back">Back</label></h3>
-                <TextEditor name='back' value={back} formType={formType}/>
+          <h4>Card Text and Notes</h4>
+          <div className="btn-group my-2 border">
+            <btn className={`btn ${textEditorShow==="FRONT"? "btn-primary":"btn-light"} border`} style={{ width: "100px" }}
+              onClick={()=>handleClick('FRONT')}
+            >Front</btn>
+            <btn className={`btn ${textEditorShow==="BACK"? "btn-primary":"btn-light"} border`}  style={{ width: "100px" }}
+              onClick={()=>handleClick('BACK')}
+            >Back</btn>
+            <btn className={`btn ${textEditorShow==="NOTES"? "btn-primary":"btn-light"} border`}  style={{ width: "100px" }}
+              onClick={()=>handleClick('NOTES')}
+            >Notes</btn>
           </div>
 
-          <div>
-            <h3><label htmlFor="notes">Notes</label></h3>
-                <TextEditor name='notes' value={notes} formType={formType}/>
+          <div className={`${textEditorShow==="FRONT"?"d-block":"d-none"}`}>
+            <TextEditor name='front' value={front} formType={formType}/>
+          </div>
+          
+          <div className={`${textEditorShow==="BACK"?"d-block":"d-none"}`}>
+            <TextEditor name='back' value={back} formType={formType}/>
+          </div>
+
+          <div className={`${textEditorShow==="NOTES"?"d-block":"d-none"}`}>
+            <TextEditor name='notes' value={notes} formType={formType}/>
           </div>
                   
-          <button>Submit</button>
+          <button className='my-3 btn btn-dark btn-lg'>Submit</button>
           
       </div>
     </Wrapper>
