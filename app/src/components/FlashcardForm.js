@@ -3,14 +3,14 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
-import { createFlashcard, updateForm, resetForm, editFlashcard, populateFlashcardForm, resetSuccess } from '../features/flashcardSlice'
+import { createFlashcard, updateForm, resetForm, editFlashcard, populateFlashcardForm, resetSuccess, setActiveCard, getOneFlashcard } from '../features/flashcardSlice'
 import TextEditor from './TextEditor'
 import axios from 'axios'
 import AsyncModal from './AsyncModal'
 import { useAuth0 } from '@auth0/auth0-react'
 import getToken from '../utils/getToken'
 
-const FlashcardForm = ({ formType, editNotesOnly }) => {
+const FlashcardForm = ({ formType, editNotesOnly,setShowEditNotes,roomWindow }) => {
   const {getAccessTokenSilently} = useAuth0()
   const dispatch = useDispatch()
   const navigate = useNavigate();
@@ -59,7 +59,11 @@ const FlashcardForm = ({ formType, editNotesOnly }) => {
       setTimeout(() => {
         dispatch(resetForm({ formType }))
         dispatch(resetSuccess())
-        if (window.history.state && window.history.state.idx > 0) {
+        if (editNotesOnly) {
+          setShowEditNotes(false)
+          dispatch(getOneFlashcard(f_id))
+        }
+        else if (window.history.state && window.history.state.idx > 0) {
           navigate(-1); // Go back if there is history
         } else {
           navigate(`/sets/${parentSet_}`, { replace: true }); // the current entry in the history stack will be replaced with the new one with { replace: true }
@@ -131,7 +135,7 @@ const FlashcardForm = ({ formType, editNotesOnly }) => {
             <TextEditor name='notes' value={notes} formType={formType}/>
       </div>
               
-      <button>Submit</button>
+      <button className='btn btn-dark mt-2'>Submit</button>
     </form>
   }
   

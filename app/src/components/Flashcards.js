@@ -62,7 +62,7 @@ const Flashcards = ({s_id_prop}) => {
 
   return (
       <section className='text-light'>
-          {!s_id_prop &&
+          {!s_id_prop && isOwner &&
               <div className='text-center mb-2'>
                   <Link to={`/flashcards/create?set=${setId}`} className='fs-4'><BsFillPlusCircleFill/></Link>
               </div>
@@ -75,9 +75,9 @@ const Flashcards = ({s_id_prop}) => {
           {s_id && <hr />}
           <div className='text-center row g-2'>
               {flashcards.length===0 &&    <span className='text-center'>No flashcards to show</span> }
-              {flashcards && flashcards.map((flashcard,i) => {
+              {flashcards && flashcards.map((flashcard, i) => {
                   const { _id, front, back, title, parentSet } = flashcard
-                  return <div className='col-lg-6 col-xl-4' key={_id}>
+                  return <div className={`${f_id ? "col-12" : "col-lg-6 col-xl-4"}`} key={_id}>
                         <div  className={`${_id===f_id?"bg-primary":""} card text-black d-flex align-items-center overflow-hidden`}>
                             <h4 className='card-title py-3 px-2 mb-0'>{i + 1} - {title.slice(0,50)}</h4>
                             

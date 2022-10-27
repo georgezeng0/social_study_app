@@ -8,12 +8,15 @@ import FlashcardForm from './FlashcardForm'
 import Loading from './Loading'
 import getToken from '../utils/getToken'
 import { useAuth0 } from '@auth0/auth0-react'
+import { HiOutlineChevronRight } from 'react-icons/hi'
+import {FaChevronCircleRight,FaChevronCircleLeft} from 'react-icons/fa'
 
 const Flashcard = ({ f_id, roomWindow }) => {
     const {getAccessTokenSilently } = useAuth0()
     const dispatch = useDispatch()
     const navigate = useNavigate();
     const { flashcards, originalFlashcards, activeCard: { card, index }, isLoading, gameMode: {isPlaying, score} } = useSelector(state => state.flashcard)
+    const {user: {_id: userMongoId}} = useSelector(state=>state.user)
 
     const [nextCardId, setNextCardId] = useState('')
     const [prevCardId, setPrevCardId] = useState('')
@@ -95,55 +98,69 @@ const Flashcard = ({ f_id, roomWindow }) => {
         
     }
 
-    if (isLoading) {
-        return <main className='container mt-5'>
-          <Loading/>
-        </main>
-    }
+    // if (isLoading) {
+    //     return <main className='container mt-5'>
+    //       <Loading/>
+    //     </main>
+    // }
     
 
 
   return (
       <Wrapper>
           {roomWindow &&
-              <button onClick={handleGoBack}>Go Back</button>
+              <button onClick={handleGoBack} className='btn btn-dark'>Go Back</button>
           }
-          <h1>{index + 1}/{flashcards.length} - {card?.title}</h1>
-          <div>
+          <h1 className=''><span className='text-dark'>{index + 1}/{flashcards.length}</span> <HiOutlineChevronRight className='text-dark' style={{bottom:"3px",position:"relative"}}></HiOutlineChevronRight> {card?.title ? card.title : "Untitled"}</h1>
+          <hr />
+          <div className='row g-1'>
+              <div className="col"></div>
               <button disabled={prevCardId.length===0}
-                onClick={handlePrevCard}>
-                  Previous
+                onClick={handlePrevCard} className='btn border-0 text-dark col'>
+                  <FaChevronCircleLeft className='fs-1'></FaChevronCircleLeft>
               </button>
-              <button disabled={nextCardId.length===0}
-                onClick={handleNextCard}>
+              <div className="col-auto d-flex justify-content-start align-items-center text-muted" style={{width:"100px"}}>
+                  Prev
+              </div>
+              <div className="col-auto d-flex justify-content-end align-items-center text-muted"  style={{width:"100px"}}>
                   Next
+              </div>
+              <button disabled={nextCardId.length===0}
+                onClick={handleNextCard} className='btn border-0 text-dark col'>
+                  <FaChevronCircleRight className='fs-1'></FaChevronCircleRight>
               </button>
+              <div className="col"></div>
               </div> 
           <div>
-              <h5>Reversible: {card?.reversible?'Yes':'No'}</h5>
-              <h5>Difficulty: {card?.stats?.difficulty}</h5>
+              {/* <h5>Reversible: {card?.reversible?'Yes':'No'}</h5> */}
+              <h5 className='text-center'>Difficulty : {card?.stats?.difficulty}</h5>
           </div>
 
-          <div>
-              {!roomWindow && <>
-                <button onClick={()=>navigate(`/flashcards/${f_id}/edit`)}> Edit </button>
-                <button onClick={async () => {
-                  const token = await getToken(getAccessTokenSilently)
-                  dispatch(deleteFlashcard({ f_id, s_id: card.parentSet, token }))
-                  if (nextCardId) {
-                    navigate(`/flashcards/${nextCardId}`)
-                  } else if (prevCardId) {
-                    navigate(`/flashcards/${prevCardId}`)
-                  } else {
-                    navigate(`/sets/${card.parentSet}`)
-                  }
-                }}> Delete </button>
+          <div className='d-flex flex-column align-items-center mt-2'>
+              {!roomWindow && userMongoId === card?.owner && <>
+                  <div className="btn-group btn-group-sm">
+                        <span className='btn disabled'>Owner actions : </span>
+                        <button onClick={()=>navigate(`/flashcards/${f_id}/edit`)} className="btn btn-primary"> Edit </button>
+                        <button onClick={async () => {
+                        const token = await getToken(getAccessTokenSilently)
+                        dispatch(deleteFlashcard({ f_id, s_id: card.parentSet, token }))
+                        if (nextCardId) {
+                            navigate(`/flashcards/${nextCardId}`)
+                        } else if (prevCardId) {
+                            navigate(`/flashcards/${prevCardId}`)
+                        } else {
+                            navigate(`/sets/${card.parentSet}`)
+                        }
+                      }}
+                          className="btn btn-danger"
+                      > Delete </button>
+                  </div>
+                
               </>}
-              <button onClick={()=>setCardState({...cardState, flip: !cardState.flip})}>Flip Card</button>
-              <button onClick={()=>setCardState({...cardState, showNotes: !cardState.showNotes})}>Show/Hide Notes</button>
+              
           </div>
 
-          <div className="card">
+          <div className={`${card?.image?.url ? "card":""}`}>
               <img src={card?.image?.url} alt="" className="card-image" />
           </div>
 
@@ -158,22 +175,37 @@ const Flashcard = ({ f_id, roomWindow }) => {
           <div className={`card _flip-back`}>
           <article className={`card-body container`} dangerouslySetInnerHTML={{__html: dompurifyHTML(cardBack)}}>
               </article>
-              </div></div></div>
-
+                  </div></div></div>
+          
+                  <div className="d-flex justify-content-center">
+          <button className='btn btn-lg btn-outline-dark my-3'
+                  onClick={() => setCardState({ ...cardState, flip: !cardState.flip })}>Flip Card</button>
               
-                  
-              <div className={`_notes container ${cardState.showNotes ? 'd-block' : 'd-none'}`} >
-              <h5 className='display-6 border-bottom'>Notes</h5>
-              <button onClick={() => setShowEditNotes(!showEditNotes)}>
-                  {showEditNotes ? "Cancel Editing":"Edit Notes"}</button>
-              {showEditNotes ?
-                  <FlashcardForm formType="formEdit" editNotesOnly={true} /> :
-                  <p dangerouslySetInnerHTML={{ __html: dompurifyHTML(card?.notes) }}
-                      className='p-2'
-                  ></p>
-              }
-              </div>
+            </div>
 
+          <div className="row mt-3">
+              <div className="col"></div>
+            <button className='btn btn-light border ms-auto col'
+              onClick={() => setCardState({ ...cardState, showNotes: !cardState.showNotes })}>Show/Hide Notes</button>
+                  <div className="col"></div>
+          </div>
+
+        <div className={`_notes container ${cardState.showNotes ? 'd-block' : 'd-none'}`} >
+            <h5 className='display-6'>Notes</h5>
+           
+                  
+              
+            {!isPlaying && !roomWindow && showEditNotes ?
+                <FlashcardForm formType="formEdit" editNotesOnly={true} setShowEditNotes={setShowEditNotes} roomWindow /> :
+                <p dangerouslySetInnerHTML={{ __html: dompurifyHTML(card?.notes) }}
+                      className='p-2 border'
+                      style={{minHeight:"100px"}}
+                ></p>
+          }
+              <button onClick={() => setShowEditNotes(!showEditNotes)} className="btn btn-dark mt-1">
+              {showEditNotes ? "Cancel Editing" : "Edit Notes"}</button>
+              
+        </div>
               
       </Wrapper>
   )

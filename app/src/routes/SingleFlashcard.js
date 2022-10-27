@@ -10,21 +10,23 @@ const SingleFlashcard = () => {
   const {activeCard: {card}, gameMode: {isPlaying}} = useSelector(state=>state.flashcard)
 
     return (
-      <main className='container mt-5'>
+      <main className='container pb-5'>
+        <div className='d-flex mb-3'>
+          <Link to={`/sets/${card?.parentSet}`} className="btn btn-outline-dark btn-sm">Back to Set</Link>
+      </div>
         {isPlaying && <PlayWindow />}
       <div className="container">
         <div className="row">
-          <div className="col-12 col-lg-8">
+          <div className="col-12 col-xl-8">
             <Flashcard f_id={f_id} /></div>
          
           <div className="col">
-            <Flashcards /></div>
+              <Flashcards />
+            </div>
           
           </div>
       </div>
-      <div>
-        <Link to={`/sets/${card?.parentSet}`}>Back to Set</Link>
-      </div>
+      
     </main>
   )
 }
