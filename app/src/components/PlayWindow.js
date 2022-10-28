@@ -30,15 +30,19 @@ const PlayWindow = () => {
     },[incorrect,correct, f_id])
 
     return (
-      <section>
-          <h5>Playing Set</h5>
-            <span>Score: {score}/{flashcards.length}</span>
-            <span>Card Result: {isCorrect||isIncorrect?isCorrect?"Correct":"Incorrect":"Unmarked"}</span>
-          <div>Self-score this card:
-                <button disabled={isCorrect} onClick={()=>dispatch(correctCard(f_id))}>Correct</button>
-                <button disabled={isIncorrect}  onClick={()=>dispatch(incorrectCard(f_id))}>Wrong</button>
+      <section className='p-3 bg-dark text-white border-rounded col-lg-8 d-flex flex-column text-center'>
+          <h5 className='text-center'>Playing Set</h5>
+            <div>Score: <b>{score}/{flashcards.length}</b></div>
+            <div>Current Flashcard Result: {isCorrect||isIncorrect?isCorrect?"Correct":"Incorrect":"Unmarked"}</div>
+            <div className='h6 mt-3'>Self-score this card: </div>
+            <div className="btn-group d-flex justify-content-center">
+                <button disabled={isCorrect} onClick={()=>dispatch(correctCard(f_id))} className="btn btn-success">Correct</button>
+                <button disabled={isIncorrect}  onClick={()=>dispatch(incorrectCard(f_id))} className="btn btn-danger">Wrong</button>
             </div>
-            <button onClick={async () => {
+            <div className='d-flex justify-content-end'>
+                <button
+                    className='btn btn-light mt-3'
+                    onClick={async () => {
                 const token = await getToken(getAccessTokenSilently)
                 dispatch(saveGameHistory({token}))
                 dispatch(resetGame())
@@ -46,6 +50,8 @@ const PlayWindow = () => {
                     navigate(`/sets/${parentSet}`)
                 })
             }}>End Session</button>
+            </div>
+            
     </section>
   )
 }

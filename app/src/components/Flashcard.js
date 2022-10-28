@@ -177,7 +177,7 @@ const Flashcard = ({ f_id, roomWindow }) => {
               </article>
                   </div></div></div>
           
-                  <div className="d-flex justify-content-center">
+        <div className="d-flex justify-content-center">
           <button className='btn btn-lg btn-outline-dark my-3'
                   onClick={() => setCardState({ ...cardState, flip: !cardState.flip })}>Flip Card</button>
               

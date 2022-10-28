@@ -14,7 +14,7 @@ const SingleFlashcard = () => {
         <div className='d-flex mb-3'>
           <Link to={`/sets/${card?.parentSet}`} className="btn btn-outline-dark btn-sm">Back to Set</Link>
       </div>
-        {isPlaying && <PlayWindow />}
+        {isPlaying && <div className='row'><div className="col"></div><PlayWindow/><div className="col"></div></div>}
       <div className="container">
         <div className="row">
           <div className="col-12 col-xl-8">
