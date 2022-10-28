@@ -109,7 +109,7 @@ user: {setHistory, _id:userMongoID}
           }
           
 
-          <button onClick={playSetButton} className='btn btn-dark'>Play Set</button>
+          <button onClick={playSetButton} className='btn btn-dark' disabled={numFlashcards===0}>Play Set</button>
           {isPlaying && 
             <button onClick={continueSessionButton} className='btn btn-dark'>Continue Session</button>
           }

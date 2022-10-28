@@ -10,6 +10,7 @@ const StudyTimer = ({ props: { setShowTimer, showTimer,setTimerSummary } }) => {
     const { timer: { form: { studyTimeInput, breakTimeInput, repeatInput },
         startTime, expiresAt, isStudy, studyTime, breakTime, repeat, isPaused, timeLeftAtPause }
     } = useSelector(state => state.user)
+    const [showForm,setShowForm] = useState(false)
 
     // Calcuilate time left using expiresAt from redux state
     const calculateTimeLeft = () => {
@@ -86,47 +87,56 @@ const StudyTimer = ({ props: { setShowTimer, showTimer,setTimerSummary } }) => {
 
   return (
       <Modal show={showTimer} onHide={() => setShowTimer(false)}>
-          <Modal.Header closeButton>
-              <Modal.Title>Timer</Modal.Title>
+          <Modal.Header closeButton className='bg-primary'>
+              <Modal.Title className='text-center display-6'>Timer</Modal.Title>
           </Modal.Header> 
           <Modal.Body>
-              <div>
-                  Time Left: {parseInt(timeLeft / 1000 / 60)}m {parseInt((timeLeft / 1000) % 60)}s
-                  <br />
-                  Current Period: {isStudy? "Study" : "Break"}
-                  <br />
-                    Repeats left: {repeat}
+              <div className='d-flex flex-column align-items-center'>
+                  <span>Time Left:</span>
+                  <span className='fs-2 mb-1'>{parseInt(timeLeft / 1000 / 60)}m {parseInt((timeLeft / 1000) % 60)}s</span>
+                  Current Period: <b>{isStudy? "Study" : "Break"}</b>
+                  <span>Repeats left: {repeat}</span>
+                  <div className="btn-group d-flex justify-content-center my-2">
+                      <button className="btn btn-dark" style={{width:"120px"}} onClick={()=>setShowForm(!showForm)}>New Timer</button>
+                      <button className='btn btn-dark' style={{width:"120px"}} type='button' onClick={handlePause} disabled={timeLeft<=0}> {isPaused ? "Continue" : "Pause"}</button>
+                  </div>
               </div>
 
+        
+          <div className={`${showForm?"d-block":"d-none"}`}>
+                  <form onSubmit={handleSubmit} className="d-flex flex-column justify-content-center">
+                      <div className='row mb-2'>
+                        <label htmlFor="studyMinutes" className='col-4 col-form-label text-end'>Study For : </label>
+                        <input id="studyMinutes" type="number" step="1" min="0" max="60"
+                                name="studyTimeInput"
+                              value={studyTimeInput} onChange={handleChange}
+                              className="form-control col"
+                          />
+                          <span className="text-muted col-2">Min</span>
+                        </div>
+                 
+                      <div className="row mb-2">
+                        <label htmlFor="breakMinutes" className='col-4 col-form-label text-end'>Break For : </label>
+                        <input id="breakMinutes" type="number" step="1" min="0" max="60"
+                        name="breakTimeInput"
+                              value={breakTimeInput} onChange={handleChange}
+                              className="form-control col"
+                          />
+                          <span className="col-2 text-muted">Min</span>
+                      </div>
 
-          <div>
-              <form onSubmit={handleSubmit}>
-                  <label htmlFor="studyMinutes">Study For : </label>
-                   <input id="studyMinutes" type="number" step="1" min="0" max="60"
-                          name="studyTimeInput"
-                          value={studyTimeInput} onChange={handleChange}
-                  /> Minutes
+                
+                      <div className="row mb-2">
+                        <label htmlFor="repeat" className='col-4 col-form-label text-end'>Repeat : </label>
+                        <input id="repeat" type="number" step="1" min="0"
+                        name="repeatInput"
+                              value={repeatInput} onChange={handleChange}
+                              className="form-control col"
+                          />
+                          <span className="col-2 text-muted">Times</span>
+                      </div>  
 
-                  <br />
-
-                  <label htmlFor="breakMinutes">Break For : </label>
-                  <input id="breakMinutes" type="number" step="1" min="0" max="60"
-                    name="breakTimeInput"
-                    value={breakTimeInput} onChange={handleChange}
-                  /> Minutes
-
-                  <br />
-
-                  <label htmlFor="repeat">Repeat : </label>
-                  <input id="repeat" type="number" step="1" min="0"
-                  name="repeatInput"
-                  value={repeatInput} onChange={handleChange}
-                  /> Times
-                  
-                  <br />
-
-                      <button type='submit'>Start</button>
-                      <button type='button' onClick={handlePause} disabled={timeLeft<=0}> {isPaused ? "Continue" : "Pause"}</button>
+                  <button type='submit' className="btn btn-success btn-sm" >Start</button>
 
               </form>
               </div>
