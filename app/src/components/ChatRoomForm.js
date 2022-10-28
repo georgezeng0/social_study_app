@@ -6,8 +6,9 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { useParams } from 'react-router-dom'
 
 const ChatRoomForm = ({isEdit}) => {
-    const { roomForm: { name,isPublic } } = useSelector(state => state.chat)
-    const { getAccessTokenSilently } = useAuth0()
+    const { roomForm: { name, isPublic } } = useSelector(state => state.chat)
+    const {user:{_id:userMongoID}} = useSelector(state=>state.user)
+    const { getAccessTokenSilently, loginWithRedirect } = useAuth0()
     const dispatch = useDispatch();
     const { c_id } = useParams()
 
@@ -23,6 +24,9 @@ const ChatRoomForm = ({isEdit}) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        if (!userMongoID) {
+            loginWithRedirect()
+        }
         const token = await getToken(getAccessTokenSilently)
         if (!isEdit) {
             dispatch(createRoom({ token }))
@@ -39,13 +43,19 @@ const ChatRoomForm = ({isEdit}) => {
     }
 
   return (
-    <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="border py-3 px-4 rounded-pill row">
+          <div className="col-6">
         <input type="text" placeholder='Room Name'
-          value={name} onChange={handleChange} name="name"
-          />
-          <label htmlFor="isPublic">Public?</label>
-          <input type="checkbox" id="isPublic" name="isPublic" checked={isPublic} onChange={handleChange} />
-          <button>{isEdit ? "Edit Room" : "Create Room"}</button>
+              value={name} onChange={handleChange} name="name"
+              className='form-control'
+              />
+              </div>
+          <label htmlFor="isPublic" className='col-form-label col-2 text-end'>Public?</label>
+          <div className="col-1 d-flex align-items-center">
+          <input type="checkbox" id="isPublic" name="isPublic" checked={isPublic} onChange={handleChange} className="form-check-input"/>
+          </div>
+          
+          <button className='col-auto ms-auto btn btn-dark btn-sm'>{isEdit ? "Edit Room" : "New Room"}</button>
       </form>
   )
 }

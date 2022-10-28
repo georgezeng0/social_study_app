@@ -15,12 +15,14 @@ const ChatRooms = () => {
   
 
   return (
-      <main>
+      <main className='container'>
       <ChatRoomForm/>
-      <div>
+      <div className='row my-3'>
         {rooms.map(room => {
-          return <p key={room._id}>
-            <Link to={`${room._id}`}>{room.title}</Link>
+          return <p key={room._id} className="col-12 card p-2 bg-light">
+            <h3 className='card-title text-center'>{room.title}</h3>
+            <span className="badge bg-secondary mb-2">{room.isPublic? "Public": "Private"}</span>
+            <Link to={`${room._id}`} className="btn btn-outline-dark">View</Link>
           </p>
         })}
       </div>
