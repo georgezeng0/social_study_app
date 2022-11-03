@@ -3,6 +3,7 @@ import axios from 'axios'
 
 const initialState = {
     isLoading: false,
+    roomLoading: false,
     error: {
         isError: false,
         message: '',
@@ -365,14 +366,17 @@ export const chatSlice = createSlice({
         [getOneChatRoom.pending]: (state) => {
             state.error.isError = false;
             state.isLoading = true
+            state.roomLoading = true
         },
         [getOneChatRoom.fulfilled]: (state,action) => {
             state.isLoading = false;
+            state.roomLoading = false;
             state.error.isError = false;
             state.chatRoom = { ...initialState.chatRoom,...action.payload }
         },
         [getOneChatRoom.rejected]: (state, action) => {
             state.isLoading = false;
+            state.roomLoading = false;
             state.error.isError = true;
             state.error = { ...state.error, ...action.payload }
         },

@@ -2,7 +2,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import React,{ useEffect,useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChatBox, ChatRoomForm, FlashcardRoomWindow, VideoPlayer } from '../components'
+import { ChatBox, ChatRoomForm, FlashcardRoomWindow, Loading, VideoPlayer } from '../components'
 import { joinRoom,leaveRoom, getOneChatRoom,toggleShowEdit, deleteRoom, resetMessageCount } from '../features/chatSlice';
 import getToken from '../utils/getToken';
 
@@ -10,7 +10,7 @@ const ChatRoom = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { getAccessTokenSilently } = useAuth0()
-  const { chatRoom, showEdit, newMessages } = useSelector(state => state.chat)
+  const { chatRoom, showEdit, newMessages, roomLoading } = useSelector(state => state.chat)
   const { user } = useSelector(state => state.user)
   const { c_id } = useParams()
 
@@ -57,30 +57,51 @@ const ChatRoom = () => {
     navigate('/chatrooms')
   }
 
+  if (roomLoading) {
+    return <Loading/>
+  }
+
   return (
-    <main>
-      <h1>{chatRoom.title}
+    <main className='container'>
+      <h1 className='text-center display-1'>{chatRoom.title}
+      <span className="badge bg-primary fs-5 align-middle ms-4">{chatRoom.isPublic?"Public":"Private"}</span>
       </h1>
+      
       {!chatRoom.isPublic && isJoined && 
-        < h4 >
-        Passcode for new members - {chatRoom.passcode}
-      </h4>
+        <h4 className='text-center rounded-pill border bg-dark text-white py-2'>
+        Passcode to join - {chatRoom.passcode}
+        </h4>
       }
+
       {
-        chatRoom.owner===user._id &&
-        <h5>You are the owner</h5>
+        chatRoom.owner === user._id &&
+        <div>
+          <h5 className='text-center'>You are the owner</h5>
+          <div className='row my-3'>
+            <div className="col"></div>
+            <button onClick={() => dispatch(toggleShowEdit())} className="col-2 btn btn-primary">Edit</button>
+            <button onClick={handleDeleteButton} className="col-2 btn btn-danger">Delete</button>
+            <div className="col"></div>
+          </div>
+        </div>
       }
-      <div>
-        {!chatRoom.isPublic && !isJoined && chatRoom.owner!==user._id &&
-          <input type="text" id="passcode" placeholder="Passcode" value={passcode} onChange={(e)=>setPasscode(e.target.value)} />
+
+      {showEdit && <ChatRoomForm isEdit />}
+
+      <div className='row mt-3'>
+        <div className="col"></div>
+        {!chatRoom.isPublic && !isJoined && chatRoom.owner !== user._id &&
+          <div className="col-3">
+            <input className='form-control'
+            type="text" id="passcode" placeholder="Passcode" value={passcode} onChange={(e) => setPasscode(e.target.value)} />
+          </div>
         }
-      <button onClick={handleJoinLeave}> {isJoined ? "Leave" : "Join"}</button>
+          <button onClick={handleJoinLeave} className='btn btn-dark col-1'> {isJoined ? "Leave" : "Join"}</button>
+        <div className="col"></div>
+        <div className="form-text text-center w-100">A passcode can be provided by the owner or a member</div>
       </div>
-      {showEdit && <ChatRoomForm isEdit/>}
-      <div>
-        <button onClick={()=>dispatch(toggleShowEdit())}>Edit</button>
-        <button onClick={handleDeleteButton}>Delete</button>
-      </div>
+
+      
 
       <div>
         <h4>View flashcards</h4>

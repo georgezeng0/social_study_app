@@ -51,8 +51,12 @@ module.exports.getUserRooms = async (req, res, next) => {
 module.exports.editChatRoom = async (req, res, next) => {
     // Get payload user id from req
     const { payload: { sub: auth_id, permissions } } = req.auth
-    const room = await Chat.findById(req.params.c_id).populate('owner')
-        .populate({ path: 'users', populate: 'user' }).populate('messages').populate({ path: 'messages', populate: 'author' })
+    const room = await Chat.findById(req.params.c_id)
+        .populate('owner')
+        .populate({ path: 'users', populate: 'user' })
+        .populate('messages')
+        .populate({ path: 'messages', populate: 'author' })
+        .select('+passcode')
     if (auth_id === room.owner.u_id) {
         Object.keys(req.body).map(key => {
             room[key]=req.body[key]
@@ -62,10 +66,9 @@ module.exports.editChatRoom = async (req, res, next) => {
             res.send(room)
         } else {
             res.send({
-                _id: room._id,
-                title: room.title,
-                isPublic: room.isPublic,
-                owner: room.owner
+                ...room._doc,
+                messages: [],
+                videoId: ""
             })
         }
     } else {
