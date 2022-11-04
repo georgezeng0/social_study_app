@@ -1,17 +1,17 @@
 import React from 'react'
-import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import Flashcard from './Flashcard'
 import Flashcards from './Flashcards'
 import FlashcardSets from './FlashcardSets'
 
 const FlashcardRoomWindow = () => {
-    const dispatch = useDispatch()
+    // Acts as a route within a component - allows viewing of 3 components without routing url
+    
     const { roomWindow: { f_id, s_id, state } } = useSelector(state => state.flashcard)
     
     if (state === "SETS") {
         return (
-            <div>
+            <div className='container'>
                 <FlashcardSets chatRoom />
             </div>
         )
@@ -19,7 +19,7 @@ const FlashcardRoomWindow = () => {
 
     if (state === "SET") {
         return (
-            <div>
+            <div className='container'>
                 <Flashcards s_id_prop={s_id} />
             </div>
         )
@@ -27,8 +27,12 @@ const FlashcardRoomWindow = () => {
 
     if (state === "FLASHCARD") {
         return (
-            <div>
-                <Flashcard f_id={f_id} roomWindow />
+            <div className='container row'>
+                <div className="col-xl"></div>
+                <div className="col-xl-8">
+                    <Flashcard f_id={f_id} roomWindow />
+                </div>
+                <div className="col-xl"></div>
             </div>
         )
     }

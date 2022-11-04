@@ -132,7 +132,7 @@ user: {setHistory, _id:userMongoID}
                 }
               </p>
               
-              <div className='d-flex flex-column list-group' style={{maxHeight:"300px",overflowX:"hidden",overflorY:"auto"}}>
+              <div className='d-flex flex-column list-group' style={{maxHeight:"300px",overflowX:"hidden",overflowY:"auto"}}>
                 {history && history.sessions && history.sessions.map((item,i) => {
                   return <div key={item._id} className={`list-group-item d-flex justify-content-between ${i%2==0 && "bg-light"}`} >
                     <span> Score - <b>{parseInt((item.score / item.totalCards) * 100)}%</b></span>

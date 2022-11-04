@@ -3,6 +3,7 @@ import React,{ useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 import { resetForm, updateForm, sendMessage } from '../features/chatSlice'
+import breakpoints from '../utils/breakpoints'
 import getToken from '../utils/getToken'
 import UserIcon from './UserIcon'
 
@@ -32,26 +33,45 @@ const ChatBox = () => {
     }
 
   return (
-      <Wrapper className='d-flex'>
-          <div>
-            <div className="messages">
-                  {messages.map(message => {
-                      return <p key={message._id}>{message.author.nickname} - {message.body}</p>
-                })}
+      <Wrapper className='row g-0 border border rounded border-2 p-1 bg-dark'>
+          <div className='col-12 col-md-8'>
+              <div className="messages container p-3" >
+                  <div className="messages-inner p-2" style={{ overflowX: "hidden",overflowY:"scroll" }}>
+                    {messages.map(message => {
+                        return <div key={message._id}
+                            className="card mb-1"
+                        >
+                            <div className="card-body">
+                                <p className="card-text">
+                                <b>{message.author.nickname}</b> : {message.body}
+                                </p>
+                            </div>
+                            
+                        </div>
+                    })}
+                  </div>
+                  
             </div>
-            <div className="chatInput">
-                  <form onSubmit={handleSubmit}>
-                      <input
-                          type="text" placeholder='Write Message...'
-                          name="message"
-                          value={message}
-                          onChange={handleChange} />
-                      <button>Send</button>
+            <div className="chatInput container">
+                  <form onSubmit={handleSubmit} className="row">
+                      <div className="col">
+                        <textarea
+                            placeholder='Write Message...'
+                            name="message"
+                            value={message}
+                            onChange={handleChange}
+                            className="h-100 form-control"
+                        />
+                      </div>
+                    
+                      <div className="col-auto d-flex align-items-center me-2">
+                          <button className='btn btn-success'>Send</button>
+                        </div>
                 </form>
             </div>
           </div>
           
-          <div className="chatBar">
+          <div className="chatBar col" style={{overflowX:"hidden"}}>
               {users.map((user, i) => {
                   // Display user nickname if exists, otherwise name
                   return <p key={i}>
@@ -67,21 +87,23 @@ const ChatBox = () => {
 
 const Wrapper = styled.div`
 .messages{
-    height: 500px;
-    width: 500px;
-    border: 1px solid black;
+    height: 600px;
+}
+.messages-inner{
     overflow: scroll;
+    height: 100%;
 }
 .chatInput{
-    border: 1px solid blue;
-    height: 50px;
-    width: 500px;
+    height: 100px;
 }
 .chatBar{
-    height: 550px;
-    width: 200px;
-    border: 1px solid green;
+    height: 700px;
     overflow: scroll;
+}
+@media (max-width:${breakpoints.md}) {
+    .chatBar{
+        height: 300px
+    }
 }
 `
 

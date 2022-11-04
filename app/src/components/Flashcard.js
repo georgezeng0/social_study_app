@@ -98,18 +98,18 @@ const Flashcard = ({ f_id, roomWindow }) => {
         
     }
 
-    // if (isLoading) {
-    //     return <main className='container mt-5'>
-    //       <Loading/>
-    //     </main>
-    // }
+    if (roomWindow && isLoading) {
+        return <main className='container mt-5'>
+          <Loading/>
+        </main>
+    }
     
 
 
   return (
       <Wrapper>
           {roomWindow &&
-              <button onClick={handleGoBack} className='btn btn-dark'>Go Back</button>
+              <button onClick={handleGoBack} className='btn btn-dark mb-2'>Go Back</button>
           }
           <h1 className=''><span className='text-dark'>{index + 1}/{flashcards.length}</span> <HiOutlineChevronRight className='text-dark' style={{bottom:"3px",position:"relative"}}></HiOutlineChevronRight> {card?.title ? card.title : "Untitled"}</h1>
           <hr />
@@ -201,9 +201,12 @@ const Flashcard = ({ f_id, roomWindow }) => {
                       className='p-2 border'
                       style={{minHeight:"100px"}}
                 ></p>
-          }
-              <button onClick={() => setShowEditNotes(!showEditNotes)} className="btn btn-dark mt-1">
-              {showEditNotes ? "Cancel Editing" : "Edit Notes"}</button>
+              }
+
+            {!isPlaying && !roomWindow &&
+                <button onClick={() => setShowEditNotes(!showEditNotes)} className="btn btn-dark mt-1">
+                    {showEditNotes ? "Cancel Editing" : "Edit Notes"}</button>
+            }
               
         </div>
               
@@ -242,8 +245,8 @@ const Wrapper = styled.section`
     height: 100%;
     width: 100%;
 }
-._notes{
-
+.card-image{
+    max-width: 800px;
 }
 `
 

@@ -69,7 +69,7 @@ const Flashcards = ({s_id_prop}) => {
           }
           {s_id_prop &&
               <div>
-                  <button onClick={handleGoBack}>Go Back</button>
+                  <button onClick={handleGoBack} className="btn btn-dark mb-2">Go Back</button>
               </div>
           }
           {s_id && <hr />}
@@ -82,8 +82,8 @@ const Flashcards = ({s_id_prop}) => {
                             <h4 className='card-title py-3 px-2 mb-0'>{i + 1} - {title.slice(0,50)}</h4>
                             
                             {s_id_prop ?
-                                <button onClick={()=>handleViewButton(_id)} className="btn btn-primary rounded-0 w-100">View</button> :
-                                <Link to={`/flashcards/${_id}`} className="btn btn-secondary rounded-0 w-100">View</Link>
+                                <button onClick={()=>handleViewButton(_id)} className="btn btn-light rounded-0 w-100">View</button> :
+                                <Link to={`/flashcards/${_id}`} className="btn btn-light rounded-0 w-100">View</Link>
                                 }
                             {/* Edit/delete only when in "set" view */}
                               {s_id && isOwner && <div className="btn-group-sm row w-100">

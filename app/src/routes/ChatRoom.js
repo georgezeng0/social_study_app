@@ -16,6 +16,7 @@ const ChatRoom = () => {
 
   const [isJoined, setIsJoined] = useState(false)
   const [passcode, setPasscode] = useState('')
+  const [showViewer,setShowViewer] = useState(false)
 
   useEffect(() => {
     if (chatRoom.users.findIndex(item => item.user?._id === user?._id) > -1) {
@@ -88,7 +89,7 @@ const ChatRoom = () => {
 
       {showEdit && <ChatRoomForm isEdit />}
 
-      <div className='row mt-3'>
+      <div className='row my-3'>
         <div className="col"></div>
         {!chatRoom.isPublic && !isJoined && chatRoom.owner !== user._id &&
           <div className="col-3">
@@ -96,20 +97,34 @@ const ChatRoom = () => {
             type="text" id="passcode" placeholder="Passcode" value={passcode} onChange={(e) => setPasscode(e.target.value)} />
           </div>
         }
-          <button onClick={handleJoinLeave} className='btn btn-dark col-1'> {isJoined ? "Leave" : "Join"}</button>
+          <button onClick={handleJoinLeave} className='btn btn-dark col-2'> {isJoined ? "Leave" : "Join"}</button>
         <div className="col"></div>
-        <div className="form-text text-center w-100">A passcode can be provided by the owner or a member</div>
-      </div>
+
+        {!chatRoom.isPublic &&
+          <div className="form-text text-center w-100">A passcode can be provided by the owner or a member</div>
+        }
+
+        </div>
 
       
 
-      <div>
-        <h4>View flashcards</h4>
-        <FlashcardRoomWindow/>
+      <div className='border rounded p-3 mb-3 '>
+        <div className="d-flex justify-content-between align-items-center py-2 px-1">
+          <div className="h4">Flashcard Viewer</div>
+          <button className="btn btn-secondary" onClick={()=>setShowViewer(!showViewer)}>Show/Hide</button>
+        </div>
+        <div className={`p-2 ${showViewer?"":"d-none"}`} style={{ height: "500px",overflowX:"hidden",overflowY:"auto"}}>
+          <FlashcardRoomWindow/>
+        </div>
       </div>
 
-      <ChatBox />
-      <VideoPlayer />
+      <div>
+        <ChatBox />
+        </div>
+
+      <div>
+        <VideoPlayer />
+        </div>
       
     </main>
   )
