@@ -127,11 +127,11 @@ const ChatRoom = () => {
         </div>
       </div>
 
-      <div>
+      <div className='mb-3'>
         <ChatBox />
         </div>
 
-      <div>
+      <div className='mb-3'>
         <VideoPlayer />
         </div>
       
