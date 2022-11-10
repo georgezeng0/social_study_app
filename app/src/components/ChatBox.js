@@ -50,6 +50,7 @@ const ChatBox = () => {
           <div className='col-12 col-md-8'>
               <div className="messages container p-3" >
                   <div className="messages-inner p-2 d-flex flex-column-reverse " style={{ overflowX: "hidden",overflowY:"scroll" }}>
+                      {/* reverse the array so that newest is at top (with flex column reverse in use) */}
                       {[].concat(messages).reverse().map(message => {
                           const bgColour = message.author.icon.color || "white"
                           const date = new Date(message.date)

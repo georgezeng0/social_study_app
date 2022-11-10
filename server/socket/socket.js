@@ -77,6 +77,41 @@ module.exports = (server) => {
             
         });
 
+        // Check if socket online users matches database
+        socket.on('SYNC_CHATROOM_USERS', async (data) => {
+            const { chatroom } = data
+            const socketRooms = socketIO.of("/").adapter.rooms // Map object - for read purposes, do not alter
+            let socketsChatroom
+            const socketsToRemove = []
+            if (socketRooms.get(`${chatroom}`)) {
+                socketsChatroom = Array.from(socketRooms.get(`${chatroom}`)) 
+                const room = await Chat.findById(chatroom)
+                for (const user of room.users) {
+                    for (const databaseSocket of user.socketID) {
+                        // If a socketID in the database for the user doesn't exist in current room socket > then remove it
+                        if (socketsChatroom.indexOf(databaseSocket) == -1) {
+                            socketsToRemove.push(databaseSocket)
+                        }
+                    }
+                }
+                // Removes sockets out of sync from the users in the room so that they go offline
+                const updatedRoom = await Chat.findOneAndUpdate(
+                    { _id: chatroom },
+                    { $pull: { "users.$[].socketID": { $in: socketsToRemove } } },
+                    { new: true }
+                )
+                // Update for client
+                if (updatedRoom) {
+                    socketIO.emit('UPDATE_CLIENT_SOCKET_DISCONNECT', {
+                        c_id: updatedRoom._id,
+                        updatedUsers: updatedRoom.users
+                    })
+                }
+                }
+               
+            
+        })
+
         // Listen for message
         socket.on('NEW_MESSAGE', (data) => {
             const c_id = data.chatRoom

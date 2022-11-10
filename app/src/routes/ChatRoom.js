@@ -3,7 +3,10 @@ import React,{ useEffect,useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChatBox, ChatRoomForm, FlashcardRoomWindow, Loading, VideoPlayer } from '../components'
-import { joinRoom,leaveRoom, getOneChatRoom,toggleShowEdit, deleteRoom, resetMessageCount } from '../features/chatSlice';
+import {
+  joinRoom, leaveRoom, getOneChatRoom, toggleShowEdit,
+  deleteRoom, resetMessageCount, syncUserSockets
+} from '../features/chatSlice';
 import getToken from '../utils/getToken';
 
 const ChatRoom = () => {
@@ -40,6 +43,12 @@ const ChatRoom = () => {
   useEffect(() => {
     if (chatRoom._id !== c_id) {
       fetchChatRoom()
+    }
+    if (chatRoom.users.length > 0) {
+      // Check if database information on user sockets corresponds to actual socket room
+      // If user doesnt trigger "on disconnect" event socket, they may still appear online e.g. if server shuts down/ crashes
+      // This is highly likely if using Heroku eco tier due to sleep after inactivity
+      dispatch(syncUserSockets({c_id}))
     }
   }, [c_id])
 

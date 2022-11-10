@@ -256,6 +256,9 @@ export const chatSlice = createSlice({
         disconnectedSocket: (state, action) => {
             state.socket.isConnected = false;
         },
+        syncUserSockets: (state, action) => {
+            
+        },
         updateRoomUsers: (state, action) => {
             const { c_id, updatedUsers }=action.payload
             if (state.chatRoom._id === c_id) {
@@ -267,8 +270,6 @@ export const chatSlice = createSlice({
         },
         updateUserSockets: (state, action) => {
             const { c_id, userMongoID, socketID } = action.payload
-            // c_id is strinified mongoose object id?
-            // will need to recode this for background chat functionality (have a separate property for background chat)
             const ind = state.chatRoom.users.findIndex(item => item.user._id === userMongoID)
             if (ind > -1) {
                 state.chatRoom.users[ind].socketID=[...socketID]
@@ -470,7 +471,7 @@ export const {
     updateForm, resetForm, updateRoomForm, resetRoomForm, updateRoomUsers,
     startConnecting, connectionEstablished, disconnectedSocket, updateUserSockets,
     updateMessages, populateRoomForm, toggleShowEdit, resetMessageCount,
-    videoControl, videoResponse,resetVideoResponse
+    videoControl, videoResponse,resetVideoResponse, syncUserSockets
     
 } = chatSlice.actions
 

@@ -95,9 +95,10 @@ const chatMiddleware = store => {
             socket.emit("VIDEO_CONTROL", {chatroom: c_id, actionType, payload})
         }
 
-        //test
-        if (action.type === "chat/updateForm") {
-            // Test
+        // Sync chatroom users online/offline status
+        if (action.type === "chat/syncUserSockets") {
+            const { c_id } = action.payload
+            socket.emit("SYNC_CHATROOM_USERS", {chatroom: c_id})
         }
         
         return next(action)
