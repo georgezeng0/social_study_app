@@ -1,5 +1,8 @@
 import { io } from 'socket.io-client';
-import { connectionEstablished, disconnectedSocket, updateRoomUsers, updateUserSockets, updateMessages, videoResponse } from '../features/chatSlice';
+import {
+    connectionEstablished, disconnectedSocket, updateRoomUsers, updateUserSockets,
+    updateMessages, videoResponse, finishUserSync
+} from '../features/chatSlice';
 
 const chatMiddleware = store => {
     // Initialise socket - only connect upon logged in user otherwise remain undefined.
@@ -12,7 +15,7 @@ const chatMiddleware = store => {
         //     return;
         // }
 
-         // Get redux state 
+        // Get redux state 
         const state = store.getState();
         const { user } = state.user
 
@@ -56,52 +59,59 @@ const chatMiddleware = store => {
                 socket.on('VIDEO_RESPONSE', (data) => {
                     store.dispatch(videoResponse(data))
                 })
+
+                // FINISH_SYNC_CHATROOM_USERS - listen for end of syncing chatroom users
+                socket.on('FINISH_SYNC_CHATROOM_USERS', (data) => {
+                    store.dispatch(finishUserSync(data.chatroom))
+                })
             }
         }
 
-        // emit user and chatroom data when user joins chatroom
-        if (action.type === "chat/joinRoom/fulfilled") {
-            const { user: { _id } } = store.getState().user;
-            const c_id = action.payload._id
-            const users = [...action.payload.users] || []
-            // Emit info
-            socket.emit("USER_JOIN_ROOM", {
-                userMongoID: _id ,
-                socketID: socket.id,
-                c_id: c_id
-            })
+        if (socket) {
+            // emit user and chatroom data when user joins chatroom
+            if (action.type === "chat/joinRoom/fulfilled") {
+                const { user: { _id } } = store.getState().user;
+                const c_id = action.payload._id
+                const users = [...action.payload.users] || []
+                // Emit info
+                socket.emit("USER_JOIN_ROOM", {
+                    userMongoID: _id,
+                    socketID: socket.id,
+                    c_id: c_id
+                })
 
-            // Update socket info - add socket ID to user that joined chat and update state
-            const ind = users.findIndex(item => item.user._id === _id)
-            if (ind > -1) {
-                const sockets = users[ind].socketID
-                if (sockets.indexOf(socket.id) < 0) {
-                    users[ind].socketID.push(socket.id)
-                    store.dispatch(updateRoomUsers([users]))
+                // Update socket info - add socket ID to user that joined chat and update state
+                const ind = users.findIndex(item => item.user._id === _id)
+                if (ind > -1) {
+                    const sockets = users[ind].socketID
+                    if (sockets.indexOf(socket.id) < 0) {
+                        users[ind].socketID.push(socket.id)
+                        store.dispatch(updateRoomUsers([users]))
+                    }
                 }
+        
+            }
+
+            // Message successfully created on database - emit new message 
+            if (action.type === "chat/sendMessage/fulfilled") {
+                const message = action.payload;
+                socket.emit("NEW_MESSAGE", message)
+            }
+
+            // Play video
+            if (action.type === "chat/videoControl") {
+                const { c_id, actionType, payload } = action.payload
+                socket.emit("VIDEO_CONTROL", { chatroom: c_id, actionType, payload })
+            }
+
+            // Sync chatroom users online/offline status
+            if (action.type === "chat/syncUserSockets") {
+                const { c_id } = action.payload
+                socket.emit("SYNC_CHATROOM_USERS", { chatroom: c_id })
             }
         
+            return next(action)
         }
-
-        // Message successfully created on database - emit new message 
-        if (action.type === "chat/sendMessage/fulfilled") {
-            const message = action.payload;
-            socket.emit("NEW_MESSAGE", message)
-        }
-
-        // Play video
-        if (action.type === "chat/videoControl") {
-            const { c_id, actionType, payload } = action.payload
-            socket.emit("VIDEO_CONTROL", {chatroom: c_id, actionType, payload})
-        }
-
-        // Sync chatroom users online/offline status
-        if (action.type === "chat/syncUserSockets") {
-            const { c_id } = action.payload
-            socket.emit("SYNC_CHATROOM_USERS", {chatroom: c_id})
-        }
-        
-        return next(action)
     }
 } 
 

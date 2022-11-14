@@ -23,7 +23,7 @@ function hexToRGB(hex, alpha) {
 const ChatBox = () => {
     const { getAccessTokenSilently } = useAuth0()
     const dispatch = useDispatch()
-    const { inputForm: { message }, isLoading,
+    const { inputForm: { message }, isLoading, syncLoading,
         chatRoom: {messages, users=[]}
     } = useSelector(state => state.chat)
     const { user: { u_id, nickname } } = useSelector(state => state.user)
@@ -48,8 +48,8 @@ const ChatBox = () => {
   return (
       <Wrapper className='row g-0 border border rounded border-2 p-1 bg-light'>
           <div className='col-12 col-md-8'>
-              <div className="messages container p-3" >
-                  <div className="messages-inner p-2 d-flex flex-column-reverse " style={{ overflowX: "hidden",overflowY:"scroll" }}>
+              <div className="messages container p-2" >
+                  <div className="messages-inner d-flex flex-column-reverse border border-dark p-2" style={{ overflowX: "hidden",overflowY:"scroll" }}>
                       {/* reverse the array so that newest is at top (with flex column reverse in use) */}
                       {[].concat(messages).reverse().map(message => {
                           const bgColour = message.author.icon.color || "white"
@@ -76,9 +76,9 @@ const ChatBox = () => {
             </div>
           </div>
           
-          <div className='col chat-wrapper'>
-          <div className="chatBar m-2 border border-2 rounded border-dark 
-          d-flex flex-column">
+          <div className='col chat-wrapper py-2 px-2'>
+          <div className="chatBar border border-2 rounded border-dark 
+          d-flex flex-column mb-2">
               <div style={{ overflowX: "hidden" , overflowY:"auto"}}>
               <h3 className='text-center bg-dark text-white mb-0 pb-2 pt-1'>Users</h3>
               {users.map((user, i) => {
@@ -89,7 +89,7 @@ const ChatBox = () => {
                       </div>
                       <div className='d-flex flex-column col ms-auto text-center'>
                         <span className=''>{user?.user?.nickname || user?.user?.name}</span>
-                        <span> {user?.socketID.length ? <b className='text-success'>Online</b> : <span className='text-muted'>Offline</span>}</span>
+                        <span> {syncLoading? "..." : user?.socketID.length ? <b className='text-success'>Online</b> : <span className='text-muted'>Offline</span>}</span>
                       </div>
                   </div>
               })}
@@ -150,7 +150,7 @@ const Wrapper = styled.div`
     height: 100px;
 }
 .chatBar{
-    height: 600px;
+    height: 585px;
 }
 .chatBar-below{
     display:none;

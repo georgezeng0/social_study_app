@@ -3,6 +3,7 @@ import axios from 'axios'
 
 const initialState = {
     isLoading: false,
+    syncLoading: false,
     roomLoading: false,
     error: {
         isError: false,
@@ -257,7 +258,13 @@ export const chatSlice = createSlice({
             state.socket.isConnected = false;
         },
         syncUserSockets: (state, action) => {
-            
+            state.syncLoading = true;
+        },
+        finishUserSync: (state, action) => {
+            // If socket signal is for the current chatroom
+            if (state.chatRoom._id === action.payload) {
+                state.syncLoading = false;
+            }  
         },
         updateRoomUsers: (state, action) => {
             const { c_id, updatedUsers }=action.payload
@@ -266,6 +273,7 @@ export const chatSlice = createSlice({
                     item.socketID = updatedUsers[i].socketID
                     return item
                 })
+                state.syncLoading = false;
             }
         },
         updateUserSockets: (state, action) => {
@@ -274,6 +282,7 @@ export const chatSlice = createSlice({
             if (ind > -1) {
                 state.chatRoom.users[ind].socketID=[...socketID]
             }
+            state.syncLoading = false;
         },
         updateMessages: (state, action) => {
             const newMessage = action.payload;
@@ -471,7 +480,7 @@ export const {
     updateForm, resetForm, updateRoomForm, resetRoomForm, updateRoomUsers,
     startConnecting, connectionEstablished, disconnectedSocket, updateUserSockets,
     updateMessages, populateRoomForm, toggleShowEdit, resetMessageCount,
-    videoControl, videoResponse,resetVideoResponse, syncUserSockets
+    videoControl, videoResponse,resetVideoResponse, syncUserSockets, finishUserSync
     
 } = chatSlice.actions
 

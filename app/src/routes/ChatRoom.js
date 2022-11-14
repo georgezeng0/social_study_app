@@ -19,7 +19,8 @@ const ChatRoom = () => {
 
   const [isJoined, setIsJoined] = useState(false)
   const [passcode, setPasscode] = useState('')
-  const [showViewer,setShowViewer] = useState(false)
+  const [showViewer, setShowViewer] = useState(false)
+  const [syncPerformed, setSyncPerformed] = useState(false)
 
   useEffect(() => {
     if (chatRoom.users.findIndex(item => item.user?._id === user?._id) > -1) {
@@ -30,27 +31,35 @@ const ChatRoom = () => {
   }, [chatRoom, c_id])
 
   useEffect(() => {
+    if (chatRoom.users.length > 0 && !syncPerformed) {
+      // Check if database information on user sockets corresponds to actual socket room
+      // If user doesnt trigger "on disconnect" event socket, they may still appear online e.g. if server shuts down/ crashes
+      // This is highly likely if using Heroku eco tier due to sleep after inactivity
+      dispatch(syncUserSockets({ c_id }))
+      setSyncPerformed(true)
+    }
+  },[chatRoom.users,syncPerformed])
+
+  useEffect(() => {
     if (newMessages[c_id]) {
       dispatch(resetMessageCount(c_id))
     }
   }, [dispatch, newMessages, c_id])
 
+  // Fetch new chatroom on url change
   const fetchChatRoom = async () => {
     const token = await getToken(getAccessTokenSilently)
     dispatch(getOneChatRoom({ c_id, token }))
   }
-
+  
   useEffect(() => {
     if (chatRoom._id !== c_id) {
       fetchChatRoom()
-    }
-    if (chatRoom.users.length > 0) {
-      // Check if database information on user sockets corresponds to actual socket room
-      // If user doesnt trigger "on disconnect" event socket, they may still appear online e.g. if server shuts down/ crashes
-      // This is highly likely if using Heroku eco tier due to sleep after inactivity
       dispatch(syncUserSockets({c_id}))
     }
   }, [c_id])
+
+
 
   const handleJoinLeave = async () => {
     const token = await getToken(getAccessTokenSilently)
@@ -122,7 +131,8 @@ const ChatRoom = () => {
           <div className="h4">Flashcard Viewer</div>
           <button className="btn btn-secondary" onClick={()=>setShowViewer(!showViewer)}>Show/Hide</button>
         </div>
-        <div className={`p-2 ${showViewer?"":"d-none"}`} style={{ height: "500px",overflowX:"hidden",overflowY:"auto"}}>
+        <div className={`p-2 ${showViewer ? "" : "d-none"} border border-dark`}
+          style={{ height: "500px", overflowX: "hidden", overflowY: "auto" }}>
           <FlashcardRoomWindow/>
         </div>
       </div>

@@ -84,7 +84,7 @@ module.exports = (server) => {
             let socketsChatroom
             const socketsToRemove = []
             if (socketRooms.get(`${chatroom}`)) {
-                socketsChatroom = Array.from(socketRooms.get(`${chatroom}`)) 
+                socketsChatroom = Array.from(socketRooms.get(`${chatroom}`))
                 const room = await Chat.findById(chatroom)
                 for (const user of room.users) {
                     for (const databaseSocket of user.socketID) {
@@ -107,8 +107,8 @@ module.exports = (server) => {
                         updatedUsers: updatedRoom.users
                     })
                 }
-                }
-               
+            }
+            socketIO.emit('FINISH_SYNC_CHATROOM_USERS', { chatroom })
             
         })
 
