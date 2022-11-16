@@ -71,10 +71,6 @@ const App = () => {
               path="/sets/:s_id/edit"
               element={<PrivateRoute component={SetEdit} />}
             />
-            {/* <Route
-              path="/login"
-              element={<Login/>}
-            /> */}
             <Route
               path="/profile"
               element={<PrivateRoute component={Profile} />}

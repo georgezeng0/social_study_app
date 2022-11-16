@@ -17,8 +17,7 @@ const chatMiddleware = store => {
 
         // Get redux state 
         const state = store.getState();
-        const { user } = state.user
-
+        
         // emit User connected if logged in (using user returned from getUser action if user exists)
         if (action.type === "user/getUser/fulfilled") {
             // If user is logged in and socket is undefined (not connected)
@@ -109,9 +108,9 @@ const chatMiddleware = store => {
                 const { c_id } = action.payload
                 socket.emit("SYNC_CHATROOM_USERS", { chatroom: c_id })
             }
-        
-            return next(action)
+
         }
+        return next(action)
     }
 } 
 

@@ -35,32 +35,39 @@ const UserForm = () => {
     }
 
   return (
-      <form onSubmit={handleSubmit}>
-          <div>
-              <label htmlFor="name">Name</label>
-              <input name="name" id="name" type="text" value={name} onChange={handle_auth0Change} />
+      <form onSubmit={handleSubmit} className="pb-2 d-flex flex-column align-items-center text-center">
+          <h2 className='display-6'>Edit Details</h2>
+          <div className='mb-2 w-100 d-flex flex-column align-items-center'>
+              <label htmlFor="name" className="form-label h5">Name</label>
+              <input name="name" id="name" type="text" value={name} onChange={handle_auth0Change}
+              className="form-control text-center" style={{maxWidth:"400px"}}
+              />
           </div>
-          <div>
-              <label htmlFor="nickname">Nickname</label>
-              <input name="nickname" id="nickname" type="text" value={nickname} onChange={handle_auth0Change} />
+          <div className='mb-2 w-100 d-flex flex-column align-items-center'>
+              <label htmlFor="nickname" className="form-label h5">Nickname</label>
+              <input name="nickname" id="nickname" type="text" value={nickname} onChange={handle_auth0Change}
+                  className="form-control text-center" style={{ maxWidth: "400px" }} />
           </div>
-          <div>
-              <label htmlFor="email">Email</label>
-              <input name="email" id="email" type="email" value={email} onChange={handle_auth0Change} />
+          <div className='mb-2 w-100 d-flex flex-column align-items-center'>
+              <label htmlFor="email" className="form-label h5">Email</label>
+              <input name="email" id="email" type="email" value={email} onChange={handle_auth0Change}
+              className="form-control text-center" style={{maxWidth:"400px"}}/>
           </div>
-          <div>
-              <h3>Change Icon Colours</h3>
-            <div>
-                <label htmlFor="color">Background Color</label>
-                <input name="color" id="color" type="color" value={color} onChange={handle_DBChange} />
+          <div className='mb-2'>
+              <h3 className='display-6 mt-3'>Icon Colours</h3>
+            <div className='mb-2'>
+                <label htmlFor="color" className="form-label h5">Background Color</label>
+                  <input name="color" id="color" type="color" value={color} onChange={handle_DBChange}
+                  className="form-control" style={{maxWidth:"400px"}}/>
             </div>
-            <div>
-                <label htmlFor="textColor">Text Color</label>
-                <input name="textColor" id="textColor" type="color" value={textColor} onChange={handle_DBChange} />
+            <div className='mb-2'>
+                <label htmlFor="textColor" className="form-label h5">Text Color</label>
+                  <input name="textColor" id="textColor" type="color" value={textColor} onChange={handle_DBChange}
+                  className="form-control" style={{maxWidth:"400px"}}/>
             </div>
           </div>
            
-          <button disabled={isLoading||isAPILoading}>Save</button>
+          <button disabled={isLoading||isAPILoading} className="btn btn-success">Save</button>
     </form>
   )
 }

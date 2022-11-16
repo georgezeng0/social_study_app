@@ -17,7 +17,7 @@ const SingleFlashcard = () => {
         {isPlaying && <div className='row'><div className="col"></div><PlayWindow/><div className="col"></div></div>}
       <div className="container">
         <div className="row">
-          <div className="col-12 col-xl-8">
+          <div className="col-12 col-xl-8 mb-3">
             <Flashcard f_id={f_id} /></div>
          
           <div className="col">
