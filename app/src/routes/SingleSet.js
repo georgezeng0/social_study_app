@@ -10,7 +10,7 @@ import { useAuth0 } from '@auth0/auth0-react'
 const SingleSet = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { loginWithRedirect } = useAuth0();
+  const { loginWithRedirect,loginWithPopup } = useAuth0();
 
   const {
     selectedSet, error: { isError, message, status }, isLoading,
@@ -67,7 +67,8 @@ user: {setHistory, _id:userMongoID}
       dispatch(playSet(flashcards))
       setPlayButton(true)
     } else {
-      loginWithRedirect()
+      loginWithPopup()
+      //loginWithRedirect()
     }
   }
 

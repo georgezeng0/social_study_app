@@ -1,6 +1,6 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
-import { Auth0Provider } from '@auth0/auth0-react';
+import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 
 import {
   FlashcardEdit, FlashcardNew, Flashcards, SingleFlashcard,

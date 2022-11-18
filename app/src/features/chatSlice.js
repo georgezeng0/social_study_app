@@ -26,11 +26,16 @@ const initialState = {
         videoId: ''
     },
     joinedRooms: [],
+    search: {
+        name: '',
+        isPublic: false,
+    },
     roomForm: {
         name: '',
         isPublic: false,
     },
     rooms: [],
+    filteredRooms: [],
     showEdit: false,
     newMessages: {}, // key is chat_id, value is number of new messages for that chatroom
     videoResponse: {
@@ -244,6 +249,17 @@ export const chatSlice = createSlice({
                 state.roomForm[name] = value
             }
         },
+        updateSearch: (state, { payload: { name, value } }) => {
+            if (name === "isPublic") {
+                state.search.isPublic = !state.search.isPublic
+            } else {
+                state.search[name] = value
+            }
+            state.filteredRooms = state.rooms.filter((room) => {
+                return state.search.isPublic? room.isPublic == state.search.isPublic : true &&
+                room.title.toUpperCase().includes(state.search.name.toUpperCase())
+            })
+        },
         resetRoomForm: (state, action) => {
             state.roomForm={...initialState.roomForm}
         },
@@ -366,7 +382,8 @@ export const chatSlice = createSlice({
         [getRooms.fulfilled]: (state,action) => {
             state.isLoading = false;
             state.error.isError = false;
-            state.rooms=action.payload
+            state.rooms = action.payload
+            state.filteredRooms = action.payload
         },
         [getRooms.rejected]: (state, action) => {
             state.isLoading = false;
@@ -480,7 +497,8 @@ export const {
     updateForm, resetForm, updateRoomForm, resetRoomForm, updateRoomUsers,
     startConnecting, connectionEstablished, disconnectedSocket, updateUserSockets,
     updateMessages, populateRoomForm, toggleShowEdit, resetMessageCount,
-    videoControl, videoResponse,resetVideoResponse, syncUserSockets, finishUserSync
+    videoControl, videoResponse, resetVideoResponse, syncUserSockets, finishUserSync,
+    updateSearch
     
 } = chatSlice.actions
 

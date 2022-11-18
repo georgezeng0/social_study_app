@@ -9,14 +9,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUser,clearUser } from '../features/userSlice'
 import getToken from '../utils/getToken';
 import { getUserRooms } from '../features/chatSlice';
+import { useNavigate } from 'react-router-dom';
 
 function AuthWrapper({ children }) {
   const { isLoading, error, user, isAuthenticated } = useAuth0();
   const { user: reduxUser } = useSelector(state => state.user)
   const { getAccessTokenSilently } = useAuth0();
-  
   const dispatch = useDispatch()
-  
+
   useEffect(() => {
     if (isAuthenticated && user) {
       const getUserFn = async () => {
@@ -27,13 +27,14 @@ function AuthWrapper({ children }) {
         // Also get user chatrooms that they have joined
         dispatch(getUserRooms({ u_id: user.sub, token }))
       }
+
       getUserFn()
     }
     if (!isLoading && !user && reduxUser._id) {
       dispatch(clearUser())
       // If no user in auth0 (e.g. logged out), then clear the Redux user store if there is one
     }
-  },[user,isAuthenticated])
+  }, [user, isAuthenticated])
 
     // Return Loading component if auth is loading
   if (isLoading) {

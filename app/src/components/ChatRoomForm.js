@@ -43,8 +43,8 @@ const ChatRoomForm = ({isEdit}) => {
     }
 
   return (
-      <form onSubmit={handleSubmit} className="border py-3 px-4 rounded-pill row">
-          <div className="col-6">
+      <form onSubmit={handleSubmit} className="py-3 px-4 row">
+          <div className="col-5 col-md-7">
         <input type="text" placeholder='Room Name'
               value={name} onChange={handleChange} name="name"
               className='form-control'
