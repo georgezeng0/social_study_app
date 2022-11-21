@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 const NavChatModal = ({setShowMessages}) => {
   const { joinedRooms, newMessages } = useSelector(state => state.chat)
+  const { user } = useSelector(state => state.user)
   
   const shortenString = (s) => {
     if (!s) {
@@ -20,8 +21,12 @@ const NavChatModal = ({setShowMessages}) => {
   return (
       <Wrapper>
       <div className='d-flex justify-content-between align-items-center mb-2'>
-        <h4 className='m-0'>Room Notifications</h4>
-        <button className='btn-close' onClick={()=>setShowMessages(false)}></button></div>
+        <h4 className='m-0'>Chat Notifications</h4>
+        <button className='btn-close' onClick={() => setShowMessages(false)}></button></div>
+          {!user._id && <div>
+            Log in to view
+          </div>}
+
           {joinedRooms.map(
             room => {
               const { _id: c_id, title, messages } = room

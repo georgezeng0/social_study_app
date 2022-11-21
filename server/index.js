@@ -1,5 +1,3 @@
-// index.js
-
 /**
  * Required modules
  */
@@ -9,12 +7,8 @@ if(process.env.NODE_ENV !== "production"){
 }
 
 const express = require('express');
-const path = require('path');
 const mongoose = require('mongoose');
-const wrapAsync = require('./utils/wrapAsync')
-const AppError = require('./utils/appError')
 const session = require('express-session')
-const MongoDBStore = require('connect-mongodb-session')(session)
 const cors = require('cors');
 
 // Mongoose models
@@ -44,16 +38,6 @@ const PORT = process.env.PORT || 5000;
      console.log(`MonogDB Connection error - ${err}`)
  })
 
-// MongoDB session store
-
-const store = new MongoDBStore({
-    uri: MONGODB_URL,
-    collection: 'sessions'
-})
-store.on('error', function(error) {
-    console.log(error);
-  });
-
 /**
  * App Configuration
  */
@@ -66,20 +50,6 @@ app.use(cors());
 // JSON body parser & url encoded bodies
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
-
-// Session
-app.use(session({
-    secret: SESSION_SECRET,
-    name: 'studyApp.sid', // Otherwise default is "connect.sid"
-    cookie: {
-        path: '/', // Default
-        maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-        secure: false, // Consider true for production which requires https website.
-    },
-    store: store, // Set to the mongoDB store set up above
-    resave: false,
-    saveUninitialized: true,
-}))
 
 // Socket.io
 const http = require('http').Server(app);
