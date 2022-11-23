@@ -36,12 +36,14 @@ const Flashcard = ({ f_id, roomWindow }) => {
             ...cardState,
             showNotes: false
         })
+        // 50% chance to show reverse if card is reversible (during playthrough only)
+        const isReverse = isPlaying && card.reversible && Math.random()>0.5
         if (cardState.flip) {
             setCardFront(card?.back)
             setCardBack(card?.front)
         } else {
-            setCardFront(card?.front)
-            setCardBack(card?.back)
+            setCardFront(isReverse? card?.back:card?.front)
+            setCardBack(isReverse? card?.front:card?.back)
         }
     },[f_id,card])
 

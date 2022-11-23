@@ -1,12 +1,10 @@
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate, useParams, Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { useParams, Link } from 'react-router-dom'
 import { Flashcard, Flashcards, PlayWindow } from '../components'
 
 const SingleFlashcard = () => {
   const { f_id } = useParams()
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
   const {activeCard: {card}, gameMode: {isPlaying}} = useSelector(state=>state.flashcard)
 
     return (

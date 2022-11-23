@@ -9,13 +9,19 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUser,clearUser } from '../features/userSlice'
 import getToken from '../utils/getToken';
 import { getUserRooms } from '../features/chatSlice';
-import { useNavigate } from 'react-router-dom';
+import { resetError } from '../features/setSlice';
+import { resetError as resetFlashcardError} from '../features/setSlice';
 
 function AuthWrapper({ children }) {
   const { isLoading, error, user, isAuthenticated } = useAuth0();
   const { user: reduxUser } = useSelector(state => state.user)
   const { getAccessTokenSilently } = useAuth0();
   const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(resetError())
+    dispatch(resetFlashcardError())
+  }, [])
 
   useEffect(() => {
     if (isAuthenticated && user) {

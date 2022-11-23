@@ -289,6 +289,9 @@ export const flashcardSlice = createSlice({
                 state.activeCard = { ...state.gameMode.savedCardWithIndex }
                 state.roomWindow.state="SET"
             }
+        },
+        resetError: (state, action) => {
+            state.error = { ...initialState.error }
         }
     },
     extraReducers: {
@@ -395,7 +398,7 @@ export const flashcardSlice = createSlice({
     }
 })
 
-export const { updateForm, resetForm, resetGame, setActiveCard, resetSuccess,
+export const { updateForm, resetForm, resetError, resetGame, setActiveCard, resetSuccess,
     playSet, correctCard, incorrectCard, updateRoomWindow, setFlashcardsState } = flashcardSlice.actions
 
 export default flashcardSlice.reducer

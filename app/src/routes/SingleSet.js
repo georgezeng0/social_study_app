@@ -3,14 +3,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { DeleteSetButton, Flashcards, Loading, ToggleFavouriteSetButton } from '../components'
 import {  getSingleSet, resetError } from '../features/setSlice'
-import { playSet, setFlashcardsState } from '../features/flashcardSlice'
+import { playSet, setFlashcardsState, resetError as resetFlashcardError } from '../features/flashcardSlice'
 import Error from './Error'
 import { useAuth0 } from '@auth0/auth0-react'
+
 
 const SingleSet = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { loginWithRedirect,loginWithPopup } = useAuth0();
+  const { loginWithPopup } = useAuth0();
 
   const {
     selectedSet, error: { isError, message, status }, isLoading,
@@ -32,7 +33,8 @@ user: {setHistory, _id:userMongoID}
   
   // Reset any errors in the "set" redux store on page load
   useEffect(() => {
-    dispatch(resetError())
+      dispatch(resetError())
+      dispatch(resetFlashcardError())
   }, [dispatch])
   
   // find user history for set
@@ -40,7 +42,7 @@ user: {setHistory, _id:userMongoID}
     if (setHistory.length > 0) {
       setHistoryState(setHistory.find(history => history.set === s_id))
     }
-  },[setHistory])
+  },[setHistory,s_id])
 
   // Fetch the set on page load.
   useEffect(() => {
@@ -135,7 +137,7 @@ user: {setHistory, _id:userMongoID}
               
               <div className='d-flex flex-column list-group' style={{maxHeight:"300px",overflowX:"hidden",overflowY:"auto"}}>
                 {history && history.sessions && history.sessions.map((item,i) => {
-                  return <div key={item._id} className={`list-group-item d-flex justify-content-between ${i%2==0 && "bg-light"}`} >
+                  return <div key={item._id} className={`list-group-item d-flex justify-content-between ${i%2===0 && "bg-light"}`} >
                     <span> Score - <b>{parseInt((item.score / item.totalCards) * 100)}%</b></span>
                     <span className="text-muted align-end">{new Date(item.sessionEnd).toLocaleDateString("en-GB")}</span>
                   </div>
