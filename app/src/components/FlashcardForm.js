@@ -142,14 +142,14 @@ const FlashcardForm = ({ formType, editNotesOnly,setShowEditNotes,roomWindow }) 
 
   return (
     <>
-      <Wrapper onSubmit={handleSubmit} className="card mt-2 mb-5 text-center">
+      <Wrapper onSubmit={handleSubmit} className="card mt-2 mb-5 text-center needs-validation" >
         <div className="card-body">
           <div className="card-title display-2 mb-3">New Flashcard</div>
           <div className='mb-3'>
             <label htmlFor="front" className='h4 form-label'>Title</label>
             <input type="text" name="title" value={title}
               onChange={handleChange} className='form-control text-center'
-              placeholder="Something brief to describe this flashcard e.g. 'Image based question'" />
+              placeholder="Something brief to describe this flashcard e.g. 'Image based question'" required/>
           </div>
                     
           <div className='mb-3'>

@@ -88,7 +88,7 @@ user: {setHistory, _id:userMongoID}
   }
 
   return (
-    <main className='container'>
+    <main className='container pb-5'>
       <h1 className='text-center display-1'>{name}</h1>
       <hr />
       <h3 className='text-center display-6 text-muted'>{isPublic?"Public":"Private"} Flashcard Set</h3>

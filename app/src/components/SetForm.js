@@ -69,12 +69,12 @@ success: {isSuccess, successMessage}, selectedSet: {_id: createdSetID}
     <>
       <div className="row">
         <div className="col-xxl-2"></div>
-      <form onSubmit={handleSubmit} className="col">
+      <form onSubmit={handleSubmit} className="col needs-validation">
         
         <div className='mb-3'>
           <label htmlFor="name" className='form-label h4 d-block text-center'>Set Name</label>
             <input type="text" name="name" id="name" onChange={handleChange} value={name}
-            className='form-control'
+            className='form-control' required
             />
           </div>
   
@@ -87,7 +87,7 @@ success: {isSuccess, successMessage}, selectedSet: {_id: createdSetID}
             </div>
          </div>
   
-          <fieldset className='container px-2 py-2 mt-3 card bg-light'>
+          <fieldset className='container px-2 py-2 mt-3 card bg-light' required>
             <h4 className='text-center form-label'>Tags</h4>
         <div className='row px-2 py-1'>
           {tagsList.map((tag, i) => {
@@ -96,7 +96,7 @@ success: {isSuccess, successMessage}, selectedSet: {_id: createdSetID}
               <input type="checkbox" id={tag} name="tags" value={tag}
                   checked={tags.indexOf(tag) > -1}
                     onChange={handleChange}
-                    className="form-check-input"
+                className="form-check-input"
               />
               </div>            
           })}

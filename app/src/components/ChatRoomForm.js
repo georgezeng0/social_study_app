@@ -43,11 +43,11 @@ const ChatRoomForm = ({isEdit}) => {
     }
 
   return (
-      <form onSubmit={handleSubmit} className="py-3 px-4 row">
+      <form onSubmit={handleSubmit} className="py-3 px-4 row needs-validation">
           <div className="col-5 col-md-7">
         <input type="text" placeholder='Room Name'
               value={name} onChange={handleChange} name="name"
-              className='form-control'
+              className='form-control' required
               />
               </div>
           <label htmlFor="isPublic" className='col-form-label col-2 text-end'>Public?</label>

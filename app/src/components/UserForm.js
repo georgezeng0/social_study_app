@@ -35,23 +35,23 @@ const UserForm = () => {
     }
 
   return (
-      <form onSubmit={handleSubmit} className="pb-2 d-flex flex-column align-items-center text-center">
+      <form onSubmit={handleSubmit} className="pb-2 d-flex flex-column align-items-center text-center needs-validation">
           <h2 className='display-6'>Edit Details</h2>
           <div className='mb-2 w-100 d-flex flex-column align-items-center'>
               <label htmlFor="name" className="form-label h5">Name</label>
               <input name="name" id="name" type="text" value={name} onChange={handle_auth0Change}
-              className="form-control text-center" style={{maxWidth:"400px"}}
+              className="form-control text-center" style={{maxWidth:"400px"}} required
               />
           </div>
           <div className='mb-2 w-100 d-flex flex-column align-items-center'>
               <label htmlFor="nickname" className="form-label h5">Nickname</label>
               <input name="nickname" id="nickname" type="text" value={nickname} onChange={handle_auth0Change}
-                  className="form-control text-center" style={{ maxWidth: "400px" }} />
+                  className="form-control text-center" style={{ maxWidth: "400px" }} required/>
           </div>
           <div className='mb-2 w-100 d-flex flex-column align-items-center'>
               <label htmlFor="email" className="form-label h5">Email</label>
               <input name="email" id="email" type="email" value={email} onChange={handle_auth0Change}
-              className="form-control text-center" style={{maxWidth:"400px"}}/>
+              className="form-control text-center" style={{maxWidth:"400px"}} required/>
           </div>
           <div className='mb-2'>
               <h3 className='display-6 mt-3'>Icon Colours</h3>
