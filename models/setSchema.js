@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Flashcard = require('./flashcardSchema');
+const User = require('./userSchema');
 
 const cloudinary = require('cloudinary').v2;
 
@@ -18,24 +19,33 @@ const setSchema = new mongoose.Schema(
         isPublic: Boolean
     });
 
-// Deleting set will also delete child flashcards
+
 setSchema.pre('findOneAndDelete', function () {
     // Cannot use arrow function so that "this" points to the query instance
     // Populate the set so that the image url can be found in the post middleware
     this.populate('flashcards')
 })
 
+// Deleting set will also delete child flashcards
 setSchema.post('findOneAndDelete', async (set) => {
     const flashcards=set.flashcards
     if (flashcards.length > 0) {
         flashcards.map((card) => {
             if (card?.image?.publicID) {
                 cloudinary.uploader.destroy(card.image.publicID, function(error,result) {
-                    console.log("Delete Cloudinary image post-flashcard deletion :",result, error) });
+                    // console.log("Delete Cloudinary image post-flashcard deletion :", result, error)
+                });
             }
         })
         await Flashcard.deleteMany({ _id: { $in: set.flashcards } })
     }
+
+    // Also will remove this set's setHistory from users
+    await User.updateMany(
+        {setHistory: { $elemMatch: { set: { $in: [set._id.toString()] } } }},
+        { $pull: { setHistory: { set: { $in: [set._id.toString()] }  } } },
+        { multi: true }
+    )
 })
 
 const Set = mongoose.model('Set', setSchema);

@@ -9,7 +9,7 @@ import { BsFillPlusCircleFill } from 'react-icons/bs'
 
 const Flashcards = ({s_id_prop}) => {
     const { getAccessTokenSilently } = useAuth0()
-    const { selectedSet: { flashcards: flashcards_set } } = useSelector(state => state.set)
+    const { selectedSet: { flashcards: flashcards_set, owner: setOwner } } = useSelector(state => state.set)
     const { flashcards: flashcards_ } = useSelector(state => state.flashcard)
     const { user: {_id:userMongoID} } = useSelector(state => state.user)
     const dispatch = useDispatch()
@@ -47,6 +47,8 @@ const Flashcards = ({s_id_prop}) => {
         if (flashcards.length > 0) {
             const owner = flashcards[0].owner
             setIsOwner(owner===userMongoID)
+        } else {
+            setIsOwner(setOwner==userMongoID)
         }
     }, [flashcards, userMongoID])
     

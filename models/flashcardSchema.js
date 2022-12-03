@@ -30,7 +30,8 @@ const flashcardSchema = new mongoose.Schema(
 flashcardSchema.post('findOneAndDelete', (card) => {
     if (card.image.publicID) {
         cloudinary.uploader.destroy(card.image.publicID, function(error,result) {
-            console.log("Delete Cloudinary image post-flashcard deletion :",result, error) });
+            //console.log("Delete Cloudinary image post-flashcard deletion :",result, error) 
+        });
     }
     
 })
