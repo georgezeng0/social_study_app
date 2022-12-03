@@ -46,6 +46,13 @@ setSchema.post('findOneAndDelete', async (set) => {
         { $pull: { setHistory: { set: { $in: [set._id.toString()] }  } } },
         { multi: true }
     )
+
+    // And remove set from favSets from users
+    await User.updateMany(
+        { favSets: set._id.toString()},
+        { $pull: { favSets: {$in: [set._id.toString()] } } },
+        { multi: true }
+    )
 })
 
 const Set = mongoose.model('Set', setSchema);
