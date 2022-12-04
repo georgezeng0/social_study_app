@@ -31,16 +31,16 @@ const Landing = () => {
       <div className='landing-info-container container-fluid d-flex flex-column align-items-center'>
         <h2 className='py-3'>Your mate for rote learning</h2>
         
-        <div className='container feature-container'>
+        <div className='container feature-container text-center'>
           <div className="feature-container-row row d-flex justify-content-center">
-            <div className="col-md feature-item my-2 my-md-0 mx-md-2">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt sequi, nam praesentium illo dicta quaerat eius! Commodi quo alias mollitia earum suscipit, eveniet rerum nemo tempore ipsa, ea reiciendis necessitatibus.
+            <div className="col-md feature-item my-2 my-md-0 mx-md-2 h-100 d-flex flex-column justify-content-center">
+              Create, view and play with flashcards. Learn by repetition!
             </div>
-            <div className="col-md feature-item middle-item my-2 my-md-0 mx-md-2">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio totam officia modi minima eligendi soluta nemo maxime ex quo aliquam deleniti exercitationem quia, nam alias recusandae esse doloribus doloremque enim.
+            <div className="col-md feature-item middle-item my-2 my-md-0 mx-md-2 h-100 d-flex flex-column justify-content-center">
+              Join and create chatrooms to message with other users. 
             </div>
-            <div className="col-md feature-item my-2 my-md-0 mx-md-2">
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Beatae quo iure temporibus, soluta adipisci vitae recusandae, consequuntur iste eius et vel rerum id dignissimos minima numquam dicta animi ex similique.
+            <div className="col-md feature-item my-2 my-md-0 mx-md-2 h-100 d-flex flex-column justify-content-center">
+              Create an account to keep track of your flashcard scores.
             </div>
           </div>
         </div>

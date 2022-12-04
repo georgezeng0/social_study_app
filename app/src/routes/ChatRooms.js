@@ -32,7 +32,7 @@ const ChatRooms = () => {
       
       <div className='row my-3'>
         {rooms.map(room => {
-          return <p key={room._id} className="col-12 card p-2 bg-light text-center">
+          return <article key={room._id} className="col-12 card p-2 bg-light text-center">
             <h3 className='card-title text-center'>{room.title}</h3>
             <div className="row">
               <div className="col"></div>
@@ -40,7 +40,7 @@ const ChatRooms = () => {
               <div className="col"></div>
             </div>
             <Link to={`${room._id}`} className="btn btn-outline-dark">View</Link>
-          </p>
+          </article>
         })}
       </div>
       
