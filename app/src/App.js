@@ -33,7 +33,7 @@ const App = () => {
     domain="dev-y-3g49-u.us.auth0.com"
     clientId="SV8Pkp3FCN990lN9ila2c4sU8zTOBcuA"
         redirectUri={window.location.origin}
-        audience={process.env.REACT_APP_AUTH0_AUDIENCE}
+        audience={process.env.REACT_APP_AUTH0_AUDIENCE || "http://localhost:3000/"}
         scope="user"
     >
     <AuthWrapper>
