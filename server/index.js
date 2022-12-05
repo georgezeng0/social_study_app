@@ -58,35 +58,35 @@ const http = require('http').Server(app);
 require('./socket/socket.js')(http)
 
 // Helmet
-if (process.env.NODE_ENV !== "production") {
-    app.use(helmet({
-        contentSecurityPolicy: {
-            directives: {
-                "default-src": ["'self'","fonts.gstatic.com","blob:","*.cloudinary.com","*.auth0.com"],
-                    "font-src": ["'self'", "https:", "data:", "fonts.gstatic.com"],
-                    "script-src": ["'self'","blob:",],
-                    "img-src": ["'self'", "images.unsplash.com", "data:", "*.cloudinary.com", "blob:"]
-            }
-        },
-        crossOriginEmbedderPolicy: false,
-        expectCt: false,
-    }))
-} else {
-    app.use(
-        helmet({
-            contentSecurityPolicy: {
-                directives: {
-                    "default-src": ["'self'" ,"fonts.gstatic.com","blob:","*.cloudinary.com","*.auth0.com"],
-                    "font-src": ["'self'", "https:", "data:", "fonts.gstatic.com"],
-                    "script-src": ["'self'","blob:",],
-                    "img-src": ["'self'", "images.unsplash.com", "data:", "*.cloudinary.com", "blob:"]
-                }
-            },
-            crossOriginResourcePolicy: true,
-            crossOriginEmbedderPolicy: false,
-        })
-    );
-}
+// if (process.env.NODE_ENV !== "production") {
+//     app.use(helmet({
+//         contentSecurityPolicy: {
+//             directives: {
+//                 "default-src": ["'self'","fonts.gstatic.com","blob:","*.cloudinary.com","*.auth0.com","*.youtube.com"],
+//                     "font-src": ["'self'", "https:", "data:", "fonts.gstatic.com"],
+//                     "script-src": ["'self'","blob:","*.youtube.com","https://www.youtube.com/iframe_api"],
+//                     "img-src": ["'self'", "images.unsplash.com", "data:", "*.cloudinary.com", "blob:"]
+//             }
+//         },
+//         crossOriginEmbedderPolicy: false,
+//         expectCt: false,
+//     }))
+// } else {
+//     app.use(
+//         helmet({
+//             contentSecurityPolicy: {
+//                 directives: {
+//                     "default-src": ["'self'" ,"fonts.gstatic.com","blob:","*.cloudinary.com","*.auth0.com","*.youtube.com"],
+//                     "font-src": ["'self'", "https:", "data:", "fonts.gstatic.com"],
+//                     "script-src": ["'self'","blob:","*.youtube.com","https://www.youtube.com/iframe_api"],
+//                     "img-src": ["'self'", "images.unsplash.com", "data:", "*.cloudinary.com", "blob:"]
+//                 }
+//             },
+//             crossOriginResourcePolicy: true,
+//             crossOriginEmbedderPolicy: false,
+//         })
+//     );
+// }
 
 /**
  * Routes Definitions
