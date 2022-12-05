@@ -8,16 +8,17 @@ if(process.env.NODE_ENV !== "production"){
 
 const express = require('express');
 const mongoose = require('mongoose');
-const session = require('express-session')
 const cors = require('cors');
+const helmet = require('helmet')
+const path = require('path')
 
-// Mongoose models
 
 // Routes import
 const flashcardRoutes = require('./routes/flashcardRoutes')
 const setRoutes = require('./routes/setRoutes')
 const userRoutes = require('./routes/userRoutes')
 const chatRoutes = require('./routes/chatRoutes')
+
 
 /**
  * App variables
@@ -56,6 +57,37 @@ const http = require('http').Server(app);
 // Run socket config code and event controller
 require('./socket/socket.js')(http)
 
+// Helmet
+if (process.env.NODE_ENV !== "production") {
+    app.use(helmet({
+        contentSecurityPolicy: {
+            directives: {
+                "default-src": ["'self'","fonts.gstatic.com","blob:","*.cloudinary.com","*.auth0.com"],
+                    "font-src": ["'self'", "https:", "data:", "fonts.gstatic.com"],
+                    "script-src": ["'self'","blob:",],
+                    "img-src": ["'self'", "images.unsplash.com", "data:", "*.cloudinary.com", "blob:"]
+            }
+        },
+        crossOriginEmbedderPolicy: false,
+        expectCt: false,
+    }))
+} else {
+    app.use(
+        helmet({
+            contentSecurityPolicy: {
+                directives: {
+                    "default-src": ["'self'" ,"fonts.gstatic.com","blob:","*.cloudinary.com","*.auth0.com"],
+                    "font-src": ["'self'", "https:", "data:", "fonts.gstatic.com"],
+                    "script-src": ["'self'","blob:",],
+                    "img-src": ["'self'", "images.unsplash.com", "data:", "*.cloudinary.com", "blob:"]
+                }
+            },
+            crossOriginResourcePolicy: true,
+            crossOriginEmbedderPolicy: false,
+        })
+    );
+}
+
 /**
  * Routes Definitions
  */
@@ -76,12 +108,11 @@ app.use("/api/users", userRoutes)
 // Chat routes
 app.use("/api/chat", chatRoutes)
 
-// Sends session for development purposes.
-if (process.env.NODE_ENV !== "production") {
-    app.get("/testSession", (req, res) => {
-        res.send(req.session)
-    })
-}
+// Route to react html for other routes
+app.use(express.static(path.join(__dirname, "../app/build")));
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../app/build/index.html"))
+})
 
 /**
  *  Error Handling
@@ -106,6 +137,9 @@ app.use((err, req, res, next) => {
         res.status(status).send({ errorName:name, message });
     }
 })
+
+
+
 
 /**
  * Server Activation
