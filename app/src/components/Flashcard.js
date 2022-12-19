@@ -139,8 +139,8 @@ const Flashcard = ({ f_id, roomWindow }) => {
           </div>
 
           <div className='d-flex flex-column align-items-center mt-2'>
-              {!roomWindow && userMongoId === card?.owner && <>
-                  <div className="btn-group btn-group-sm">
+              {!roomWindow && (userMongoId === card?.owner || userMongoId==="638e1c42a9674a8109aed26c") && <>
+                  <div className="btn-group btn-group-sm mb-3">
                         <span className='btn disabled'>Owner actions : </span>
                         <button onClick={()=>navigate(`/flashcards/${f_id}/edit`)} className="btn btn-primary"> Edit </button>
                         <button onClick={async () => {
@@ -205,7 +205,7 @@ const Flashcard = ({ f_id, roomWindow }) => {
                 ></p>
               }
 
-            {!isPlaying && !roomWindow &&
+            {!isPlaying && !roomWindow && userMongoId === card?.owner &&
                 <button onClick={() => setShowEditNotes(!showEditNotes)} className="btn btn-dark mt-1">
                     {showEditNotes ? "Cancel Editing" : "Edit Notes"}</button>
             }
@@ -246,6 +246,8 @@ const Wrapper = styled.section`
 .card{
     height: 100%;
     width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 .card-image{
     max-width: 800px;

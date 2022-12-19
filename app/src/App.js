@@ -1,6 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
+import ScrollToTop from './utils/scrollToTop';
 
 import {
   FlashcardEdit, FlashcardNew, Flashcards, SingleFlashcard,
@@ -36,7 +37,8 @@ const App = () => {
         audience={process.env.REACT_APP_AUTH0_AUDIENCE || "http://localhost:3000/"}
         scope="user"
     >
-    <AuthWrapper>
+      <AuthWrapper>
+      <ScrollToTop/>
       <Navbar/>
       <Routes>
             <Route

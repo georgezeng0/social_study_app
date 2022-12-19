@@ -79,7 +79,7 @@ const FlashcardSets = ({ chatRoom }) => {
                     </div>
                     
                     <h6 className='card-subtitle text-muted mb-1'>{isPublic ? "Public" : "Private"}</h6>
-                    <div>{tags.map((tag,i) => {
+                    <div style={{ maxHeight: "25px", overflow: "hidden"}}>{tags.map((tag,i) => {
                       return <span className='badge bg-dark' key={i}>
                         {tag}
                       </span>
