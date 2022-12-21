@@ -22,7 +22,7 @@ const SingleSet = () => {
     gameMode: {isPlaying, savedCardWithIndex: {card: card_Saved}}
   } = useSelector(state => state.flashcard)
   const {
-user: {setHistory, _id:userMongoID}
+user: {setHistory, _id:userMongoID, isStoreLoading: userLoading}
   } = useSelector(state=>state.user)
   const { s_id } = useParams()
   const { name = '', stats = {}, tags=[], isPublic, flashcards } = selectedSet
@@ -44,10 +44,12 @@ user: {setHistory, _id:userMongoID}
     }
   },[setHistory,s_id])
 
-  // Fetch the set on page load.
+  // Fetch the set on page load after user info loaded
   useEffect(() => {
+    if (!userLoading) {
       dispatch(getSingleSet(s_id))
-  }, [dispatch, s_id])
+    }
+  }, [dispatch, s_id, userLoading])
 
   //Delete success message and redirect
   useEffect(() => {

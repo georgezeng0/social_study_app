@@ -73,6 +73,7 @@ const initialState = {
         resetPasswordSuccess: false
     },
     isLoading: false, //Generic Loading for whole page - used for API calls to backend
+    isStoreLoading: true, // For user store state finished updating from DB
     isAPILoading: false, //Loading for third party APIs e.g. Auth0Management API
     isButtonLoading: false, //Loading state for buttons and small components e.g. toggle favourite set button that
     // does not require the entire page to go into loading animation
@@ -329,22 +330,28 @@ export const userSlice = createSlice({
                 timeLeft=0
             }
             saveTimerState({...state.timer, savedTimeLeft: timeLeft })
+        },
+        noUserLoaded: (state, action) => {
+            state.isStoreLoading=false
         }
     },
     extraReducers: {
         [getUser.pending]: (state) => {
             state.error.isError = false;
             state.isLoading = true
+            state.isStoreLoading=true
         },
         [getUser.fulfilled]: (state,action) => {
             state.isLoading = false;
             state.error.isError = false;
             state.user = { ...state.user, ...action.payload };
+            state.isStoreLoading=false
         },
         [getUser.rejected]: (state, action) => {
             state.isLoading = false;
             state.error.isError = true;
             state.error = { ...state.error, ...action.payload }
+            state.isStoreLoading=false
         },
         [getUserProfile.pending]: (state) => {
             state.error.isError = false;
@@ -440,6 +447,7 @@ export const userSlice = createSlice({
 
 export const { clearUser, updateDBForm, updateForm, resetSuccess, populateDBForm,
     updateTimerForm, startNewTimer, endTimer, pauseTimer, continueTimer, saveLocalTimerState,
+    noUserLoaded
 } = userSlice.actions
 
 export default userSlice.reducer

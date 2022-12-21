@@ -8,7 +8,7 @@ const initialForm = {
     owner: ''
 }
 const initialState = {
-    isLoading: false,
+    isLoading: true,
     error: {
         isError: false,
         status: '',
@@ -37,8 +37,9 @@ const initialState = {
 export const getSingleSet = createAsyncThunk(
     'set/getSingleSet',
     async (s_id, thunkAPI) => {
+        const {_id} = thunkAPI.getState().user.user
         try {
-            const res = await axios(`/api/sets/${s_id}`);
+            const res = await axios(`/api/sets/${s_id}?user=${_id}`);
             return res.data
         } catch (error) {
             return thunkAPI.rejectWithValue( {status: error.response.status, message: error.response.data.message });
@@ -51,10 +52,11 @@ export const getSets = createAsyncThunk(
     'set/getSets',
     async (_, thunkAPI) => {
         const { search, tags, isFavourite } = thunkAPI.getState().set.filter
-        const {u_id} = thunkAPI.getState().user.user
+        const {_id} = thunkAPI.getState().user.user
         let searchQuery = "";
         // Add query string if any search values truthy
-        if (search || tags.length > 0 || isFavourite && u_id) {
+        if (search || tags.length > 0 || isFavourite || _id) {
+            
             searchQuery = '?'
             if (search) {
                 searchQuery = `${searchQuery}search=${search}&`
@@ -67,7 +69,10 @@ export const getSets = createAsyncThunk(
                 searchQuery = `${searchQuery}${tagString}`
             }
             if (isFavourite) {
-                searchQuery=`${searchQuery}isFavourite=${u_id}&`
+                searchQuery=`${searchQuery}isFavourite=${1}&`
+            }
+            if (_id) {
+                searchQuery=`${searchQuery}user=${_id}`
             }
         }
         try {

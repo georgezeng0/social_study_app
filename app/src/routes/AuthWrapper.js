@@ -6,7 +6,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { Loading } from '../components';
 import Error from './Error'
 import { useDispatch, useSelector } from 'react-redux';
-import { getUser,clearUser } from '../features/userSlice'
+import { getUser,clearUser, noUserLoaded } from '../features/userSlice'
 import getToken from '../utils/getToken';
 import { getUserRooms } from '../features/chatSlice';
 import { resetError } from '../features/setSlice';
@@ -36,11 +36,15 @@ function AuthWrapper({ children }) {
 
       getUserFn()
     }
-    if (!isLoading && !user && reduxUser._id) {
-      dispatch(clearUser())
+    if (!isLoading && !user) {
+      dispatch(noUserLoaded())
+      // Update loading state
+      if (reduxUser._id) {
+        dispatch(clearUser())
+      }
       // If no user in auth0 (e.g. logged out), then clear the Redux user store if there is one
     }
-  }, [user, isAuthenticated])
+  }, [user, isAuthenticated, isLoading])
 
     // Return Loading component if auth is loading
   if (isLoading) {

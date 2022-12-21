@@ -4,26 +4,32 @@ const User = require('../../models/userSchema');
 const AppError = require('../utils/appError');
 
 module.exports.getSets = async (req, res, next) => {
-    // Backend pagination TBD
-    const { search = "", tags = "", isFavourite = "" } = req.query
+    let { search = "", tags = "", isFavourite = "",user="" } = req.query
     let sets = await Set.find(
         {
             name: { "$regex": search, "$options": "i" },
             tags:
                 tags ? { "$in": tags } :
-                /.*/g // Regex to match anything if no tags in search query
+                    /.*/g, // Regex to match anything if no tags in search query
         }
     );
-    // Filter for user favourite 
-    if (sets.length > 0 && isFavourite) {
-        const [user] = await User.find({u_id: isFavourite })//user id is passed here rather than "isFavourite" boolean which is True if id is truthy
-        if (user) {
+    if (user) {
+        [user] = await User.find({_id: user })//user id is passed here rather than "isFavourite" boolean which is True if id is truthy
+    }
+    if (isFavourite ) {
+        // Filter for user favourite
+        if (sets.length > 0 && user) {
             const favSets = user.favSets
             sets = sets.filter(set => {
                 return favSets.indexOf(set._id) > -1
             })
         }
     }
+    // Filter private sets
+    sets = sets.filter(set => {
+        return set.owner.toString()===(user && user._id.toString()) || set.isPublic
+    })
+
     res.send(sets)
 }
 
@@ -75,9 +81,14 @@ module.exports.deleteSet = async (req, res, next) => {
 
 module.exports.getSingleSet = async (req, res, next) => {
     const set = await Set.findById(req.params.s_id).populate('flashcards') 
+    let {user="" } = req.query
     if (!set) {
         // If Set not found
         return next(new AppError(404, "Set not found."))
+    }
+    else if(set.isPublic === false && set.owner.toString() !== user) {
+        // If Set is private and user not owner
+        return next(new AppError(401, "Private Set - Unauthorised."))
     }
     res.send(set)
 }

@@ -4,6 +4,7 @@ import { SortFilterSets, Loading } from '../components'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateRoomWindow } from '../features/flashcardSlice'
+import { useAuth0 } from '@auth0/auth0-react'
 
 const FlashcardSets = ({ chatRoom }) => {
     // chatRoom prop is true if component is in a chatroom
@@ -11,15 +12,18 @@ const FlashcardSets = ({ chatRoom }) => {
   const dispatch = useDispatch()
   
     const { sets, isLoading, error: { isError, status, message },
-      success: { isSuccess, successMessage } } = useSelector(state => state.set)
-  const [page, setPage] = useState(0)   
+    success: { isSuccess, successMessage } } = useSelector(state => state.set)
+  const { isStoreLoading} = useSelector(state => state.user)
+    const [page, setPage] = useState(0)   
 
 
-     // Fetch sets
-     useEffect(() => {
-        dispatch(resetError())
-        dispatch(getSets())
-     }, [dispatch])
+      // Fetch sets only after user fetched from DB - in order to filter private sets
+  useEffect(() => {
+    if (!isStoreLoading) { 
+      dispatch(resetError())
+      dispatch(getSets())
+    }
+    }, [dispatch,isStoreLoading])
     
     if ( isLoading ) {
         return <Loading/>
