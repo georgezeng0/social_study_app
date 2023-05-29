@@ -5,7 +5,7 @@ import { Flashcard, Flashcards, PlayWindow } from '../components'
 
 const SingleFlashcard = () => {
   const { f_id } = useParams()
-  const {activeCard: {card}, gameMode: {isPlaying}} = useSelector(state=>state.flashcard)
+  const { activeCard: { card }, gameMode: { isPlaying } } = useSelector(state => state.flashcard)
 
     return (
       <main className='container pb-5'>

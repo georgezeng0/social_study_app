@@ -36,33 +36,43 @@ const Flashcard = ({ f_id, roomWindow }) => {
             ...cardState,
             showNotes: false
         })
-        // 50% chance to show reverse if card is reversible (during playthrough only)
-        const isReverse = isPlaying && card.reversible && Math.random()>0.5
-        if (cardState.flip) {
-            setCardFront(card?.back)
-            setCardBack(card?.front)
-        } else {
-            setCardFront(isReverse? card?.back:card?.front)
-            setCardBack(isReverse? card?.front:card?.back)
+        if (card?._id) {
+            console.log("setcard")
+            // 50% chance to show reverse if card is reversible (during playthrough only)
+            const isReverse = isPlaying && card.reversible && Math.random() > 0.5
+            if (cardState.flip) {
+                setCardFront(card?.back)
+                setCardBack(card?.front)
+            } else {
+                //setCardFront(card?.front)
+                //setCardBack(card?.back)
+                setCardFront(isReverse ? card?.back : card?.front)
+                setCardBack(isReverse ? card?.front : card?.back)
+            }
         }
-    },[f_id,card])
+    }, [f_id,
+        card
+    ])
 
-    // Gets flashcard every time if not playing
+    // Gets flashcard every time if not playing and 
     useEffect(() => {
-        if (!isPlaying) {
+        if (!isPlaying && (flashcards.length===0 || flashcards[0].parentSet !== card?.parentSet)) {
+            console.log("getoneflashcard")
             dispatch(getOneFlashcard(f_id))
         }
-    }, [dispatch, f_id, isPlaying])
+    }, [f_id, flashcards,card, isPlaying])
 
     useEffect(() => {
         if (flashcards) {
+            console.log("setactivecard")
             dispatch(setActiveCard({ f_id, roomWindow }))
         }
-    }, [dispatch, flashcards, f_id])
+    }, [flashcards, card, f_id])
     
     // Logic for next/ previous card buttons
     useEffect(() => {
-        if (flashcards.length && card?._id===f_id) {
+        if (flashcards.length && card?._id === f_id) {
+            console.log("buttonlogic")
             const n = flashcards.length
             if (index > 0 && index < n - 1) {
                 setPrevCardId(flashcards[index - 1]._id)
@@ -101,6 +111,12 @@ const Flashcard = ({ f_id, roomWindow }) => {
     }
 
     if (roomWindow && isLoading) {
+        return <main className='container mt-5'>
+          <Loading/>
+        </main>
+    }
+
+    if (isLoading) {
         return <main className='container mt-5'>
           <Loading/>
         </main>
